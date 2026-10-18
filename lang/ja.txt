@@ -64,6 +64,7 @@ bind.buffer.line.prev=バッファーの前の行
 bind.mod.focus=ナビゲーション切り替え
 bind.mod.reload=モッドのコードを再読み込み
 screen.main_menu=メインメニュー
+screen.settings=オプション
 screen.confirm=確認
 screen.title=タイトル画面
 main.language=言語

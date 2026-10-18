@@ -107,6 +107,8 @@ namespace DiceVoders.Core.Strings
 
             // Screen names, spoken on entry.
             D("screen.main_menu", "Main menu"),
+            // The options, when its own title cannot be read.
+            D("screen.settings", "Options"),
             D("screen.confirm", "Confirm"),
             // The boot scene's title screen (the arcade machine), before its own prompt.
             D("screen.title", "Title screen"),
@@ -313,6 +315,7 @@ namespace DiceVoders.Core.Strings
             => Has("bind." + actionKey) ? Get("bind." + actionKey) : fallback;
 
         public static string ScreenMainMenu => Get("screen.main_menu");
+        public static string ScreenSettings => Get("screen.settings");
         public static string ScreenConfirm => Get("screen.confirm");
         public static string ScreenTitle => Get("screen.title");
         public static string MainLanguage => Get("main.language");

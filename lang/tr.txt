@@ -64,6 +64,7 @@ bind.buffer.line.prev=Önceki arabellek satırı
 bind.mod.focus=Gezinmeyi aç veya kapat
 bind.mod.reload=Mod kodunu yeniden yükle
 screen.main_menu=Ana menü
+screen.settings=Seçenekler
 screen.confirm=Onay
 screen.title=Başlık ekranı
 main.language=Dil

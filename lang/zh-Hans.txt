@@ -64,6 +64,7 @@ bind.buffer.line.prev=缓冲区上一行
 bind.mod.focus=切换导航
 bind.mod.reload=重新加载模组代码
 screen.main_menu=主菜单
+screen.settings=选项
 screen.confirm=确认
 screen.title=标题画面
 main.language=语言

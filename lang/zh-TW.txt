@@ -64,6 +64,7 @@ bind.buffer.line.prev=緩衝區上一行
 bind.mod.focus=切換導覽
 bind.mod.reload=重新載入模組程式碼
 screen.main_menu=主選單
+screen.settings=選項
 screen.confirm=確認
 screen.title=標題畫面
 main.language=語言

@@ -64,6 +64,7 @@ bind.buffer.line.prev=Linha anterior do buffer
 bind.mod.focus=Alternar navegação
 bind.mod.reload=Recarregar código do mod
 screen.main_menu=Menu principal
+screen.settings=Opções
 screen.confirm=Confirmação
 screen.title=Tela de título
 main.language=Idioma

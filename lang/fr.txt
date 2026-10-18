@@ -64,6 +64,7 @@ bind.buffer.line.prev=Ligne de tampon précédente
 bind.mod.focus=Activer ou désactiver la navigation
 bind.mod.reload=Recharger le code du mod
 screen.main_menu=Menu principal
+screen.settings=Options
 screen.confirm=Confirmation
 screen.title=Écran titre
 main.language=Langue

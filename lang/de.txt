@@ -64,6 +64,7 @@ bind.buffer.line.prev=Vorherige Pufferzeile
 bind.mod.focus=Navigation umschalten
 bind.mod.reload=Mod-Code neu laden
 screen.main_menu=Hauptmenü
+screen.settings=Optionen
 screen.confirm=Bestätigung
 screen.title=Titelbildschirm
 main.language=Sprache

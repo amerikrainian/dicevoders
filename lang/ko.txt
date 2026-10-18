@@ -64,6 +64,7 @@ bind.buffer.line.prev=이전 버퍼 줄
 bind.mod.focus=탐색 켜기/끄기
 bind.mod.reload=모드 코드 다시 불러오기
 screen.main_menu=메인 메뉴
+screen.settings=옵션
 screen.confirm=확인
 screen.title=타이틀 화면
 main.language=언어

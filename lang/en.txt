@@ -66,6 +66,7 @@ bind.buffer.line.prev=Previous buffer line
 bind.mod.focus=Toggle navigation
 bind.mod.reload=Reload mod code
 screen.main_menu=Main menu
+screen.settings=Options
 screen.confirm=Confirm
 screen.title=Title screen
 main.language=Language

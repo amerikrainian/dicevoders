@@ -76,8 +76,7 @@ has all of them with constants to retarget. The update check asks
   reloadable, engine-coupled: day-to-day work), **Tests**.
 - Buffers: only `ui` (the focused control's lines) so far; `BufferKeys` lists the keys.
 - Not ported from starvaders: its game screens, the fight (Core `Fight/`, Module `Fight/`), the
-  popup reader, the settings screen and `OptionNodes` (DiceVaders' `OptionView` has no
-  `TooltipTrigger`), the pause fallback for Escape (`Navigation.BackFallback` is unset).
+  popup reader, the pause fallback for Escape (`Navigation.BackFallback` is unset).
 
 ## Input
 `Module/Input/OsKeys` reads the OS (`GetAsyncKeyState`, once per frame, only while the game window
@@ -114,6 +113,27 @@ sends `keybd_event`.
     as radio buttons (selected = the item's `Selected` child), Apply & Exit; Enter picks (the locale
     switches at once, and the mod's strings with it), landing picks nothing; Escape is Apply & Exit.
     Known wrinkle: picking a language says "selected" in the old language and again in the new.
+  - `SettingsScreen` (`SettingsSceneController`, SettingsMenuScene, layer 35, exclusive; named by
+    its `BackgroundPanel/TitleText`, "Options & Extras"): three Tab-stops. The tab strip
+    (`CategoryButtons/*/Button`, captions beside them) is a row entered at `_currentTab`; landing on
+    a tab clicks it (the page switches). The page (`Panels[_currentTab]`) in hierarchy order: rows
+    are the view items in no other view item (a chooser's arrows and the "?" are parts of it), texts
+    outside rows are lines ("Music by plasterbrain..."), except the key bindings' column headers
+    (`Labels`) and a captionless button's caption beside it (Delete Current Profile). Then Reset to
+    Default and Apply & Exit (`InnerBG/<name>/Button`); Escape is Apply & Exit. Rows
+    (`UI/OptionNodes`, starvaders'): toggles (Enter = `OnClick`), sliders (Left/Right = the row's
+    steps; 0..1 as percent), choosers (Resolution, Screen Type) as combo boxes whose Enter opens a
+    `ChoiceSubmenuScreen` landing on the current choice (pick = `_currentOptionIndex` +
+    `UpdateText`, applied with the settings), the screen type's own Apply after it, key bindings
+    ("Select, W"; Enter pushes `KeyCaptureScreen`, the game's rebind with the keyboard lent),
+    profile slots as radio buttons ("P-1" from `Existed` over "Create New Profile", selected =
+    `Selected` child). A row's tooltip is read only while its `TooltipTriggerView` shows: every row
+    has one, and the hidden ones hold prefab placeholder text. `SaveAndExit` applies, then unloads
+    the scene in a run or reloads the main menu from it (a fresh menu: focus on its first item).
+    Verified live: every page's readout, tab switching and wrap, a slider step, a toggle, both
+    choosers' lists (opened and left with Escape), Escape out. Not exercised: picking a different
+    resolution or screen type, a rebind (needs real keys), Reset to Default (resets at once, no
+    prompt), the profile slots and Delete Current Profile (they change the save), options in a run.
   - `ConfirmPromptScreen` (`ConfirmPromptController`, layer 37): starvaders', compiled against this
     game's controller (focus start from `GetFirstActiveViewItemToStartAt`), not yet seen live.
   - `ModMenuScreen`, `HelpScreen`, `KeyCaptureScreen`: the mod's own, unchanged.
