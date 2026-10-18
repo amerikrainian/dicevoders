@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using StarVaders;
 using StarVaders.PauseMenu;
+using DiceVoders.Core;
 using DiceVoders.Core.Graph;
 using DiceVoders.Core.Strings;
 using DiceVoders.Core.UI;
@@ -82,6 +84,103 @@ namespace DiceVoders.Module.Screens
             var guide = Item(frame, "StrategyGuideButton");
             if (ViewNodes.IsShown(guide)) b.AddItem(ControlId.Structural("pause:guide"), ViewNodes.Button(guide));
             b.PopContext();
+            BuildDetails(b, menu);
+        }
+
+        // ---- the stats panel: the board's figures for a view ----
+
+        private static readonly DetailType[] Views = { DetailType.AllUnitSTR, DetailType.AttackMultScoredLastTurn, DetailType.TriggeredLastTurn };
+
+        // Its views as a row of radio buttons named by the game's titles, entered at the one shown;
+        // choosing one is the game's SetCurrentDetail (the overlay switched on first, as the game's Tab
+        // does, if it is off). Then each figure the overlay draws, tiles top row first, then the
+        // artifacts: "3, 2, Migo, 810"; an artifact's Mult with its word ("Trail Pot, Mult 9.5").
+        private static void BuildDetails(GraphBuilder b, PauseMenuController menu)
+        {
+            b.BeginStop("pause:details");
+            b.PushContext(null);
+            b.StartRow("pause:details", entry: () => Math.Max(0, Array.IndexOf(Views, menu.CurrentDetailType)));
+            foreach (var view in Views)
+            {
+                var v = view;
+                b.AddItem(ControlId.Structural("pause:view:" + v), new NodeVtable
+                {
+                    ControlType = ControlTypes.RadioButton,
+                    Announcements = new List<NodeAnnouncement>
+                    {
+                        GameNodes.LabelPart(() => GameLoc.Get(v + "_Misc") ?? v.ToString()),
+                        GameNodes.SelectedPart(() => menu.IsDetailsVisible && menu.CurrentDetailType == v),
+                    },
+                    SearchText = () => GameLoc.Get(v + "_Misc") ?? v.ToString(),
+                    OnActivate = () => ShowDetail(menu, v),
+                });
+            }
+            b.EndRow();
+            if (menu.IsDetailsVisible)
+            {
+                int i = 0;
+                foreach (var line in DetailLines(menu.CurrentDetailType))
+                {
+                    string text = line;
+                    b.AddItem(ControlId.Structural("pause:detail:" + i++), GameNodes.Text(() => text));
+                }
+            }
+            b.PopContext();
+        }
+
+        private static void ShowDetail(PauseMenuController menu, DetailType view)
+        {
+            try
+            {
+                if (!menu.IsDetailsVisible) menu.OnPressTab();
+                menu.SetCurrentDetail(Array.IndexOf(Views, view));
+            }
+            catch (Exception e) { CoreLog.Warning("PauseScreen: showing " + view + " failed: " + e.Message); }
+        }
+
+        private static List<string> DetailLines(DetailType view)
+        {
+            var lines = new List<string>();
+            try
+            {
+                for (int y = Encounter.Encounter.Rows - 1; y >= 0; y--)
+                    for (int x = 0; x < Encounter.Encounter.Columns; x++)
+                    {
+                        var tile = Encounter.Encounter.Tile(x, y);
+                        var unit = Encounter.Encounter.At(x, y);
+                        if (tile == null || unit == null || tile.DetailObject == null || !tile.DetailObject.activeInHierarchy) continue;
+                        var parts = new List<string> { Strings.EncCoord(x + 1, y + 1), Encounter.Encounter.Name(unit) };
+                        Figure(parts, tile.AttackDetailText, null);
+                        Figure(parts, tile.MultDetailText, MultWord());
+                        Figure(parts, tile.ScoredDetailText, null);
+                        if (parts.Count > 2) lines.Add(string.Join(", ", parts));
+                    }
+                var model = Encounter.Encounter.Model;
+                int slots = model?.ArtifactSlots?.Count ?? 0;
+                for (int slot = 0; slot < slots; slot++)
+                {
+                    var artifact = Encounter.Encounter.Artifact(slot);
+                    var av = Encounter.Encounter.ArtifactView(artifact);
+                    if (av == null || av.DetailObject == null || !av.DetailObject.activeInHierarchy) continue;
+                    var parts = new List<string> { Encounter.Encounter.ArtifactName(artifact) };
+                    Figure(parts, av.MultDetailText, MultWord());
+                    Figure(parts, av.TriggerDetailText, null);
+                    if (parts.Count > 1) lines.Add(string.Join(", ", parts));
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("PauseScreen: reading the " + view + " figures failed: " + e.Message); }
+            return lines;
+        }
+
+        private static string MultWord() => GameLoc.Get("GlobalMult_Keyword") ?? "Mult";
+
+        // A drawn figure, with its word where the view draws two kinds.
+        private static void Figure(List<string> parts, TMPro.TMP_Text tmp, string word)
+        {
+            if (tmp == null || !tmp.gameObject.activeInHierarchy) return;
+            string text = GameText.Of(tmp);
+            if (text == null) return;
+            parts.Add(word != null ? Strings.EncFigure(word, text) : text);
         }
 
         private static AViewItem Item(UnityEngine.Transform frame, string path)

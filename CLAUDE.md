@@ -250,9 +250,15 @@ sends `keybd_event`.
     way. One stop, as drawn: Resume (landing: `IsSelected`, else the selected speed would take it),
     Options, Abandon Run, Save and Exit, Rewind Turn, the speeds as a row of radio buttons ("speed
     1".."speed 4": the arrows draw no caption; selected = `SelectedSpeedObjects[i].activeSelf`),
-    Strategy Guide. Verified live: open, resume, both by Escape. Not read: the
-    stats panel (`StatFrame`, "ATTACK & MULT scored last turn" with arrows: per-unit overlays on the
-    board). Not exercised: any button but Resume.
+    Strategy Guide. Verified live: open, resume, both by Escape. A second stop, the stats
+    panel (the board overlay drawn while paused, `IsDetailsVisible`; the game's Tab is `OnPressTab`):
+    its `DetailType` views as a row of radio buttons named by `<DetailType>_Misc` ("ALL unit STR",
+    "ATTACK & MULT scored last turn", "TRIGGERS and SCORED last turn"), entered at
+    `CurrentDetailType`, Enter = `SetCurrentDetail` (after `OnPressTab` if hidden); then the overlay's
+    figures, bare numbers whose meaning is the title: tiles top row first ("3, 2, Migo, 810": the
+    `TileView` `AttackDetailText`, `MultDetailText` with "Mult", `ScoredDetailText`), then artifacts
+    by slot (`ArtifactView` `MultDetailText` "Trail Pot, Mult 9.5", `TriggerDetailText`). Verified
+    live, every view. Not exercised: any button but Resume.
   - `ResultScreen` (`EncounterController.ResultPanel`, layer 30, exclusive): the end screen shown
     (`GreenScreen` "INVASION SUCCESSFUL" with "NEXT TARGET : 500", `RedScreen` "SIMULATION FAILED"
     / "LOSE 1 HEART : EXTRA TURN", `OTKScreen` "SUCCESS!" / "ONE TURN KO!", `GameOverScreen`), a

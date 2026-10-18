@@ -19,9 +19,10 @@ namespace DiceVoders.Module.UI
 
         // A keyword is an icon and its word, which the game wraps as one ("<nobr><sprite name=Chrono>
         // <b>Chrono</b></nobr>"): there the icon is decoration and dropped. Elsewhere an icon reads as
-        // its word ("2 <sprite name=Attack>" is "2 Attack"; "Unspent <sprite name=ShopToken> is
-        // converted" keeps it), unless its own word follows it (Charge's title "<Charge> Charge"). Most
-        // icons are named for their words; ShopToken's is Cash (ShopToken_TooltipTitle), and the
+        // its word ("2 <sprite name=Attack>" is "2 STR"; "Unspent <sprite name=ShopToken> is
+        // converted" keeps it), unless its word or its name follows it (Charge's title "<Charge>
+        // Charge", the stats panel's "<Attack> ATTACK"). An icon's word is its keyword's
+        // (Attack_Keyword is "<Attack> STR"); ShopToken's is Cash (ShopToken_TooltipTitle), and the
         // scoring line's Target is "When scored" (the strategy guide's Guide_Scoring_1: 'The following
         // icon means "When scored":'), with a colon where it opens a line, as the scoring line's
         // marker ("When scored: Spend 2 Charge Arrow Get +1 Budge"). Arrow, between a trigger
@@ -52,7 +53,7 @@ namespace DiceVoders.Module.UI
             text = DecorThenWord.Replace(text, "");
             text = text.Replace(DecorStart, IconStart);
             text = IconRun.Replace(text, m => " " + Count(m.Value) + " " + IconWord(m.Groups[1].Value) + " ");
-            text = IconThenWord.Replace(text, m => SameWord(IconWord(m.Groups[1].Value), m.Groups[2].Value) ? "" : m.Value);
+            text = IconThenWord.Replace(text, m => SameWord(IconWord(m.Groups[1].Value), m.Groups[2].Value) || SameWord(m.Groups[1].Value, m.Groups[2].Value) ? "" : m.Value);
             text = Icon.Replace(text, m => " " + IconWord(m.Groups[1].Value) + " ");
             text = PaddedQuote.Replace(text, "\"$1\"");
             text = TextUtil.StripRichText(text);
@@ -79,6 +80,9 @@ namespace DiceVoders.Module.UI
         }
 
         // An icon's word: its name, but for the two named otherwise.
+        // An icon's word: its keyword's (<name>_Keyword is the icon and its word: Attack's is "STR"),
+        // else its name; Target and ShopToken, whose keywords are the bare icon, have theirs from the
+        // guide and the Cash tooltip. Per language, cached.
         private static string IconWord(string name)
         {
             switch (name)
@@ -86,8 +90,24 @@ namespace DiceVoders.Module.UI
                 case "Target": return WhenScored() ?? name;
                 case LineTarget: { string words = WhenScored(); return words != null ? words + ":" : "Target"; }
                 case "ShopToken": return Plain("ShopToken_TooltipTitle") ?? name;
-                default: return name;
             }
+            string locale = CurrentLocale();
+            if (locale != _wordsLocale) { _words.Clear(); _wordsLocale = locale; }
+            if (!_words.TryGetValue(name, out var word))
+            {
+                word = Plain(name + "_Keyword") ?? name;
+                _words[name] = word;
+            }
+            return word;
+        }
+
+        private static readonly Dictionary<string, string> _words = new Dictionary<string, string>();
+        private static string _wordsLocale;
+
+        private static string CurrentLocale()
+        {
+            try { return UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale?.Identifier.Code; }
+            catch { return null; }
         }
 
         // The quoted words of the guide's 'The following icon means "When scored":', in the current
