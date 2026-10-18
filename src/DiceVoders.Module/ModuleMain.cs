@@ -65,6 +65,9 @@ namespace DiceVoders.Module
             _harmony = new Harmony("com.amerikranian.dicevoders.module." + Guid.NewGuid().ToString("N"));
 
             GameScenes.Start();
+            // Escape on a screen with no Back of its own pauses the encounter, as the game's Menu key.
+            Navigation.BackFallbackAvailable = () => Encounter.Encounter.Controller != null && !PauseScreen.Open;
+            Navigation.BackFallback = Encounter.EncounterKeys.Menu;
             RegisterInput();
             RegisterScreens();
             try { _harmony.PatchAll(typeof(ModuleMain).Assembly); }
@@ -140,6 +143,7 @@ namespace DiceVoders.Module
             ScreenManager.Register(new CreditsScreen());
             ScreenManager.Register(new EncounterScreen());
             ScreenManager.Register(new ResultScreen());
+            ScreenManager.Register(new PauseScreen());
             ScreenManager.Register(new TipScreen());
             ScreenManager.Register(new ModMenuScreen());
             ScreenManager.Register(new HelpScreen());

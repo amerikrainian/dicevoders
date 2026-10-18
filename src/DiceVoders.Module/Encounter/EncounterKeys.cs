@@ -142,6 +142,9 @@ namespace DiceVoders.Module.Encounter
             }, "freeze");
         }
 
+        /// <summary>The game's Menu key: opens the pause menu, or resumes from it (ignored while a tip shows).</summary>
+        public static bool Menu() => Encounter.Controller != null && Run("menu", k => k.OnMenu(Context()));
+
         /// <summary>Escape in a target choice: the game's Cancel, which drops it.</summary>
         public static void CancelSelection() => Run("cancel", k => k.OnCancel(Context()));
 

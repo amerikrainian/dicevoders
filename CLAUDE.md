@@ -76,7 +76,7 @@ has all of them with constants to retarget. The update check asks
   reloadable, engine-coupled: day-to-day work), **Tests**.
 - Buffers: only `ui` (the focused control's lines) so far; `BufferKeys` lists the keys.
 - Not ported from starvaders: its game screens, the fight (Core `Fight/`, Module `Fight/`), the
-  popup reader, the pause fallback for Escape (`Navigation.BackFallback` is unset).
+  popup reader. The encounter is this game's own (`Module/Encounter/`, Core `Encounter/`).
 
 ## Input
 `Module/Input/OsKeys` reads the OS (`GetAsyncKeyState`, once per frame, only while the game window
@@ -205,6 +205,15 @@ sends `keybd_event`.
     as it opens, the first die (silent) at a new turn; the strip's nodes `QuietVanish`. Readouts
     checked by reflection over the module (`Invoke` on `EncounterScreen.ChoiceText`...) with a tip
     up; buying, placing, Proceed not exercised.
+  - `PauseScreen` (`EncounterController.PauseMenuController`, layer 33, exclusive; up while
+    `PausePanel` is active and `IsPaused`): "Game Menu". Escape on the encounter opens it: the
+    navigator's `BackFallback` is the game's Menu key handler (`EncounterKeyInputController.OnMenu`:
+    ignored while a tip shows, else `OnPressPauseButton`, a toggle), and Escape in it resumes the same
+    way. Stops: Resume, Options, Abandon Run, Save and Exit, Rewind Turn, Strategy Guide; the speeds
+    as radio buttons ("speed 1".."speed 4": the arrows draw no caption; selected =
+    `SelectedSpeedObjects[i].activeSelf`). Verified live: open, resume, both by Escape. Not read: the
+    stats panel (`StatFrame`, "ATTACK & MULT scored last turn" with arrows: per-unit overlays on the
+    board). Not exercised: any button but Resume.
   - `ResultScreen` (`EncounterController.ResultPanel`, layer 30, exclusive): the end screen shown
     (`GreenScreen` "INVASION SUCCESSFUL" with "NEXT TARGET : 500", `RedScreen` "SIMULATION FAILED"
     / "LOSE 1 HEART : EXTRA TURN", `OTKScreen` "SUCCESS!" / "ONE TURN KO!", `GameOverScreen`), a

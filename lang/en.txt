@@ -120,6 +120,7 @@ enc.tile_built=new tile at {0}
 enc.clear=clear
 enc.shop_items=shop: {0}
 enc.xp={0}/{1} XP
+enc.speed=speed {0}
 bind.enc.budge_up=Budge up
 bind.enc.budge_down=Budge down
 bind.enc.freeze=Freeze

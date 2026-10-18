@@ -193,6 +193,8 @@ namespace DiceVoders.Core.Strings
             D("enc.shop_items", "shop: {0}"),
             // An artifact's XP; {0} = what it has, {1} = what its next level takes.
             D("enc.xp", "{0}/{1} XP"),
+            // A game speed in the pause menu (its arrows draw no caption); {0} = 1 to 4.
+            D("enc.speed", "speed {0}"),
             D("bind.enc.budge_up", "Budge up"),
             D("bind.enc.budge_down", "Budge down"),
             D("bind.enc.freeze", "Freeze"),
@@ -458,6 +460,7 @@ namespace DiceVoders.Core.Strings
         public static string EncClear => Get("enc.clear");
         public static string EncShopItems(string items) => F("enc.shop_items", items);
         public static string EncXp(int xp, int needed) => F("enc.xp", xp, needed);
+        public static string EncSpeed(int speed) => F("enc.speed", speed);
 
         public static string ScreenModMenu => Get("screen.mod_menu");
         public static string ModSettings => Get("mod.settings");

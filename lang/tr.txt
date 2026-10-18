@@ -118,6 +118,7 @@ enc.tile_built={0} konumunda yeni kare
 enc.clear=temiz
 enc.shop_items=dükkan: {0}
 enc.xp={0}/{1} TP
+enc.speed=hız {0}
 bind.enc.budge_up=Yukarı kaydır
 bind.enc.budge_down=Aşağı kaydır
 bind.enc.freeze=Dondur

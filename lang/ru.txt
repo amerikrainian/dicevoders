@@ -118,6 +118,7 @@ enc.tile_built=новая клетка на {0}
 enc.clear=чисто
 enc.shop_items=магазин: {0}
 enc.xp={0}/{1} опыта
+enc.speed=скорость {0}
 bind.enc.budge_up=Сдвинуть вверх
 bind.enc.budge_down=Сдвинуть вниз
 bind.enc.freeze=Заморозить

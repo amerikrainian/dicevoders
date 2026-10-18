@@ -118,6 +118,7 @@ enc.tile_built=nova casa em {0}
 enc.clear=limpo
 enc.shop_items=loja: {0}
 enc.xp={0}/{1} XP
+enc.speed=velocidade {0}
 bind.enc.budge_up=Ajustar para cima
 bind.enc.budge_down=Ajustar para baixo
 bind.enc.freeze=Congelar
