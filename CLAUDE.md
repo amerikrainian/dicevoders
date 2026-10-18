@@ -229,6 +229,20 @@ sends `keybd_event`.
     Seen live: the success screen after Skip remaining turns (phase `Simulation`). The panel sits
     under a view item, so `ViewNodes.Prose` skips only texts of items inside its scope. Not
     exercised: Proceed, the other three screens, `SimScreen` (the skipped turns played out).
+  - `ConstellationScreen` (`EncounterController.ConstellationController`, layer 32, exclusive; up while
+    its object is active; holds arrival until its `Canvas` is opaque, 3 s at most): "Constellations"
+    (`Constellations_Misc`), the run's random modifiers, shown at a run's start once unlocked and from
+    the encounter's Constellations button (`ConstellationButtonObject`, in the status stop after the
+    artifacts; it draws only initials). One stop: the `Constellations` left to right by x, each one node
+    of its shown texts (`TitleText`, `LockedText`, `PanelDescription` while `PanelTransform` shows, the
+    `Parallaxer/RevealObject` caption "Reveal!" while shown, Enter = that button's click, its
+    `OnPressReveal`); Backspace = the set (`ArtifactSetObject`'s views through `ArtifactTooltip(artifact,
+    view)`, or `UnitSetObject`'s `InvaderCompendiumEntry`s), then Proceed (`ProceedButton/Mover/Button`,
+    `OnContinuePressed`). The first-time notice (`UnlockConstellationObject`, "CONSTELLATIONS
+    UNLOCKED!...") is the only node while shown; Enter is its `TipBox` click
+    (`OnPressUnlockConstellation`, which writes the save). This save has none: tested by switching the
+    controller on over the encounter (placeholder texts, one view given a board artifact), nothing
+    pressed, then restored.
   - `TipScreen` (`TipManager.CurrentTip`, layer 40, exclusive; `UI/Tips`): a tutorial tip that
     waits for a click (its `ClickToContinue` line shows) as one text node; Enter is
     `TipManager.ClickTipBox` (ignored by the game until `TipBox._isFinished`, set when the box has

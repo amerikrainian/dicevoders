@@ -190,9 +190,12 @@ namespace DiceVoders.Module.Encounter
         /// <summary>The unit's tooltip as the game fills it on hover (<see cref="EntityTooltip.UpdateTooltip"/>,
         /// run here on the tile's own tooltip: the hidden one holds prefab placeholder text until then):
         /// its description and its rarity line ("Unit - Common").</summary>
-        public static (string Description, string Rarity) Tooltip(EntityModel entity, TileView tile)
+        public static (string Description, string Rarity) Tooltip(EntityModel entity, TileView tile) =>
+            Tooltip(entity, tile != null ? tile.EntityTooltip : null);
+
+        /// <summary>The unit's tooltip filled on the given one (a compendium entry's own).</summary>
+        public static (string Description, string Rarity) Tooltip(EntityModel entity, EntityTooltip tooltip)
         {
-            var tooltip = tile != null ? tile.EntityTooltip : null;
             if (entity == null || tooltip == null) return (null, null);
             try
             {
@@ -290,13 +293,14 @@ namespace DiceVoders.Module.Encounter
         public static List<string> ArtifactLines(ArtifactModel artifact) => ArtifactTooltip(artifact).Lines;
 
         /// <summary>The artifact's tooltip as the game fills it: its title ("Meteor [9/10 XP]", null when
-        /// it has none) and the lines after it.</summary>
-        public static (string Title, List<string> Lines) ArtifactTooltip(ArtifactModel artifact)
+        /// it has none) and the lines after it. On its board view's tooltip unless a view is given (a
+        /// compendium's).</summary>
+        public static (string Title, List<string> Lines) ArtifactTooltip(ArtifactModel artifact, ArtifactView view = null)
         {
             var lines = new List<string>();
             string title = null;
             if (artifact == null) return (null, lines);
-            var tooltip = ArtifactView(artifact)?.Tooltip;
+            var tooltip = (view ?? ArtifactView(artifact))?.Tooltip;
             try
             {
                 if (tooltip != null)

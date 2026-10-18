@@ -552,6 +552,10 @@ namespace DiceVoders.Module.Screens
                     OnSecondary = () => SayDetails(ArtifactDetails(EncounterState.Artifact(s))),
                 });
             }
+            // Constellations (once unlocked): the button draws only its constellations' initials.
+            var constellations = EncounterState.Controller?.ConstellationController?.ConstellationButtonObject?.GetComponent<ButtonView>();
+            if (ViewNodes.IsShown(constellations))
+                b.AddItem(ControlId.Structural("enc:constellations"), ViewNodes.Button(constellations, () => GameLoc.Get("Constellations_Misc") ?? "Constellations"));
             b.PopContext();
         }
 
