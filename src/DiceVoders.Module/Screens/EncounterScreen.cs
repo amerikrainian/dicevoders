@@ -591,18 +591,21 @@ namespace DiceVoders.Module.Screens
                 b.AddItem(ControlId.Structural("enc:token:" + line.Key), Stat(line.Value, TokenKeyword(line.Key)));
             }
             b.AddItem(ControlId.Structural("enc:mult"), Stat(Mult, () => GameNodes.Lines(Keywords.Line(NestedTooltipName.GlobalMult))));
-            // The artifacts outside the columns' slots: a pilot alone, then the perks as a row, in
-            // slot order as drawn.
+            // The artifacts outside the columns' slots: a pilot alone (drawn on the pilot panel), the
+            // starter perk alone (drawn in the commander's frame, above the perks), then the perks as
+            // a row, in slot order as drawn left to right.
             var model = EncounterState.Model;
             int slots = model?.ArtifactSlots?.Count ?? 0;
             var perks = new List<int>();
+            var alone = new List<int>();
             for (int slot = EncounterState.Columns; slot < slots; slot++)
             {
                 var artifact = EncounterState.Artifact(slot);
                 if (artifact == null) continue;
-                if (EncounterState.PilotName(artifact) != null) b.AddItem(ControlId.Structural("enc:artifact:" + slot), SlotArtifact(slot));
+                if (EncounterState.PilotName(artifact) != null || artifact.ArtifactType == ArtifactType.Starter) alone.Add(slot);
                 else perks.Add(slot);
             }
+            foreach (int slot in alone) b.AddItem(ControlId.Structural("enc:artifact:" + slot), SlotArtifact(slot));
             if (perks.Count > 0)
             {
                 b.PushContext(Perks());
