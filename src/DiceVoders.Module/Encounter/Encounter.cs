@@ -190,22 +190,23 @@ namespace DiceVoders.Module.Encounter
         /// <summary>The unit's tooltip as the game fills it on hover (<see cref="EntityTooltip.UpdateTooltip"/>,
         /// run here on the tile's own tooltip: the hidden one holds prefab placeholder text until then):
         /// its description and its rarity line ("Unit - Common").</summary>
-        public static (string Description, string Rarity) Tooltip(EntityModel entity, TileView tile) =>
+        public static (string Description, string Rarity, List<string> Keywords) Tooltip(EntityModel entity, TileView tile) =>
             Tooltip(entity, tile != null ? tile.EntityTooltip : null);
 
-        /// <summary>The unit's tooltip filled on the given one (a compendium entry's own).</summary>
-        public static (string Description, string Rarity) Tooltip(EntityModel entity, EntityTooltip tooltip)
+        /// <summary>The unit's tooltip filled on the given one (a compendium entry's own), with the
+        /// keyword explanations the game shows beside it ("Repeat: Repeats STR and...").</summary>
+        public static (string Description, string Rarity, List<string> Keywords) Tooltip(EntityModel entity, EntityTooltip tooltip)
         {
-            if (entity == null || tooltip == null) return (null, null);
+            if (entity == null || tooltip == null) return (null, null, new List<string>());
             try
             {
                 tooltip.UpdateTooltip(entity, Model);
-                return (GameText.Of(tooltip.DescriptionText), GameText.Of(tooltip.RarityText));
+                return (GameText.Of(tooltip.DescriptionText), GameText.Of(tooltip.RarityText), Keywords.Of(tooltip));
             }
             catch (Exception e)
             {
                 CoreLog.Warning("Encounter: filling a unit's tooltip failed: " + e.Message);
-                return (GameLoc.Get(entity.EntityName + "_Entity_Desc"), null);
+                return (GameLoc.Get(entity.EntityName + "_Entity_Desc"), null, new List<string>());
             }
         }
 
@@ -293,13 +294,15 @@ namespace DiceVoders.Module.Encounter
         public static List<string> ArtifactLines(ArtifactModel artifact) => ArtifactTooltip(artifact).Lines;
 
         /// <summary>The artifact's tooltip as the game fills it: its title ("Meteor [9/10 XP]", null when
-        /// it has none) and the lines after it. On its board view's tooltip unless a view is given (a
-        /// compendium's).</summary>
-        public static (string Title, List<string> Lines) ArtifactTooltip(ArtifactModel artifact, ArtifactView view = null)
+        /// it has none), the lines after it, and the keyword explanations the game shows beside it
+        /// ("Mini-Dice: Rolled and scored automatically each turn."). On its board view's tooltip
+        /// unless a view is given (a compendium's).</summary>
+        public static (string Title, List<string> Lines, List<string> Keywords) ArtifactTooltip(ArtifactModel artifact, ArtifactView view = null)
         {
             var lines = new List<string>();
+            var keywords = new List<string>();
             string title = null;
-            if (artifact == null) return (null, lines);
+            if (artifact == null) return (null, lines, keywords);
             var tooltip = (view ?? ArtifactView(artifact))?.Tooltip;
             try
             {
@@ -316,6 +319,7 @@ namespace DiceVoders.Module.Encounter
                         string text = GameText.Of(tmp);
                         if (text != null) lines.Add(text);
                     }
+                    keywords = Keywords.Of(tooltip);
                 }
             }
             catch (Exception e) { CoreLog.Warning("Encounter: filling an artifact's tooltip failed: " + e.Message); }
@@ -324,7 +328,7 @@ namespace DiceVoders.Module.Encounter
                 string desc = GameLoc.Get(artifact.ArtifactName + "_Arti_Desc");
                 if (desc != null) lines.Add(desc);
             }
-            return (title, lines);
+            return (title, lines, keywords);
         }
 
         /// <summary>The artifact's level, XP and the XP its next level takes
@@ -494,6 +498,32 @@ namespace DiceVoders.Module.Encounter
             catch (Exception e) { CoreLog.Warning("Encounter: reading slot " + x + "'s mark failed: " + e.Message); }
             return null;
         }
+
+        // ---- the board's hover tooltips (TooltipTriggerView) ----
+
+        /// <summary>The hearts' hover ("Commander Hearts: If you fail to defeat...").</summary>
+        public static Transform HeartsTrigger() =>
+            Holder()?.Find("LeftPanel/CharacterPanel/HeartsPanel/HeartTooltipTrigger");
+
+        /// <summary>The score's hover ("Objective: When time runs out...").</summary>
+        public static Transform ScoreTrigger() => ScorePanel()?.Find("ScoreTooltipTrigger");
+
+        /// <summary>The target's hover: the pilot panel's in a pilot fight, else the act map's (both
+        /// "VICTORY CONDITION: At the end of every ACT...").</summary>
+        public static Transform TargetTrigger()
+        {
+            var mask = Controller?.PilotPanel?.transform.parent;
+            if (mask == null) return null;
+            return PilotTarget() != null ? mask.Find("PilotPanel/PilotPanelTooltipTrigger") : mask.Find("MapPanel/MapTooltipTrigger");
+        }
+
+        /// <summary>The shop's rarity figure and its hover ("Shop rarity: Increases the chance...").</summary>
+        public static Transform RarityTrigger() => Controller?.DraftPanel?.transform.Find("BG/RarityObject");
+
+        // The score panel (the pilot panel's mask's parent) and the canvas holder (the draft panel's
+        // grandparent).
+        private static Transform ScorePanel() => Controller?.PilotPanel?.transform.parent?.parent;
+        private static Transform Holder() => Controller?.DraftPanel?.transform.parent?.parent;
 
         public static ArtifactView SlotView(int x)
         {

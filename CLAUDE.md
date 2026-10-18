@@ -214,6 +214,19 @@ sends `keybd_event`.
     as it opens, the first die (silent) at a new turn; the strip's nodes `QuietVanish`. Readouts
     checked by reflection over the module (`Invoke` on `EncounterScreen.ChoiceText`...) with a tip
     up; buying, placing, Proceed not exercised.
+  - Keywords (`UI/Keywords`, starvaders' `*_InfoLine` more-info lines' counterpart): the game draws a
+    tooltip's keywords as side boxes (`NestedTooltipController`), one per `NestedTooltipName`, from
+    `<Name>_TooltipTitle`/`_TooltipDesc`; which ones is the list the fill keeps (`_nestedTooltips` on
+    `Tooltip` after `SetArtifactText`/`SetTextKey`, on `EntityTooltip` after `UpdateTooltip`, from the
+    definition's `NestedTooltips`). Every artifact, unit, shop choice and constellation set's details
+    (Backspace and the ui buffer) end with them ("Mini-Dice: Rolled and scored automatically each
+    turn."); a column header adds Dice Power's while it has some. The status stop's details: Mult,
+    Budge, Chrono, Mini-Dice, Cash = their keyword entries (Swap has none); hearts, attack and target =
+    the board's `TooltipTriggerView` hovers (`HeartTooltipTrigger` "Commander Hearts",
+    `ScoreTooltipTrigger` "Objective", `PilotPanelTooltipTrigger` in a pilot fight else
+    `MapTooltipTrigger`, both "VICTORY CONDITION"); the shop strip has "Shop rarity, +0 %"
+    (`DraftPanel/BG/RarityObject`, its `RarityNumber`) with its hover, whose chances are coloured by
+    rarity and read as bare figures ("84% | 13% | 6% | 0%").
   - `PauseScreen` (`EncounterController.PauseMenuController`, layer 33, exclusive; up while
     `PausePanel` is active and `IsPaused`): "Game Menu". Escape on the encounter opens it: the
     navigator's `BackFallback` is the game's Menu key handler (`EncounterKeyInputController.OnMenu`:

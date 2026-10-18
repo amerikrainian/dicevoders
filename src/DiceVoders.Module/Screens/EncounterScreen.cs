@@ -242,6 +242,9 @@ namespace DiceVoders.Module.Screens
             b.StartRow(BoardStop, strictColumns: true);
             for (int i = 0; i < choices.Count; i++)
                 b.AddItem(ChoiceId(choices[i]), Choice(choices[i], i == 0));
+            var rarity = EncounterState.RarityTrigger();
+            if (rarity != null && rarity.gameObject.activeInHierarchy)
+                b.AddItem(ControlId.Structural("enc:rarity"), Stat(() => ShopRarity(rarity), () => Keywords.Trigger(rarity)));
             if (proceed != null)
                 b.AddItem(ControlId.Structural("enc:proceed"), StripButton(proceed, () => GameLoc.Get("Proceed_Misc") ?? "Proceed"));
             if (skip != null)
@@ -267,9 +270,20 @@ namespace DiceVoders.Module.Screens
                     if (view != null) EncounterState.Hover(view);
                 },
                 OnActivate = () => { var target = EncounterState.SlotTarget(x); if (target != null) EncounterState.Click(target); },
-                Details = () => ArtifactDetails(EncounterState.Artifact(x)),
-                OnSecondary = () => SayDetails(ArtifactDetails(EncounterState.Artifact(x))),
+                Details = () => HeaderDetails(x),
+                OnSecondary = () => SayDetails(HeaderDetails(x)),
             };
+        }
+
+        // The column's artifact, then Dice Power explained while the column has some.
+        private static IEnumerable<string> HeaderDetails(int x)
+        {
+            foreach (var line in ArtifactDetails(EncounterState.Artifact(x))) yield return line;
+            if (EncounterState.DicePower(x) > 0)
+            {
+                string power = Keywords.Line(NestedTooltipName.DiceMult);
+                if (power != null) yield return power;
+            }
         }
 
         internal static string HeaderText(int x)
@@ -357,10 +371,11 @@ namespace DiceVoders.Module.Screens
         {
             var unit = EncounterState.At(x, y);
             if (unit == null) yield break;
-            var (description, rarity) = EncounterState.Tooltip(unit, EncounterState.Tile(x, y));
+            var (description, rarity, keywords) = EncounterState.Tooltip(unit, EncounterState.Tile(x, y));
             string name = EncounterState.Name(unit);
             yield return description != null ? name + ": " + description : name;
             if (rarity != null) yield return rarity;
+            foreach (var line in keywords) yield return line;
         }
 
         /// <summary>"Meteor, LV. 2, 9/20 XP": the artifact's name, its level past the first, its XP;
@@ -381,15 +396,15 @@ namespace DiceVoders.Module.Screens
         }
 
         // "Meteor [9/10 XP]: After you score a pair...", the game's title (its XP) leading, then the
-        // rarity and scaling.
+        // rarity and scaling, then the keywords the game explains beside it.
         private static IEnumerable<string> ArtifactDetails(ArtifactModel artifact)
         {
             if (artifact == null) yield break;
-            var (title, lines) = EncounterState.ArtifactTooltip(artifact);
+            var (title, lines, keywords) = EncounterState.ArtifactTooltip(artifact);
             title = title ?? EncounterState.ArtifactName(artifact);
-            if (lines.Count == 0) { yield return title; yield break; }
-            yield return title + ": " + lines[0];
+            yield return lines.Count > 0 ? title + ": " + lines[0] : title;
             for (int i = 1; i < lines.Count; i++) yield return lines[i];
+            foreach (var line in keywords) yield return line;
         }
 
         // ---- the dice ----
@@ -455,6 +470,19 @@ namespace DiceVoders.Module.Screens
             };
         }
 
+        // "Shop rarity, +0 %": the hover's title and the figure drawn under it.
+        private static string ShopRarity(UnityEngine.Transform rarity)
+        {
+            var parts = new List<string>();
+            var view = rarity.GetComponent<TooltipTriggerView>();
+            var tip = view != null && view.Tooltip != null ? view.Tooltip.GetComponentInChildren<Tooltip>(true) : null;
+            parts.Add((tip != null ? GameText.Of(tip.TitleText) : null) ?? GameLoc.Get("ShopRarity_TooltipTitle"));
+            var number = rarity.Find("RarityNumber");
+            if (number != null && number.gameObject.activeInHierarchy) parts.Add(GameText.Of(number.GetComponent<TMPro.TMP_Text>()));
+            parts.RemoveAll(string.IsNullOrEmpty);
+            return string.Join(", ", parts);
+        }
+
         internal static string ChoiceName(DraftChoice choice)
         {
             try
@@ -492,7 +520,8 @@ namespace DiceVoders.Module.Screens
 
         // A unit's tooltip is its EntityTooltip; anything else's its Tooltip (the other holds the
         // prefab's placeholder text): "title: description" (an artifact's title with its XP, a unit's
-        // the longer one it draws), then the rarity and the scaling, each only where switched on.
+        // the longer one it draws), then the rarity and the scaling, each only where switched on, then
+        // the keywords the game explains beside it.
         private static IEnumerable<string> ChoiceDetails(DraftChoice choice)
         {
             var lines = new List<string>();
@@ -508,6 +537,7 @@ namespace DiceVoders.Module.Screens
                 title = title ?? ChoiceName(choice);
                 lines.Add(description != null ? title + ": " + description : title);
                 foreach (var tmp in rest) { string text = Shown(tmp); if (text != null) lines.Add(text); }
+                lines.AddRange(unit ? Keywords.Of(choice.EntityTooltip) : Keywords.Of(choice.Tooltip));
             }
             catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a shop choice's tooltip failed: " + e.Message); }
             return lines;
@@ -525,16 +555,16 @@ namespace DiceVoders.Module.Screens
             b.PushContext(null, positions: false);
             if (ActionTip() != null)
                 b.AddItem(ControlId.Structural("enc:tip"), Stat(() => { var tip = ActionTip(); return tip != null ? Tips.Text(tip) : null; }));
-            b.AddItem(ControlId.Structural("enc:target"), Stat(TargetLine));
-            b.AddItem(ControlId.Structural("enc:attack"), Stat(Attack));
+            b.AddItem(ControlId.Structural("enc:target"), Stat(TargetLine, () => Keywords.Trigger(EncounterState.TargetTrigger())));
+            b.AddItem(ControlId.Structural("enc:attack"), Stat(Attack, () => Keywords.Trigger(EncounterState.ScoreTrigger())));
             b.AddItem(ControlId.Structural("enc:turns"), Stat(Turns));
-            b.AddItem(ControlId.Structural("enc:hearts"), Stat(Hearts));
+            b.AddItem(ControlId.Structural("enc:hearts"), Stat(Hearts, () => Keywords.Trigger(EncounterState.HeartsTrigger())));
             foreach (var token in TokenLines())
             {
                 var line = token;
-                b.AddItem(ControlId.Structural("enc:token:" + line.Key), Stat(line.Value));
+                b.AddItem(ControlId.Structural("enc:token:" + line.Key), Stat(line.Value, TokenKeyword(line.Key)));
             }
-            b.AddItem(ControlId.Structural("enc:mult"), Stat(Mult));
+            b.AddItem(ControlId.Structural("enc:mult"), Stat(Mult, () => GameNodes.Lines(Keywords.Line(NestedTooltipName.GlobalMult))));
             // The artifacts outside the columns' slots.
             var model = EncounterState.Model;
             int slots = model?.ArtifactSlots?.Count ?? 0;
@@ -560,12 +590,29 @@ namespace DiceVoders.Module.Screens
             b.PopContext();
         }
 
-        private static NodeVtable Stat(Func<string> text) => new NodeVtable
+        private static NodeVtable Stat(Func<string> text, Func<IEnumerable<string>> details = null) => new NodeVtable
         {
             ControlType = ControlTypes.Text,
             Announcements = new List<NodeAnnouncement> { new NodeAnnouncement(text, live: true, kind: AnnouncementKinds.Label) },
             SearchText = text,
+            Details = details,
+            OnSecondary = details != null ? () => SayDetails(details()) : (Action)null,
         };
+
+        // A token's explanation, the game's keyword entry for it; Swap has none.
+        private static Func<IEnumerable<string>> TokenKeyword(string key)
+        {
+            NestedTooltipName name;
+            switch (key)
+            {
+                case "budge": name = NestedTooltipName.Budge; break;
+                case "chrono": name = NestedTooltipName.Chrono; break;
+                case "minidice": name = NestedTooltipName.MiniDice; break;
+                case "cash": name = NestedTooltipName.ShopToken; break;
+                default: return null;
+            }
+            return () => GameNodes.Lines(Keywords.Line(name));
+        }
 
         /// <summary>The target as the score panel names it ("Defeat the P.O.G. (Pluto Outer Guards)";
         /// a pilot, "Roxy, Trailblazer").</summary>

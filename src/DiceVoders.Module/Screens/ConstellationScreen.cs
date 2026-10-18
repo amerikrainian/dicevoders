@@ -20,7 +20,9 @@ namespace DiceVoders.Module.Screens
     /// Shield."; a locked one "Complete 3 CHALLENGES to unlock... (0/3)"); one still to reveal is a
     /// button, its caption "Reveal !" last, and Enter reveals it (<see cref="Constellation.OnPressReveal"/>,
     /// the button's own click), its texts said again once revealed. Backspace reads what the
-    /// constellation changes: its artifacts' names and descriptions, or its units. Then Proceed
+    /// constellation changes: its artifacts' names and descriptions, or its units, with the keywords
+    /// the game explains beside them. First the scene's title hover ("Constellation System",
+    /// Backspace its explanation); then Proceed
     /// (<see cref="ConstellationController.OnContinuePressed"/>), once the game shows it.
     ///
     /// The first time, the unlock notice (<c>UnlockedConstellations</c>, "CONSTELLATIONS UNLOCKED! From
@@ -72,6 +74,17 @@ namespace DiceVoders.Module.Screens
                 return;
             }
             b.BeginStop("constellations:list");
+            // The scene's title hover ("Constellation System", Backspace its explanation), first.
+            var system = c.TooltipViewItem;
+            if (ViewNodes.IsShown(system) && Keywords.Trigger(system.transform).Count > 0)
+                b.AddItem(ControlId.Structural("constellations:system"), new NodeVtable
+                {
+                    ControlType = ControlTypes.Text,
+                    Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(() => SystemTitle(system)) },
+                    SearchText = () => SystemTitle(system),
+                    Details = () => Keywords.Trigger(system.transform),
+                    OnSecondary = () => SayDetails(Keywords.Trigger(system.transform)),
+                });
             var shown = new List<Constellation>();
             foreach (var con in c.Constellations)
                 if (con != null && con.gameObject.activeInHierarchy) shown.Add(con);
@@ -85,6 +98,13 @@ namespace DiceVoders.Module.Screens
             if (ViewNodes.IsShown(proceed))
                 b.AddItem(ControlId.Structural("constellations:proceed"),
                     ViewNodes.Button(proceed, () => GameText.Of(c.ContinueButton.Find("Top")?.GetComponentInChildren<TMPro.TMP_Text>(false)) ?? GameLoc.Get("Proceed_Misc") ?? "Proceed"));
+        }
+
+        private static string SystemTitle(AViewItem system)
+        {
+            var view = system.TryCast<TooltipTriggerView>();
+            var tip = view != null && view.Tooltip != null ? view.Tooltip.GetComponentInChildren<Tooltip>(true) : null;
+            return tip != null ? GameText.Of(tip.TitleText) : null;
         }
 
         // The notice: its text (its "to continue" line left out) as one node; Enter is its click.
@@ -158,9 +178,10 @@ namespace DiceVoders.Module.Screens
                     {
                         var artifact = view.ArtifactModel;
                         if (artifact == null || artifact.ArtifactName == ArtifactName.None) continue;
-                        var (title, desc) = Encounter.Encounter.ArtifactTooltip(artifact, view);
+                        var (title, desc, keywords) = Encounter.Encounter.ArtifactTooltip(artifact, view);
                         title = title ?? Encounter.Encounter.ArtifactName(artifact);
                         lines.Add(desc.Count > 0 ? title + ": " + desc[0] : title);
+                        foreach (var line in keywords) if (!lines.Contains(line)) lines.Add(line);
                     }
                 }
                 if (con.UnitSetObject != null && con.UnitSetObject.activeInHierarchy)
@@ -169,11 +190,12 @@ namespace DiceVoders.Module.Screens
                     {
                         var unit = entry.entityView != null ? entry.entityView.EntityModel : null;
                         if (unit == null) continue;
-                        var (desc, rarity) = Encounter.Encounter.Tooltip(unit, entry.EntityTooltip);
+                        var (desc, rarity, keywords) = Encounter.Encounter.Tooltip(unit, entry.EntityTooltip);
                         var parts = new List<string> { Encounter.Encounter.Name(unit) };
                         if (desc != null) parts.Add(desc);
                         if (rarity != null) parts.Add(rarity);
                         lines.Add(string.Join(": ", parts));
+                        foreach (var line in keywords) if (!lines.Contains(line)) lines.Add(line);
                     }
                 }
             }
