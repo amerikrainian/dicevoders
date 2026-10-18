@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using DiceVoders.Core;
 using DiceVoders.Core.Graph;
 using DiceVoders.Core.UI;
 using DiceVoders.Module.UI;
@@ -9,7 +11,10 @@ namespace DiceVoders.Module.Screens
     /// <summary>
     /// A tutorial tip that waits for a click ("[click] to continue"), as a modal over whatever scene
     /// it shows in: its text is the one node, Enter continues as the game's click does. Tips that do
-    /// not wait are not read yet (StarVaders' popup reader is not ported).
+    /// not wait are the encounter's to read. Once up for a tip, the screen stays up while that tip
+    /// shows (by native pointer), whatever its continue line does meanwhile: Tip10 was heard four
+    /// times over, most likely the screen dropping and coming back as the tip animated, each return
+    /// a fresh landing. Each time it comes up is logged.
     /// </summary>
     public sealed class TipScreen : Screen
     {
@@ -18,10 +23,17 @@ namespace DiceVoders.Module.Screens
         public override bool Exclusive => true;
         public override bool AllowsTypeahead => false;
 
+        private IntPtr _tip;
+
         public override bool IsActive()
         {
             var tip = Tips.Current;
-            return tip != null && Tips.WaitsForClick(tip) && Tips.Text(tip) != null;
+            if (tip == null) { _tip = IntPtr.Zero; return false; }
+            if (tip.Pointer == _tip) return Tips.Text(tip) != null;
+            if (!Tips.WaitsForClick(tip) || Tips.Text(tip) == null) return false;
+            _tip = tip.Pointer;
+            CoreLog.Info("TipScreen: up for " + tip.name);
+            return true;
         }
 
         public override void Build(GraphBuilder b)
