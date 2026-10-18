@@ -195,6 +195,13 @@ sends `keybd_event`.
     as it opens, the first die (silent) at a new turn; the strip's nodes `QuietVanish`. Readouts
     checked by reflection over the module (`Invoke` on `EncounterScreen.ChoiceText`...) with a tip
     up; buying, placing, Proceed not exercised.
+  - `ResultScreen` (`EncounterController.ResultPanel`, layer 30, exclusive): the end screen shown
+    (`GreenScreen` "INVASION SUCCESSFUL" with "NEXT TARGET : 500", `RedScreen` "SIMULATION FAILED"
+    / "LOSE 1 HEART : EXTRA TURN", `OTKScreen` "SUCCESS!" / "ONE TURN KO!", `GameOverScreen`), a
+    dialog named by its `Title`: its prose, then its buttons (no caption: the game's "Proceed").
+    Seen live: the success screen after Skip remaining turns (phase `Simulation`). The panel sits
+    under a view item, so `ViewNodes.Prose` skips only texts of items inside its scope. Not
+    exercised: Proceed, the other three screens, `SimScreen` (the skipped turns played out).
   - `TipScreen` (`TipManager.CurrentTip`, layer 40, exclusive; `UI/Tips`): a tutorial tip that
     waits for a click (its `ClickToContinue` line shows) as one text node; Enter is
     `TipManager.ClickTipBox` (ignored by the game until `TipBox._isFinished`, set when the box has

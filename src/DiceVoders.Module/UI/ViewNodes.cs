@@ -91,7 +91,7 @@ namespace DiceVoders.Module.UI
             return vt;
         }
 
-        /// <summary>The visible texts under <paramref name="scope"/> that belong to no view item, top
+        /// <summary>The visible texts under <paramref name="scope"/> that belong to no view item in it, top
         /// to bottom as drawn (the hierarchy's order is not the screen's: the welcome popup's sign-off
         /// comes first in it), cleaned, one per drawn line: a panel's prose. <paramref name="skip"/>
         /// leaves out one text (the panel's title, read as its name).</summary>
@@ -103,7 +103,10 @@ namespace DiceVoders.Module.UI
             foreach (var tmp in scope.GetComponentsInChildren<TMP_Text>(false))
             {
                 if (tmp == null || tmp == skip || string.IsNullOrWhiteSpace(tmp.text)) continue;
-                if (tmp.GetComponentInParent<AViewItem>() != null) continue;
+                // A view item's own text (a caption) is not prose; one the scope itself sits in is (the
+                // encounter's result screens are under an item).
+                var owner = tmp.GetComponentInParent<AViewItem>();
+                if (owner != null && owner.transform.IsChildOf(scope)) continue;
                 texts.Add(tmp);
             }
             // Stable: texts level with each other keep the hierarchy's order.
