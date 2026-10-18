@@ -231,8 +231,28 @@ namespace DiceVoders.Module.Encounter
             catch (Exception e) { CoreLog.Warning("Encounter: reading artifact slot " + slot + " failed: " + e.Message); return null; }
         }
 
-        public static string ArtifactName(ArtifactModel artifact) =>
-            artifact == null ? null : GameLoc.Get(artifact.ArtifactName + "_Arti_Title") ?? artifact.ArtifactName.ToString();
+        /// <summary>"Meteor"; a pilot's ability leads with the pilot ("Roxy, Trailblazer").</summary>
+        public static string ArtifactName(ArtifactModel artifact)
+        {
+            if (artifact == null) return null;
+            string name = GameLoc.Get(artifact.ArtifactName + "_Arti_Title") ?? artifact.ArtifactName.ToString();
+            return WithPilot(artifact, name);
+        }
+
+        /// <summary>The pilot an artifact stands for (its <see cref="ArtifactType.Pilot"/> entry is named
+        /// for them: <c>ArtifactName.Roxy</c>), null for any other artifact. The game draws pilots'
+        /// names only as images and has no text for them.</summary>
+        public static string PilotName(ArtifactModel artifact)
+        {
+            try { return artifact != null && artifact.ArtifactType == ArtifactType.Pilot ? artifact.ArtifactName.ToString() : null; }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading an artifact's type failed: " + e.Message); return null; }
+        }
+
+        private static string WithPilot(ArtifactModel artifact, string text)
+        {
+            string pilot = PilotName(artifact);
+            return pilot == null || text == null || text == pilot ? text : pilot + ", " + text;
+        }
 
         public static ArtifactView ArtifactView(ArtifactModel artifact)
         {
@@ -265,8 +285,11 @@ namespace DiceVoders.Module.Encounter
                 if (tooltip != null)
                 {
                     tooltip.SetArtifactText(artifact, false, Model);
-                    if (tooltip.TitleText != null && tooltip.TitleText.gameObject.activeSelf) title = GameText.Of(tooltip.TitleText);
-                    foreach (var tmp in new TMPro.TMP_Text[] { tooltip.DescriptionText, tooltip.RarityText, tooltip.ScalingText })
+                    if (tooltip.TitleText != null && tooltip.TitleText.gameObject.activeSelf) title = WithPilot(artifact, GameText.Of(tooltip.TitleText));
+                    // A pilot's rarity is None, which the game has no text for: its line reads Unity's
+                    // "No translation found for 'None_Misc'".
+                    var rarity = artifact.Rarity == Rarity.None ? null : tooltip.RarityText;
+                    foreach (var tmp in new TMPro.TMP_Text[] { tooltip.DescriptionText, rarity, tooltip.ScalingText })
                     {
                         if (tmp == null || !tmp.gameObject.activeSelf) continue;
                         string text = GameText.Of(tmp);
