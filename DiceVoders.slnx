@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="src/DiceVoders.Contracts/DiceVoders.Contracts.csproj" />
+  <Project Path="src/DiceVoders.Core/DiceVoders.Core.csproj" />
+  <Project Path="src/DiceVoders.Module/DiceVoders.Module.csproj" />
+  <Project Path="src/DiceVoders/DiceVoders.csproj" />
+  <Project Path="src/DiceVoders.Tests/DiceVoders.Tests.csproj" />
+</Solution>
