@@ -83,7 +83,9 @@ namespace DiceVoders.Core.Encounter
 
             if (now.Phase == DraftPhase && prev.Phase != DraftPhase)
                 lines.Add(S.EncShop);
-            else if (now.Phase == DraftPhase && prev.Phase == DraftPhase && now.Shop.Count > 0 && !Bought(prev.Shop, now.Shop))
+            // The offer arrives a moment after the shop opens: filled from empty is the opening, not
+            // a change.
+            else if (now.Phase == DraftPhase && prev.Phase == DraftPhase && prev.Shop.Count > 0 && now.Shop.Count > 0 && !Bought(prev.Shop, now.Shop))
                 lines.Add(S.EncShopItems(string.Join(", ", now.Shop)));
 
             if (isPlayer && !now.DiceRolling)

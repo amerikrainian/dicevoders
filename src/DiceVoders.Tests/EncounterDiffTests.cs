@@ -33,7 +33,7 @@ namespace DiceVoders.Tests
             var now = Snap("Draft", total: 30, turns: 3);
             now.ColumnAttack[2] = "20";
             now.ColumnAttack[4] = "10";
-            Assert.Equal(new[] { "column 3: 20, column 5: 10, 30/100 attack", "shop" },
+            Assert.Equal(new[] { "column 3: 20, column 5: 10, 30/100 attack", "Shop" },
                 EncounterDiff.Lines(Snap("Player", dice: new[] { 3, 3, 5 }), now));
         }
 
@@ -90,7 +90,7 @@ namespace DiceVoders.Tests
             now.MiniDice.Add(6);
             now.MiniDiceLabel = "Mini-Dice";
             now.Tokens.Add(new Figure { Key = "minidice", Label = "Mini-Dice", Value = 0 });
-            Assert.Equal(new[] { "Mini-Dice 6, column 6: 30, 30/100 attack", "shop" },
+            Assert.Equal(new[] { "Mini-Dice 6, column 6: 30, 30/100 attack", "Shop" },
                 EncounterDiff.Lines(WithMiniDice(Snap("Player", dice: new[] { 6, 1, 6 }), 1), now));
         }
 
@@ -207,7 +207,16 @@ namespace DiceVoders.Tests
             Assert.Empty(EncounterDiff.Lines(prev, bought));
             var rerolled = Snap("Draft");
             rerolled.Shop.AddRange(new[] { "Pyramid", "Swap or Move" });
-            Assert.Equal(new[] { "shop: Pyramid, Swap or Move" }, EncounterDiff.Lines(prev, rerolled));
+            Assert.Equal(new[] { "Shop: Pyramid, Swap or Move" }, EncounterDiff.Lines(prev, rerolled));
+        }
+
+        [Fact]
+        public void The_offer_arriving_after_the_shop_opens_is_no_change()
+        {
+            var opened = Snap("Draft");
+            var filled = Snap("Draft");
+            filled.Shop.AddRange(new[] { "Swap or Move", "Get +1 Chrono", "Shooter" });
+            Assert.Empty(EncounterDiff.Lines(opened, filled));
         }
 
         [Fact]
@@ -220,7 +229,7 @@ namespace DiceVoders.Tests
             now.TargetName = "Defeat the N.B.S.";
             now.Act = "Act 1-2";
             now.Tokens.Add(new Figure { Key = "cash", Label = "Cash", Value = 3 });
-            Assert.Equal(new[] { "Defeat the N.B.S., Act 1-2", "shop" }, EncounterDiff.Lines(prev, now));
+            Assert.Equal(new[] { "Defeat the N.B.S., Act 1-2", "Shop" }, EncounterDiff.Lines(prev, now));
         }
     }
 }

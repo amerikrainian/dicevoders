@@ -124,6 +124,7 @@ namespace DiceVoders.Module.Screens
         private Phase _phase = Phase.None;
         private bool _selecting;
         private IntPtr _reward;
+        private bool _shopLanding;
         private ControlId _pendingLanding;
         private bool _pendingSpeak;
 
@@ -144,16 +145,19 @@ namespace DiceVoders.Module.Screens
             }
             else if (!selecting && phase != _phase && EncounterEvents.Settled)
             {
-                if (phase == Phase.Draft)
-                {
-                    var choices = EncounterState.Choices();
-                    if (choices.Count > 0) { _pendingLanding = ChoiceId(choices[0]); _pendingSpeak = true; }
-                }
+                // The shop's offer arrives a moment after it opens: its landing waits for it.
+                if (phase == Phase.Draft) _shopLanding = true;
                 else if (phase == Phase.Player)
                 {
                     var dice = EncounterState.Dice();
                     if (dice.Count > 0) { _pendingLanding = DieId(dice[0]); _pendingSpeak = false; }
                 }
+            }
+            if (phase != Phase.Draft) _shopLanding = false;
+            else if (_shopLanding && !selecting && EncounterEvents.Settled)
+            {
+                var choices = EncounterState.Choices();
+                if (choices.Count > 0) { _pendingLanding = ChoiceId(choices[0]); _pendingSpeak = true; _shopLanding = false; }
             }
             // Each reward screen (level up, loot, draft) lands on its first item as it shows.
             var reward = SpecialRewardStrip.Shown();

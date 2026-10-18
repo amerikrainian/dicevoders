@@ -160,7 +160,7 @@ namespace DiceVoders.Core.Strings
             // What a column scored this turn; {0} = its 1-based number, {1} = the attack.
             D("enc.column_attack", "column {0}: {1}"),
             // The shop phase opening after a turn.
-            D("enc.shop", "shop"),
+            D("enc.shop", "Shop"),
             // A tile the grid does not have yet (the shop's Build Tile adds them).
             D("enc.no_tile", "no tile"),
             // A cell or column the game is asking for (a unit to place, a tile to build).
@@ -190,7 +190,7 @@ namespace DiceVoders.Core.Strings
             // A tile's cloud gone.
             D("enc.clear", "clear"),
             // The shop's offer after a reroll; {0} = the items.
-            D("enc.shop_items", "shop: {0}"),
+            D("enc.shop_items", "Shop: {0}"),
             // An artifact's XP; {0} = what it has, {1} = what its next level takes.
             D("enc.xp", "{0}/{1} XP"),
             // A game speed in the pause menu (its arrows draw no caption); {0} = 1 to 4.
