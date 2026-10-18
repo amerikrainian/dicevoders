@@ -120,6 +120,7 @@ enc.shop_items=tienda: {0}
 enc.xp={0}/{1} XP
 enc.speed=velocidad {0}
 bind.enc.budge_up=Ajustar arriba
+bind.enc.stats=Estadísticas
 bind.enc.budge_down=Ajustar abajo
 bind.enc.freeze=Congelar
 bind.enc.reroll=Volver a tirar

@@ -120,6 +120,7 @@ enc.shop_items=магазин: {0}
 enc.xp={0}/{1} опыта
 enc.speed=скорость {0}
 bind.enc.budge_up=Сдвинуть вверх
+bind.enc.stats=Статистика
 bind.enc.budge_down=Сдвинуть вниз
 bind.enc.freeze=Заморозить
 bind.enc.reroll=Перебросить

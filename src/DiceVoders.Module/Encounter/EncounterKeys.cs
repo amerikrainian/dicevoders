@@ -24,7 +24,8 @@ namespace DiceVoders.Module.Encounter
     /// handlers (<see cref="EncounterKeyInputController"/>, which read nothing of the key press), with
     /// the focused item hovered first, as the game's would be: S and A budge the focused die up and
     /// down, F freezes it, R rerolls with Chrono, E proceeds (launch, leave the shop), Q cancels (undoes
-    /// a budge). A budge or a freeze says the die after; one refused says so.
+    /// a budge). A budge or a freeze says the die after; one refused says so. Alt+S opens the game
+    /// menu on its stats panel.
     /// </summary>
     internal static class EncounterKeys
     {
@@ -41,6 +42,8 @@ namespace DiceVoders.Module.Encounter
             }, ctrl: true);
             Read("enc.dice", "Dice", KeyCode.D, DiceLine, ctrl: true);
             Read("enc.target", "Target", KeyCode.O, EncounterScreen.TargetLine, ctrl: true);
+            InputManager.Register("enc.stats", "Stats", InputCategory.Game, Stats)
+                .AddBinding(new KeyboardBinding(KeyCode.S, alt: true));
 
             InputManager.Register("enc.budge_up", "Budge up", InputCategory.Game, () => Budge(up: true))
                 .AddBinding(GameKey("Increment", KeyCode.S));
@@ -144,6 +147,13 @@ namespace DiceVoders.Module.Encounter
 
         /// <summary>The game's Menu key: opens the pause menu, or resumes from it (ignored while a tip shows).</summary>
         public static bool Menu() => Encounter.Controller != null && Run("menu", k => k.OnMenu(Context()));
+
+        // Alt+S: the game menu opened (the Menu key) on its stats panel.
+        private static void Stats()
+        {
+            PauseScreen.LandOnStats();
+            if (!Menu()) PauseScreen.CancelStatsLanding();
+        }
 
         /// <summary>Escape in a target choice: the game's Cancel, which drops it.</summary>
         public static void CancelSelection() => Run("cancel", k => k.OnCancel(Context()));

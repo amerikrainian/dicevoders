@@ -120,6 +120,7 @@ enc.shop_items=商店: {0}
 enc.xp={0}/{1} 经验
 enc.speed=速度 {0}
 bind.enc.budge_up=向上微调
+bind.enc.stats=统计
 bind.enc.budge_down=向下微调
 bind.enc.freeze=冻结
 bind.enc.reroll=重掷

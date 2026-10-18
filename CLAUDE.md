@@ -182,7 +182,7 @@ sends `keybd_event`.
     (`OnUpdate`). `ModelItemDict` and `ArtifactViewDict` are keyed by the boxed `ID`: artifacts
     are matched by `ArtifactID.Number` instead. Keys (`EncounterKeys`, Game category): C
     coordinates, Ctrl+A attack ("0/100 attack"), Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice,
-    Ctrl+O target, Home/End row ends, PgUp/PgDn grid top and bottom. The game's encounter keys
+    Ctrl+O target, Alt+S the game menu's stats, Home/End row ends, PgUp/PgDn grid top and bottom. The game's encounter keys
     (defaults, `EncounterInputHandler`'s PlayerInput): W/Space Click, Q Cancel, E Proceed
     (launch, leave the shop), R Reroll (Chrono), A Decrement and S Increment (budge), F Freeze,
     T ShowGuide, D NavigateNext, 1-3 SelectCard, Tab UINavigation. Ours for S, A, F, R, E, Q
@@ -258,7 +258,8 @@ sends `keybd_event`.
     figures, bare numbers whose meaning is the title: tiles top row first ("3, 2, Migo, 810": the
     `TileView` `AttackDetailText`, `MultDetailText` with "Mult", `ScoredDetailText`), then artifacts
     by slot (`ArtifactView` `MultDetailText` "Trail Pot, Mult 9.5", `TriggerDetailText`). Verified
-    live, every view. Not exercised: any button but Resume.
+    live, every view. Alt+S on the encounter (`enc.stats`) opens the menu (the Menu key) and jumps to
+    this stop once built, queued after "Game Menu". Not exercised: any button but Resume.
   - `ResultScreen` (`EncounterController.ResultPanel`, layer 30, exclusive): the end screen shown
     (`GreenScreen` "INVASION SUCCESSFUL" with "NEXT TARGET : 500", `RedScreen` "SIMULATION FAILED"
     / "LOSE 1 HEART : EXTRA TURN", `OTKScreen` "SUCCESS!" / "ONE TURN KO!", `GameOverScreen`), a

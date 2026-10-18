@@ -160,7 +160,7 @@ namespace DiceVoders.Core.UI
             return false;
         }
 
-        public override bool JumpToStop(object stopKey)
+        public override bool JumpToStop(object stopKey, bool interrupt = true)
         {
             if (stopKey == null || _graph == null || !_graph.Rerender()) return false;
             var land = KeyGraph.StopLanding(_graph.Current, _graph.State, stopKey);
@@ -173,7 +173,7 @@ namespace DiceVoders.Core.UI
             // "where is the board" with the control it lands on, even when that is the focused one.
             PlayHover(node);
             FireFocus(node);
-            Speak(ComposeMove(ReferenceEquals(from, node) ? null : from, node, entry: false), interrupt: true);
+            Speak(ComposeMove(ReferenceEquals(from, node) ? null : from, node, entry: false), interrupt: interrupt);
             _lastSpokenKey = node.Id;
             _lastSpokenNode = node;
             return true;

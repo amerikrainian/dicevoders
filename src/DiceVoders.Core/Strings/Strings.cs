@@ -196,6 +196,7 @@ namespace DiceVoders.Core.Strings
             // A game speed in the pause menu (its arrows draw no caption); {0} = 1 to 4.
             D("enc.speed", "speed {0}"),
             D("bind.enc.budge_up", "Budge up"),
+            D("bind.enc.stats", "Stats"),
             D("bind.enc.budge_down", "Budge down"),
             D("bind.enc.freeze", "Freeze"),
             D("bind.enc.reroll", "Reroll"),

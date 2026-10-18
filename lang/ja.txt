@@ -120,6 +120,7 @@ enc.shop_items=ショップ: {0}
 enc.xp={0}/{1} XP
 enc.speed=速度 {0}
 bind.enc.budge_up=上に調整
+bind.enc.stats=統計
 bind.enc.budge_down=下に調整
 bind.enc.freeze=凍結
 bind.enc.reroll=振り直し
