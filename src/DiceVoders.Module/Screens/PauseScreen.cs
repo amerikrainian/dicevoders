@@ -43,7 +43,7 @@ namespace DiceVoders.Module.Screens
 
         public override string ScreenName => GameLoc.Get("PauseTitle_Misc");
 
-        // Alt+S on the encounter: the menu, then its stats stop, once it is built (2 s at most).
+        // Ctrl+S on the encounter: the menu, then its stats stop, once it is built (2 s at most).
         private static float _statsAt = -1f;
 
         public static void LandOnStats() => _statsAt = UnityEngine.Time.unscaledTime;

@@ -121,6 +121,7 @@ enc.xp={0}/{1} XP
 enc.speed=속도 {0}
 bind.enc.budge_up=위로 조정
 bind.enc.stats=통계
+bind.enc.mult=Mult
 bind.enc.budge_down=아래로 조정
 bind.enc.freeze=얼리기
 bind.enc.reroll=다시 굴리기

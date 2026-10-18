@@ -121,6 +121,7 @@ enc.xp={0}/{1} TP
 enc.speed=hız {0}
 bind.enc.budge_up=Yukarı kaydır
 bind.enc.stats=İstatistikler
+bind.enc.mult=Mult
 bind.enc.budge_down=Aşağı kaydır
 bind.enc.freeze=Dondur
 bind.enc.reroll=Yeniden at

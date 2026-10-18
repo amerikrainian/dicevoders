@@ -17,15 +17,15 @@ namespace DiceVoders.Module.Encounter
     /// The encounter's keys (the Game category, live while the encounter screen is). Read keys speak
     /// one thing and are silent where there is nothing to read: C the focused tile's coordinates (a
     /// header's column), Ctrl+A the attack against the target ("30/100 attack"), Ctrl+T turns left and hearts, Ctrl+R
-    /// the tokens, Ctrl+D the dice, Ctrl+O the target. On the grid and its header row, Home and End go
+    /// the tokens, Ctrl+D the dice, Ctrl+O the target, Ctrl+M Mult. On the grid and its header row, Home and End go
     /// to the row's ends, Page Up and Page Down to the grid's top and bottom rows in the same column;
     /// elsewhere Home and End are the navigator's own. The game's own keys are its actions' keys, read
     /// from the game (<see cref="GameKeyBinding"/>, so its rebinding carries over), and run its own
     /// handlers (<see cref="EncounterKeyInputController"/>, which read nothing of the key press), with
     /// the focused item hovered first, as the game's would be: S and A budge the focused die up and
     /// down, F freezes it, R rerolls with Chrono, E proceeds (launch, leave the shop), Q cancels (undoes
-    /// a budge). A budge or a freeze says the die after; one refused says so. Alt+S opens the game
-    /// menu on its stats panel.
+    /// a budge). A budge or a freeze says the die after; one refused says so. Ctrl+M reads Mult;
+    /// Ctrl+S opens the game menu on its stats panel.
     /// </summary>
     internal static class EncounterKeys
     {
@@ -43,7 +43,8 @@ namespace DiceVoders.Module.Encounter
             Read("enc.dice", "Dice", KeyCode.D, DiceLine, ctrl: true);
             Read("enc.target", "Target", KeyCode.O, EncounterScreen.TargetLine, ctrl: true);
             InputManager.Register("enc.stats", "Stats", InputCategory.Game, Stats)
-                .AddBinding(new KeyboardBinding(KeyCode.S, alt: true));
+                .AddBinding(new KeyboardBinding(KeyCode.S, ctrl: true));
+            Read("enc.mult", "Mult", KeyCode.M, EncounterScreen.Mult, ctrl: true);
 
             InputManager.Register("enc.budge_up", "Budge up", InputCategory.Game, () => Budge(up: true))
                 .AddBinding(GameKey("Increment", KeyCode.S));
@@ -148,7 +149,7 @@ namespace DiceVoders.Module.Encounter
         /// <summary>The game's Menu key: opens the pause menu, or resumes from it (ignored while a tip shows).</summary>
         public static bool Menu() => Encounter.Controller != null && Run("menu", k => k.OnMenu(Context()));
 
-        // Alt+S: the game menu opened (the Menu key) on its stats panel.
+        // Ctrl+S: the game menu opened (the Menu key) on its stats panel.
         private static void Stats()
         {
             PauseScreen.LandOnStats();

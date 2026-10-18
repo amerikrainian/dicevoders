@@ -121,6 +121,7 @@ enc.xp={0}/{1} XP
 enc.speed=velocidade {0}
 bind.enc.budge_up=Ajustar para cima
 bind.enc.stats=Estatísticas
+bind.enc.mult=Mult
 bind.enc.budge_down=Ajustar para baixo
 bind.enc.freeze=Congelar
 bind.enc.reroll=Rolar de novo

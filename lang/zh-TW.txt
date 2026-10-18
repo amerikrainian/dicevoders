@@ -121,6 +121,7 @@ enc.xp={0}/{1} 經驗
 enc.speed=速度 {0}
 bind.enc.budge_up=向上微調
 bind.enc.stats=統計
+bind.enc.mult=Mult
 bind.enc.budge_down=向下微調
 bind.enc.freeze=凍結
 bind.enc.reroll=重擲
