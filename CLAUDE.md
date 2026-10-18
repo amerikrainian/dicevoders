@@ -199,6 +199,7 @@ sends `keybd_event`.
     (`GreenScreen` "INVASION SUCCESSFUL" with "NEXT TARGET : 500", `RedScreen` "SIMULATION FAILED"
     / "LOSE 1 HEART : EXTRA TURN", `OTKScreen` "SUCCESS!" / "ONE TURN KO!", `GameOverScreen`), a
     dialog named by its `Title`: its prose, then its buttons (no caption: the game's "Proceed").
+    Up while `ABottomPanel.IsActive`: a dismissed panel slides off with its end screen still on.
     Seen live: the success screen after Skip remaining turns (phase `Simulation`). The panel sits
     under a view item, so `ViewNodes.Prose` skips only texts of items inside its scope. Not
     exercised: Proceed, the other three screens, `SimScreen` (the skipped turns played out).

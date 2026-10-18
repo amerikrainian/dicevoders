@@ -27,7 +27,8 @@ namespace DiceVoders.Module.Screens
         private static GameObject Shown()
         {
             var panel = Encounter.Encounter.Controller?.ResultPanel;
-            if (panel == null || !panel.gameObject.activeInHierarchy) return null;
+            // Dismissed, the panel slides away with its end screen still switched on: its own flag says.
+            if (panel == null || !panel.IsActive || !panel.gameObject.activeInHierarchy) return null;
             foreach (var screen in new[] { panel.GreenScreen, panel.RedScreen, panel.OTKScreen, panel.GameOverScreen })
                 if (screen != null && screen.activeInHierarchy) return screen;
             return null;
