@@ -9,13 +9,11 @@ namespace DiceVoders.Module.Interop
     /// The game's localized names and descriptions, by the keys its own <see cref="LocalizationUtils"/>
     /// helpers build (<c>LocalizeEntityTitle</c> is <c>name + "_EntityTitle"</c> and so on). Those
     /// helpers answer through a callback; <see cref="LocalizationUtils.LocalizeSynchronous"/> answers
-    /// at once from the same table, and says "No translation for '...'" for a missing key, which
-    /// reads as null here.
+    /// at once from the same table, and says "No translation found for '...' in Everything" for a
+    /// missing key, which reads as null here.
     /// </summary>
     internal static class GameLoc
     {
-        public static string ArtifactName(ArtifactName name) => Get(name + "_ArtiTitle");
-
         private static readonly System.Text.RegularExpressions.Regex KeywordTag =
             new System.Text.RegularExpressions.Regex(@"\{f\.keyword\}(.*?)\{f\.end\}");
 
@@ -41,7 +39,7 @@ namespace DiceVoders.Module.Interop
             try
             {
                 string text = LocalizationUtils.LocalizeSynchronous(key);
-                if (string.IsNullOrWhiteSpace(text) || text.StartsWith("No translation for", StringComparison.Ordinal)) return null;
+                if (string.IsNullOrWhiteSpace(text) || GameText.IsMissing(text)) return null;
                 return GameText.Clean(text);
             }
             catch (Exception e)

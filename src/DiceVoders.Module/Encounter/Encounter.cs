@@ -248,6 +248,23 @@ namespace DiceVoders.Module.Encounter
             catch (Exception e) { CoreLog.Warning("Encounter: reading an artifact's type failed: " + e.Message); return null; }
         }
 
+        /// <summary>A pilot fight's target, the pilot and their ability ("Roxy, Trailblazer"), as the
+        /// score panel's <see cref="PilotPanel"/> shows them over the target panel (whose text then
+        /// holds a missing key); null outside one.</summary>
+        public static string PilotTarget()
+        {
+            var c = Controller;
+            if (c == null) return null;
+            try
+            {
+                if (!c.EncounterModel.IsPilotTribute()) return null;
+                string name = c.EncounterModel.GetCurrentPilot().ToString();
+                string ability = GameText.Of(c.PilotPanel?.AbilityTitleText);
+                return ability != null ? name + ", " + ability : name;
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading the pilot target failed: " + e.Message); return null; }
+        }
+
         private static string WithPilot(ArtifactModel artifact, string text)
         {
             string pilot = PilotName(artifact);

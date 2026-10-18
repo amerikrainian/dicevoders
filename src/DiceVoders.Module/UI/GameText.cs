@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using DiceVoders.Core;
 using DiceVoders.Core.Text;
 
 namespace DiceVoders.Module.UI
@@ -36,12 +38,24 @@ namespace DiceVoders.Module.UI
             return TextUtil.StripRichText(text);
         }
 
-        /// <summary>A TMP text's clean text, or null when it is missing or blank.</summary>
+        /// <summary>A TMP text's clean text, or null when it is missing or blank, or holds a missing
+        /// key's placeholder (logged once per text).</summary>
         public static string Of(TMPro.TMP_Text tmp)
         {
             if (tmp == null) return null;
             string text = Clean(tmp.text);
-            return string.IsNullOrWhiteSpace(text) ? null : text;
+            if (string.IsNullOrWhiteSpace(text)) return null;
+            if (!IsMissing(text)) return text;
+            if (_missingSeen.Add(text)) CoreLog.Warning("GameText: " + tmp.gameObject.name + " holds a missing key: " + text);
+            return null;
         }
+
+        private static readonly HashSet<string> _missingSeen = new HashSet<string>();
+
+        /// <summary>Whether a text is, or holds, Unity Localization's placeholder for a key the table
+        /// lacks ("No translation found for 'None_Misc' in Everything"; the game builds some keys
+        /// that do not exist, a pilot's rarity, a pilot fight's target).</summary>
+        public static bool IsMissing(string text) =>
+            text != null && text.IndexOf("No translation found for '", System.StringComparison.Ordinal) >= 0;
     }
 }

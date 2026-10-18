@@ -148,7 +148,13 @@ sends `keybd_event`.
     sprite ("Music By: plasterbrain"). Art Direction's name is drawn as `"Text Settings"`,
     quotes and all. Escape is `OnPressExitButton`, from any page, as the game's cancel.
   - `EncounterScreen` (`EncounterController`, `Module/Encounter/`; named by the score panel's
-    `TargetText`, "Defeat the P.O.G. (Pluto Outer Guards)"): two stops, starvaders' fight layout.
+    `TargetText`, "Defeat the P.O.G. (Pluto Outer Guards)"; in a pilot fight, `IsPilotTribute`, the
+    `PilotPanel` covers it and `TargetText` holds a missing key: the target reads "Roxy,
+    Trailblazer", `GetCurrentPilot` and the panel's `AbilityTitleText`): two stops, starvaders' fight layout.
+    A pilot is also an artifact (`ArtifactType.Pilot`, named for them, rarity `None`: its tooltip's
+    rarity line is a missing key, skipped); pilot names exist only as images. `GameText.Of` and
+    `GameLoc.Get` drop Unity's "No translation found for '...'" (the game builds keys that do not
+    exist), logging each once. The final boss's `FinalBossPanel` is not read yet.
     The board: a header row ("column 3, Dice Power 2[, honey][, artifact]": power from
     `DicePanel.GetAllDicePower`, keyed by the 1-based column; the column artifact is
     `ArtifactSlots[x]`, the first 6 slots being the columns', `GetColumnArtifacts`), the 6x3 grid

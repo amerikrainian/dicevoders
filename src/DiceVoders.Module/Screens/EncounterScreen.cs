@@ -562,9 +562,12 @@ namespace DiceVoders.Module.Screens
             SearchText = text,
         };
 
-        /// <summary>The target as the score panel names it ("Defeat the P.O.G. (Pluto Outer Guards)").</summary>
+        /// <summary>The target as the score panel names it ("Defeat the P.O.G. (Pluto Outer Guards)";
+        /// a pilot, "Roxy, Trailblazer").</summary>
         public static string Target()
         {
+            string pilot = EncounterState.PilotTarget();
+            if (pilot != null) return pilot;
             string text = GameText.Of(EncounterState.View?.TargetText);
             return text != null ? System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ").Trim() : null;
         }
