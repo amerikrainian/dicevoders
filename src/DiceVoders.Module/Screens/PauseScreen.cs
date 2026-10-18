@@ -14,10 +14,10 @@ namespace DiceVoders.Module.Screens
     /// <summary>
     /// The encounter's pause menu (<see cref="PauseMenuController"/>, in the encounter, not a scene of
     /// its own: <see cref="EncounterController.PausePanel"/>), opened by Escape on the encounter (the
-    /// navigator's back fallback, the game's Menu key). Named by the game's "Game Menu". Two stops:
-    /// Resume, Options, Abandon Run, Save and Exit, Rewind Turn, Strategy Guide; then the game speeds as
+    /// navigator's back fallback, the game's Menu key). Named by the game's "Game Menu". One stop, as
+    /// drawn: Resume, Options, Abandon Run, Save and Exit, Rewind Turn, the game speeds as a row of
     /// radio buttons ("speed 2", selected by <see cref="PauseMenuController.SelectedSpeedObjects"/>: the
-    /// arrows draw no caption). Each is the game's click. Escape resumes, as the Menu key does. Not
+    /// arrows draw no caption), Strategy Guide. Each is the game's click; focus lands on Resume. Escape resumes, as the Menu key does. Not
     /// read: the stats panel's per-unit overlays (what each unit scored last turn), drawn over the board.
     /// </summary>
     public sealed class PauseScreen : Screen
@@ -26,7 +26,6 @@ namespace DiceVoders.Module.Screens
         public override int Layer => 33;
         public override bool Exclusive => true;
         public override bool AllowsTypeahead => false;
-        public override object InitialFocusStop => "pause:menu";
 
         private static PauseMenuController Menu()
         {
@@ -61,23 +60,27 @@ namespace DiceVoders.Module.Screens
             foreach (var name in Buttons)
             {
                 var item = Item(frame, name);
-                if (ViewNodes.IsShown(item)) b.AddItem(ControlId.Structural("pause:" + name), ViewNodes.Button(item));
+                if (!ViewNodes.IsShown(item)) continue;
+                var vt = ViewNodes.Button(item);
+                // Landing is on Resume: a stop lands on its first node that reads selected, and a speed does.
+                if (name == "ResumeButton") vt.IsSelected = () => true;
+                b.AddItem(ControlId.Structural("pause:" + name), vt);
             }
-            var guide = Item(frame, "StrategyGuideButton");
-            if (ViewNodes.IsShown(guide)) b.AddItem(ControlId.Structural("pause:guide"), ViewNodes.Button(guide));
-            b.PopContext();
-            // The speeds, a stop of their own: one reads selected, and a stop lands on that.
-            b.BeginStop("pause:speed");
-            b.PushContext(null);
-            b.StartRow("pause:speed");
+            // The speeds, a row where the game draws them, between Rewind Turn and Strategy Guide;
+            // coming into it lands on the speed in use.
+            var shown = new List<int>();
             for (int i = 0; i < Speeds.Length; i++)
+                if (ViewNodes.IsShown(Item(frame, "SpeedGroup/" + Speeds[i]))) shown.Add(i);
+            b.StartRow("pause:speed", entry: () => System.Math.Max(0, shown.FindIndex(i => SpeedSelected(menu, i))));
+            foreach (int i in shown)
             {
                 var item = Item(frame, "SpeedGroup/" + Speeds[i]);
-                if (!ViewNodes.IsShown(item)) continue;
                 int speed = i;
                 b.AddItem(ControlId.Structural("pause:speed" + i), ViewNodes.Radio(item, () => SpeedSelected(menu, speed), () => Strings.EncSpeed(speed + 1)));
             }
             b.EndRow();
+            var guide = Item(frame, "StrategyGuideButton");
+            if (ViewNodes.IsShown(guide)) b.AddItem(ControlId.Structural("pause:guide"), ViewNodes.Button(guide));
             b.PopContext();
         }
 

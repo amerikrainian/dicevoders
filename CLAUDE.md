@@ -209,9 +209,10 @@ sends `keybd_event`.
     `PausePanel` is active and `IsPaused`): "Game Menu". Escape on the encounter opens it: the
     navigator's `BackFallback` is the game's Menu key handler (`EncounterKeyInputController.OnMenu`:
     ignored while a tip shows, else `OnPressPauseButton`, a toggle), and Escape in it resumes the same
-    way. Stops: Resume, Options, Abandon Run, Save and Exit, Rewind Turn, Strategy Guide; the speeds
-    as radio buttons ("speed 1".."speed 4": the arrows draw no caption; selected =
-    `SelectedSpeedObjects[i].activeSelf`). Verified live: open, resume, both by Escape. Not read: the
+    way. One stop, as drawn: Resume (landing: `IsSelected`, else the selected speed would take it),
+    Options, Abandon Run, Save and Exit, Rewind Turn, the speeds as a row of radio buttons ("speed
+    1".."speed 4": the arrows draw no caption; selected = `SelectedSpeedObjects[i].activeSelf`),
+    Strategy Guide. Verified live: open, resume, both by Escape. Not read: the
     stats panel (`StatFrame`, "ATTACK & MULT scored last turn" with arrows: per-unit overlays on the
     board). Not exercised: any button but Resume.
   - `ResultScreen` (`EncounterController.ResultPanel`, layer 30, exclusive): the end screen shown
