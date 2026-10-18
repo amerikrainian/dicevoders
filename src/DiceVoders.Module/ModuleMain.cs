@@ -119,6 +119,7 @@ namespace DiceVoders.Module
             // The keys that do something here, each runnable from the list.
             InputManager.Register(HelpScreen.ActionKey, "Keys here", InputCategory.Global, HelpScreen.Toggle)
                 .AddBinding(new KeyboardBinding(KeyCode.F1));
+            Encounter.EncounterKeys.Register();
         }
 
         private static void ToggleFocus()
@@ -137,6 +138,7 @@ namespace DiceVoders.Module
             ScreenManager.Register(new ConfirmPromptScreen());
             ScreenManager.Register(new SettingsScreen());
             ScreenManager.Register(new CreditsScreen());
+            ScreenManager.Register(new EncounterScreen());
             ScreenManager.Register(new TipScreen());
             ScreenManager.Register(new ModMenuScreen());
             ScreenManager.Register(new HelpScreen());

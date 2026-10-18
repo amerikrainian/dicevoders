@@ -147,12 +147,35 @@ sends `keybd_event`.
     Translator, LQA: ..."); a heading with no `Name` but a `*-logo` image under it names it by the
     sprite ("Music By: plasterbrain"). Art Direction's name is drawn as `"Text Settings"`,
     quotes and all. Escape is `OnPressExitButton`, from any page, as the game's cancel.
+  - `EncounterScreen` (`EncounterController`, `Module/Encounter/`; named by the score panel's
+    `TargetText`, "Defeat the P.O.G. (Pluto Outer Guards)"): two stops, starvaders' fight layout.
+    The board: a header row ("column 3, Dice Power 2[, honey][, artifact]": power from
+    `DicePanel.GetAllDicePower`, keyed by the 1-based column; the column artifact is
+    `ArtifactSlots[x]`, the first 6 slots being the columns', `GetColumnArtifacts`), the 6x3 grid
+    top row first ("2, 1, Migo, 10 strength": tiles "x, y" 1-based, row 1 at the bottom; the
+    model's y 0 IS the bottom, each `GridColumn`'s layout being reversed), then a strict strip:
+    in `Phase.Player` the dice in `DiceVisualOrder` ("die 3, frozen") and Launch
+    (`DicePanel/ProceedKnob/ProceedLine/LaunchPanel/LaunchButton`). Focus lands on the first die.
+    Backspace on a unit runs the game's `EntityTooltip.UpdateTooltip` on the tile's own tooltip
+    (a hidden one holds prefab placeholders: "Mutantenschwamm", Legendary) and reads it; an
+    artifact's runs `Tooltip.SetArtifactText`. The status: an action tip while one shows, target
+    and act, Target Defense (`TargetTributeScore`), Total Attack (`TotalScore`: the score panel's
+    two), turns, hearts, Budge, Chrono, Swap, Mini-Dice, Cash, Mult, the non-column artifacts.
+    A tip waiting for an action ("Press the LAUNCH button") is said once on arrival
+    (`OnUpdate`). `ModelItemDict` and `ArtifactViewDict` are keyed by the boxed `ID`: artifacts
+    are matched by `ArtifactID.Number` instead. Keys (`EncounterKeys`, Game category): C
+    coordinates, Ctrl+A attack and defense, Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice,
+    Ctrl+O target, Home/End row ends, PgUp/PgDn grid top and bottom. The game's encounter keys
+    (defaults, `EncounterInputHandler`'s PlayerInput): W/Space Click, Q Cancel, E Proceed
+    (launch, leave the shop), R Reroll (Chrono), A Decrement and S Increment (budge), F Freeze,
+    T ShowGuide, D NavigateNext, 1-3 SelectCard, Tab UINavigation; not taken yet. Not built: the
+    shop strip, budge/freeze/reroll/launch keys, scoring narration, selections (placing a unit).
   - `TipScreen` (`TipManager.CurrentTip`, layer 40, exclusive; `UI/Tips`): a tutorial tip that
     waits for a click (its `ClickToContinue` line shows) as one text node; Enter is
     `TipManager.ClickTipBox` (ignored by the game until `TipBox._isFinished`, set when the box has
     popped in). Tip01 ("Welcome to DiceVaders!...") shows over the first encounter after Start Game
-    on a new save. Tips without the line (waiting for an action) are not read. Dismissing not yet
-    exercised.
+    on a new save; Tips 1 to 8 were clicked through with it. Tips without the line (waiting for an
+    action) are the encounter's to read.
   - `ConfirmPromptScreen` (`ConfirmPromptController`, layer 37): starvaders', compiled against this
     game's controller (focus start from `GetFirstActiveViewItemToStartAt`), not yet seen live.
   - `ModMenuScreen`, `HelpScreen`, `KeyCaptureScreen`: the mod's own, unchanged.

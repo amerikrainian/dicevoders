@@ -126,6 +126,42 @@ namespace DiceVoders.Core.Strings
             // The role word for a modal dialog context.
             D("role.dialog", "dialog"),
 
+            // The encounter. A tile: {0} = column, {1} = row, both 1-based, row 1 at the bottom.
+            D("enc.coord", "{0}, {1}"),
+            // A column's header above the grid; {0} = its 1-based number (a die showing it scores there).
+            D("enc.column", "column {0}"),
+            // A label and its figure ("Dice Power 2", "Budge 3"): {0} = the game's word, {1} = the number.
+            D("enc.figure", "{0} {1}"),
+            // A unit's strength (the game's STR); {0} = the figure.
+            D("enc.strength", "{0} strength"),
+            D("enc.empty", "empty"),
+            D("enc.honey", "honey"),
+            D("enc.negative", "negative"),
+            // A unit's charges; {0} = left, {1} = the most it holds.
+            D("enc.charge", "charge {0}/{1}"),
+            // A die in the tray; {0} = its face, the column it scores.
+            D("enc.die", "die {0}"),
+            D("enc.rolling", "rolling"),
+            D("enc.frozen", "frozen"),
+            D("enc.permafrozen", "permafrozen"),
+            D("enc.cracked", "cracked"),
+            // A die a pilot rolls against the player.
+            D("enc.pilot_die", "pilot die"),
+            // Dice Power a die adds on top of its own; {0} = the amount.
+            D("enc.added_power", "plus {0} power"),
+            D("enc.hearts", "Hearts"),
+            D("enc.swap", "Swap"),
+            D("bind.enc.coords", "Coordinates"),
+            D("bind.enc.attack", "Attack and defense"),
+            D("bind.enc.turns", "Turns and hearts"),
+            D("bind.enc.tokens", "Tokens"),
+            D("bind.enc.dice", "Dice"),
+            D("bind.enc.target", "Target"),
+            D("bind.enc.first_column", "First column"),
+            D("bind.enc.last_column", "Last column"),
+            D("bind.enc.top_row", "Top row"),
+            D("bind.enc.bottom_row", "Bottom row"),
+
             D("screen.mod_menu", "DiceVoders"),
             D("mod.settings", "Settings"),
             // The mod menu's list of every key the mod binds, whatever the screen.
@@ -331,6 +367,24 @@ namespace DiceVoders.Core.Strings
         public static string CreditsPrevious => Get("credits.prev");
         public static string CreditsNext => Get("credits.next");
         public static string RoleDialog => Get("role.dialog");
+
+        public static string EncCoord(int column, int row) => F("enc.coord", column, row);
+        public static string EncColumn(int column) => F("enc.column", column);
+        public static string EncFigure(string label, string figure) => F("enc.figure", label, figure);
+        public static string EncStrength(string figure) => F("enc.strength", figure);
+        public static string EncEmpty => Get("enc.empty");
+        public static string EncHoney => Get("enc.honey");
+        public static string EncNegative => Get("enc.negative");
+        public static string EncCharge(int left, int max) => F("enc.charge", left, max);
+        public static string EncDie(int face) => F("enc.die", face);
+        public static string EncRolling => Get("enc.rolling");
+        public static string EncFrozen => Get("enc.frozen");
+        public static string EncPermafrozen => Get("enc.permafrozen");
+        public static string EncCracked => Get("enc.cracked");
+        public static string EncPilotDie => Get("enc.pilot_die");
+        public static string EncAddedPower(int amount) => F("enc.added_power", amount);
+        public static string EncHearts => Get("enc.hearts");
+        public static string EncSwap => Get("enc.swap");
 
         public static string ScreenModMenu => Get("screen.mod_menu");
         public static string ModSettings => Get("mod.settings");
