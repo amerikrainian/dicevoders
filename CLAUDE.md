@@ -271,8 +271,10 @@ sends `keybd_event`.
     `IsActive` and one of its screens shows; `Phase.LegendaryDraft`, after a pilot's success screen):
     a dialog named by `TitleText` ("Level Up!"), one stop of the shown screen's view items in
     hierarchy order: `LevelUpScreen` (the starter perk, `LevelUpArtifact`, then Proceed =
-    `OnPressLevelUpProceed`), `PilotDraftScreen` (Budge/Chrono/Heart holders = `OnPressReceive*`,
-    `ContinueObject` = `OnPressReceiveAllButton`), `LegendaryDraftScreen` (three artifacts =
+    `OnPressLevelUpProceed`), `PilotDraftScreen` ("You Receive": Budge/Chrono/Heart holders read as text by
+    their tooltips' titles, "Get +3 Budge", then Proceed = `ContinueObject`'s `OnPressReceiveAllButton`,
+    which gives all three; `OnPressReceive*` return at once unless `HasRunMod(Scarcity)`, when each is
+    a button receiving that one alone; seen live), `LegendaryDraftScreen` (three artifacts =
     `OnPressArtifactSelect`, `OnPressSkipForMoney`, `OnContinuePressed`), `OverseerLevelupScreen`. An
     artifact reads as on the board, Backspace its tooltip (`ArtifactDetails(model, view)`); a button
     by its hover tooltip's title (`ButtonView.Tooltip`, `Keywords.Tooltip`), else caption, else

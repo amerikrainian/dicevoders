@@ -17,7 +17,9 @@ namespace DiceVoders.Module.Screens
     /// <c>Phase.LegendaryDraft</c>), over the board: a dialog named by its title ("Level Up!"), one
     /// stop of whichever of its screens shows, as drawn: the starter perk levelled
     /// (<c>LevelUpScreen</c>: the perk, then Proceed, <see cref="SpecialRewardPanel.OnPressLevelUpProceed"/>),
-    /// the pilot's loot (<c>PilotDraftScreen</c>: Budge, Chrono, Heart, receive all), the legendary
+    /// the pilot's loot (<c>PilotDraftScreen</c>, "You Receive": Budge, Chrono and Heart, all received
+    /// by Proceed, <see cref="SpecialRewardPanel.OnPressReceiveAllButton"/>, so they read as text;
+    /// under the Scarcity run mod each is a button that receives it alone), the legendary
     /// draft (<c>LegendaryDraftScreen</c>: three artifacts, skip for money, proceed), the overseer's
     /// choice (<c>OverseerLevelupScreen</c>). An artifact reads as on the board ("The Tutorial, LV.
     /// 2"), Backspace its tooltip; a button by its hover tooltip's title, Backspace the tooltip; one
@@ -53,13 +55,47 @@ namespace DiceVoders.Module.Screens
             var screen = Shown(panel);
             if (screen == null) return;
             b.PushContext(GameText.Of(panel.TitleText), Strings.RoleDialog, positions: false);
-            int i = 0;
+            bool loot = screen.Pointer == panel.PilotDraftScreen.Pointer;
+            // The pilot's loot is all received by Proceed; its rewards take a click only under
+            // Scarcity (OnPressReceive* return at once otherwise), each then received alone.
+            bool pickOne = loot && Scarcity();
+            var nodes = new List<NodeVtable>();
+            var last = new List<NodeVtable>();
             foreach (var item in screen.GetComponentsInChildren<AViewItem>(false))
             {
-                var node = Node(item, screen.transform);
-                if (node != null) b.AddItem(ControlId.Structural("specialreward:" + screen.name + ":" + i++), node);
+                var button = item.TryCast<ButtonView>();
+                bool reward = loot && button != null && button.Tooltip != null;
+                var node = reward && !pickOne ? Reward(button) : Node(item, screen.transform);
+                if (node == null) continue;
+                // The buttons with nothing to say for themselves (Proceed) come after what they take.
+                if (button != null && !reward && Keywords.Tooltip(button.Tooltip).Count == 0 && button.GetComponentInChildren<ArtifactView>(false) == null) last.Add(node);
+                else nodes.Add(node);
             }
+            nodes.AddRange(last);
+            for (int i = 0; i < nodes.Count; i++)
+                b.AddItem(ControlId.Structural("specialreward:" + screen.name + ":" + i), nodes[i]);
             b.PopContext();
+        }
+
+        private static bool Scarcity()
+        {
+            try { return Encounter.Encounter.Model?.HasRunMod(RunModName.Scarcity) == true; }
+            catch (Exception e) { CoreLog.Warning("SpecialRewardScreen: reading the run mods failed: " + e.Message); return false; }
+        }
+
+        // A reward shown, not chosen: its tooltip's title as text, Backspace the tooltip.
+        private static NodeVtable Reward(ButtonView button)
+        {
+            Func<string> label = () => ButtonLabel(button);
+            return new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                SearchText = label,
+                OnFocus = () => ViewNodes.Hover(button),
+                Details = () => Keywords.Tooltip(button.Tooltip),
+                OnSecondary = () => SayDetails(Keywords.Tooltip(button.Tooltip)),
+            };
         }
 
         // A button (with the artifact it shows, if any), or an artifact outside any button; null for
