@@ -8,14 +8,14 @@ using DiceVoders.Core.UI;
 using DiceVoders.Module.Interop;
 using DiceVoders.Module.UI;
 using UnityEngine;
-using Screen = DiceVoders.Core.Screens.Screen;
 
 namespace DiceVoders.Module.Screens
 {
     /// <summary>
     /// The rewards after a pilot (<see cref="SpecialRewardPanel"/>, the encounter's bottom panel in
-    /// <c>Phase.LegendaryDraft</c>), over the board: a dialog named by its title ("Level Up!"), one
-    /// stop of whichever of its screens shows, as drawn: the starter perk levelled
+    /// <c>Phase.LegendaryDraft</c>, drawn where the dice and the shop go, the board still above it): the
+    /// encounter's strip while it shows, a row under the context of its title ("Level Up!", "You
+    /// Receive", "Choose One"), of whichever of its screens shows, as drawn: the starter perk levelled
     /// (<c>LevelUpScreen</c>: the perk, then Proceed, <see cref="SpecialRewardPanel.OnPressLevelUpProceed"/>),
     /// the pilot's loot (<c>PilotDraftScreen</c>, "You Receive": Budge, Chrono and Heart, all received
     /// by Proceed, <see cref="SpecialRewardPanel.OnPressReceiveAllButton"/>, so they read as text;
@@ -23,21 +23,26 @@ namespace DiceVoders.Module.Screens
     /// draft (<c>LegendaryDraftScreen</c>: three artifacts, skip for money, proceed), the overseer's
     /// choice (<c>OverseerLevelupScreen</c>). An artifact reads as on the board ("The Tutorial, LV.
     /// 2"), Backspace its tooltip; a button by its hover tooltip's title, Backspace the tooltip; one
-    /// with neither, the game's "Proceed". Every button is the game's click. Only the level-up seen
-    /// live so far: the others are read from their prefabs.
+    /// with neither, the game's "Proceed". Every button is the game's click; an artifact's in the
+    /// legendary draft takes it at once (<see cref="SpecialRewardPanel.OnPressArtifactSelect"/>). Each
+    /// of its screens' first item is landed on as it shows (<see cref="EncounterScreen"/>). Seen live:
+    /// all three of a pilot's (level up, loot, legendary draft); not the overseer's.
     /// </summary>
-    public sealed class SpecialRewardScreen : Screen
+    internal static class SpecialRewardStrip
     {
-        public override string Key => "specialreward";
-        public override int Layer => 31;
-        public override bool Exclusive => true;
-        public override bool AllowsTypeahead => false;
-
         private static SpecialRewardPanel Panel()
         {
             var panel = Encounter.Encounter.Controller?.specialRewardPanel;
             return panel != null && panel.IsActive && panel.gameObject.activeInHierarchy ? panel : null;
         }
+
+        /// <summary>The reward screen shown, or null.</summary>
+        public static GameObject Shown() => Shown(Panel());
+
+        /// <summary>The id of the shown screen's first item.</summary>
+        public static ControlId FirstId(GameObject screen) => Id(screen, 0);
+
+        private static ControlId Id(GameObject screen, int i) => ControlId.Structural("enc:reward:" + screen.name + ":" + i);
 
         private static GameObject Shown(SpecialRewardPanel panel)
         {
@@ -47,14 +52,14 @@ namespace DiceVoders.Module.Screens
             return null;
         }
 
-        public override bool IsActive() => Shown(Panel()) != null;
-
-        public override void Build(GraphBuilder b)
+        /// <summary>The strip: a row of the shown screen in the given stop.</summary>
+        public static void Build(GraphBuilder b, string stop)
         {
             var panel = Panel();
             var screen = Shown(panel);
             if (screen == null) return;
-            b.PushContext(GameText.Of(panel.TitleText), Strings.RoleDialog, positions: false);
+            b.PushContext(GameText.Of(panel.TitleText));
+            b.StartRow(stop, strictColumns: true);
             bool loot = screen.Pointer == panel.PilotDraftScreen.Pointer;
             // The pilot's loot is all received by Proceed; its rewards take a click only under
             // Scarcity (OnPressReceive* return at once otherwise), each then received alone.
@@ -73,14 +78,18 @@ namespace DiceVoders.Module.Screens
             }
             nodes.AddRange(last);
             for (int i = 0; i < nodes.Count; i++)
-                b.AddItem(ControlId.Structural("specialreward:" + screen.name + ":" + i), nodes[i]);
+            {
+                nodes[i].QuietVanish = true;
+                b.AddItem(Id(screen, i), nodes[i]);
+            }
+            b.EndRow();
             b.PopContext();
         }
 
         private static bool Scarcity()
         {
             try { return Encounter.Encounter.Model?.HasRunMod(RunModName.Scarcity) == true; }
-            catch (Exception e) { CoreLog.Warning("SpecialRewardScreen: reading the run mods failed: " + e.Message); return false; }
+            catch (Exception e) { CoreLog.Warning("SpecialRewardStrip: reading the run mods failed: " + e.Message); return false; }
         }
 
         // A reward shown, not chosen: its tooltip's title as text, Backspace the tooltip.

@@ -123,6 +123,7 @@ namespace DiceVoders.Module.Screens
         // frame until the node it wants is in the render.
         private Phase _phase = Phase.None;
         private bool _selecting;
+        private IntPtr _reward;
         private ControlId _pendingLanding;
         private bool _pendingSpeak;
 
@@ -154,6 +155,11 @@ namespace DiceVoders.Module.Screens
                     if (dice.Count > 0) { _pendingLanding = DieId(dice[0]); _pendingSpeak = false; }
                 }
             }
+            // Each reward screen (level up, loot, draft) lands on its first item as it shows.
+            var reward = SpecialRewardStrip.Shown();
+            var rewardPtr = reward != null ? reward.Pointer : IntPtr.Zero;
+            if (rewardPtr != _reward && reward != null) { _pendingLanding = SpecialRewardStrip.FirstId(reward); _pendingSpeak = true; }
+            _reward = rewardPtr;
             _selecting = selecting;
             if (EncounterEvents.Settled || selecting) _phase = phase;
             if (_pendingLanding != null && Navigation.Active?.MoveTo(_pendingLanding, _pendingSpeak) == true) _pendingLanding = null;
@@ -208,12 +214,13 @@ namespace DiceVoders.Module.Screens
         }
 
         // The strip under the grid: the dice and Launch while the player rolls, the shop's choices and
-        // its buttons in the shop. Its nodes vanish quietly: launching takes the dice away, and the
+        // its buttons in the shop, a pilot's rewards while they show. Its nodes vanish quietly: launching takes the dice away, and the
         // landing that causes is no news (the scoring is said).
         private static void BuildStrip(GraphBuilder b)
         {
             var phase = EncounterState.Phase;
-            if (phase == Phase.Player) BuildDice(b);
+            if (SpecialRewardStrip.Shown() != null) SpecialRewardStrip.Build(b, BoardStop);
+            else if (phase == Phase.Player) BuildDice(b);
             else if (phase == Phase.Draft) BuildShop(b);
         }
 

@@ -267,10 +267,12 @@ sends `keybd_event`.
     (`OnPressUnlockConstellation`, which writes the save). This save has none: tested by switching the
     controller on over the encounter (placeholder texts, one view given a board artifact), nothing
     pressed, then restored.
-  - `SpecialRewardScreen` (`EncounterController.specialRewardPanel`, layer 31, exclusive; up while
+  - A pilot's rewards (`Screens/SpecialRewardStrip`, `EncounterController.specialRewardPanel`, while
     `IsActive` and one of its screens shows; `Phase.LegendaryDraft`, after a pilot's success screen):
-    a dialog named by `TitleText` ("Level Up!"), one stop of the shown screen's view items in
-    hierarchy order: `LevelUpScreen` (the starter perk, `LevelUpArtifact`, then Proceed =
+    the encounter's strip, as the game draws it where the dice and shop go with the board above (it
+    was an exclusive dialog, which hid the board), a row under the context of `TitleText` ("Level
+    Up!", "You Receive", "Choose One"), each screen's first item landed on as it shows; the shown
+    screen's view items in hierarchy order: `LevelUpScreen` (the starter perk, `LevelUpArtifact`, then Proceed =
     `OnPressLevelUpProceed`), `PilotDraftScreen` ("You Receive": Budge/Chrono/Heart holders read as text by
     their tooltips' titles, "Get +3 Budge", then Proceed = `ContinueObject`'s `OnPressReceiveAllButton`,
     which gives all three; `OnPressReceive*` return at once unless `HasRunMod(Scarcity)`, when each is
@@ -278,7 +280,9 @@ sends `keybd_event`.
     `OnPressArtifactSelect`, `OnPressSkipForMoney`, `OnContinuePressed`), `OverseerLevelupScreen`. An
     artifact reads as on the board, Backspace its tooltip (`ArtifactDetails(model, view)`); a button
     by its hover tooltip's title (`ButtonView.Tooltip`, `Keywords.Tooltip`), else caption, else
-    "Proceed". The level-up seen live ("The Tutorial - LV.2: ... +3 XP"); the others from prefabs.
+    "Proceed". A legendary pick (`OnPressArtifactSelect`) takes the artifact at once. Seen live: the
+    level up ("The Tutorial - LV.2: ... +3 XP"), the loot, the legendary draft ("Choose One":
+    Universe, Last Train, Shimmer, Skip For Income); not the overseer's.
     Before it, the encounter read on, so the game sat waiting with nothing said.
   - `TipScreen` (`TipManager.CurrentTip`, layer 40, exclusive; `UI/Tips`): a tutorial tip that
     waits for a click (its `ClickToContinue` line shows) as one text node; Enter is

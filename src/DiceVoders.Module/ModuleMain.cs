@@ -143,7 +143,6 @@ namespace DiceVoders.Module
             ScreenManager.Register(new CreditsScreen());
             ScreenManager.Register(new EncounterScreen());
             ScreenManager.Register(new ResultScreen());
-            ScreenManager.Register(new SpecialRewardScreen());
             ScreenManager.Register(new PauseScreen());
             ScreenManager.Register(new ConstellationScreen());
             ScreenManager.Register(new TipScreen());
