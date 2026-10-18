@@ -45,7 +45,7 @@ namespace DiceVoders.Module.UI
         }
 
         /// <summary>The keywords an artifact's or spell's tooltip shows, once it is filled.</summary>
-        public static List<string> Of(Tooltip tooltip) => tooltip != null ? Lines(tooltip._nestedTooltips) : new List<string>();
+        public static List<string> Of(StarVaders.Tooltip tooltip) => tooltip != null ? Lines(tooltip._nestedTooltips) : new List<string>();
 
         /// <summary>The keywords a unit's tooltip shows, once it is filled.</summary>
         public static List<string> Of(EntityTooltip tooltip) => tooltip != null ? Lines(tooltip._nestedTooltips) : new List<string>();
@@ -91,12 +91,20 @@ namespace DiceVoders.Module.UI
         /// rarity read with its name (shop rarity's "Current chances: Common 84%, Uncommon 13%, ...").</summary>
         public static List<string> Trigger(UnityEngine.Transform trigger)
         {
-            var lines = new List<string>();
             var view = trigger != null ? trigger.GetComponent<TooltipTriggerView>() : null;
-            if (view == null || view.Tooltip == null) return lines;
+            return view != null ? Tooltip(view.Tooltip) : new List<string>();
+        }
+
+        /// <summary>A hover tooltip object's <see cref="Tooltip"/> as drawn, as <see cref="Trigger"/>
+        /// reads it (a button's own, <see cref="ButtonView.Tooltip"/>).</summary>
+        public static List<string> Tooltip(UnityEngine.GameObject tooltip)
+        {
+            var lines = new List<string>();
+            if (tooltip == null) return lines;
+            string name = tooltip.name;
             try
             {
-                var tip = view.Tooltip.GetComponentInChildren<Tooltip>(true);
+                var tip = tooltip.GetComponentInChildren<StarVaders.Tooltip>(true);
                 if (tip == null) return lines;
                 string title = GameText.Of(tip.TitleText);
                 var desc = new List<string>();
@@ -115,7 +123,7 @@ namespace DiceVoders.Module.UI
                 }
                 foreach (var line in Of(tip)) if (!lines.Contains(line)) lines.Add(line);
             }
-            catch (Exception e) { CoreLog.Warning("Keywords: reading " + trigger.name + "'s tooltip failed: " + e.Message); }
+            catch (Exception e) { CoreLog.Warning("Keywords: reading the tooltip " + name + " failed: " + e.Message); }
             return lines;
         }
     }
