@@ -152,7 +152,8 @@ sends `keybd_event`.
     Translator, LQA: ..."); a heading with no `Name` but a `*-logo` image under it names it by the
     sprite ("Music By: plasterbrain"). Art Direction's name is drawn as `"Text Settings"`,
     quotes and all. Escape is `OnPressExitButton`, from any page, as the game's cancel.
-  - `EncounterScreen` (`EncounterController`, `Module/Encounter/`; named by the score panel's
+  - `EncounterScreen` (`EncounterController`, `Module/Encounter/`; its name said once per push, not
+    again as an overlay closes (result, tip, pause); named by the score panel's
     `TargetText`, "Defeat the P.O.G. (Pluto Outer Guards)"; in a pilot fight, `IsPilotTribute`, the
     `PilotPanel` covers it and `TargetText` holds a missing key: the target reads "Roxy,
     Trailblazer", `GetCurrentPilot` and the panel's `AbilityTitleText`): two stops, starvaders' fight layout.
@@ -198,7 +199,8 @@ sends `keybd_event`.
     "shop", a new turn ("3 Turns, rolled 2, 4, 6"), a reroll; and every other settled change: a new
     target (its round's resets unsaid), attack, units destroyed/added/moved (keyed
     `EntityName#Number`), strength ("all units +5 strength" when alike), states and charge,
-    artifacts added/removed/moved/levelled/XP (keyed `ArtifactID.Number`), new tiles, clouds, honey,
+    artifacts added/removed/moved/levelled/XP (keyed `ArtifactID.Number`; a pilot's artifact left
+    out: its arrival is the new target's line, "Noel, Hyperfreeze, Act 2-3"), new tiles, clouds, honey,
     tokens ("Chrono 4"), Mult rising, the shop's offer rerolled (a purchase only removes), turns
     left changing within a phase. Mini-dice faces lead the scoring line ("Mini-Dice 6, column 6:
     30, ..."): caught by a Harmony postfix on `MiniDicePart.LaunchDiceToColumn`, called per die by

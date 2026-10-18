@@ -46,6 +46,20 @@ namespace DiceVoders.Module.Screens
 
         public override string ScreenName => Target();
 
+        // The target is said once per encounter, as it opens: an overlay closing (the result, a tip,
+        // the pause menu) hands focus back without it, and a new target is the events' to say.
+        private bool _named;
+
+        public override void OnPush() => _named = false;
+
+        public override void OnFocus()
+        {
+            if (_named) return;
+            base.OnFocus();
+            // Taken as said only once it could be (focus mode on, the target known).
+            _named = Navigation.FocusActive() && !string.IsNullOrEmpty(ScreenName);
+        }
+
         // Escape cancels a target choice, as the game's Cancel; otherwise it is the navigator's.
         public override IEnumerable<ElementAction> GetActions()
         {

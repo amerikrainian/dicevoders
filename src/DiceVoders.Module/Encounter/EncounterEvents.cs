@@ -129,7 +129,9 @@ namespace DiceVoders.Module.Encounter
                 for (int slot = 0; slot < (model.ArtifactSlots?.Count ?? 0); slot++)
                 {
                     var artifact = Encounter.Artifact(slot);
-                    if (artifact == null) continue;
+                    // A pilot is an artifact while it is the target: its arrival is the new target's
+                    // line, its going the result's, never "added" or "removed".
+                    if (artifact == null || Encounter.PilotName(artifact) != null) continue;
                     var xp = Encounter.ArtifactXp(artifact);
                     s.Artifacts.Add(new ArtifactSnap
                     {
