@@ -231,7 +231,10 @@ sends `keybd_event`.
     tooltip's keywords as side boxes (`NestedTooltipController`), one per `NestedTooltipName`, from
     `<Name>_TooltipTitle`/`_TooltipDesc`; which ones is the list the fill keeps (`_nestedTooltips` on
     `Tooltip` after `SetArtifactText`/`SetTextKey`, on `EntityTooltip` after `UpdateTooltip`, from the
-    definition's `NestedTooltips`). Every artifact, unit, shop choice and constellation set's details
+    definition's `NestedTooltips`), then the unit it creates (the definition's `NestedEntity`, whose
+    whole tooltip the game draws beside it while `NestedEntityTooltipObject` is on, on `Tooltip` and
+    `EntityTooltip` alike: Weaver's "Web: When scored: ...", "Unit - Token", "10 strength"). Every
+    artifact, unit, shop choice and constellation set's details
     (Backspace and the ui buffer) end with them ("Mini-Dice: Rolled and scored automatically each
     turn."); a column header adds Dice Power's while it has some. The status stop's details: Mult,
     Budge, Chrono, Mini-Dice, Cash = their keyword entries (Swap has none); hearts, attack and target =

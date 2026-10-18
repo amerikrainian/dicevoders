@@ -7,7 +7,7 @@ using DiceVoders.Module.Interop;
 namespace DiceVoders.Module.UI
 {
     /// <summary>
-    /// The game's keyword explanations, as it draws them beside a tooltip
+    /// What the game draws beside a tooltip: its keyword explanations
     /// (<see cref="NestedTooltipController"/>): one box per <see cref="NestedTooltipName"/>, titled and
     /// described by <c>&lt;Name&gt;_TooltipTitle</c> and <c>_TooltipDesc</c> (<see cref="NestedTooltip.SetText"/>).
     /// Which ones a tooltip gets is the list its fill keeps (<c>_nestedTooltips</c>, set by
@@ -44,11 +44,54 @@ namespace DiceVoders.Module.UI
             return lines;
         }
 
-        /// <summary>The keywords an artifact's or spell's tooltip shows, once it is filled.</summary>
-        public static List<string> Of(StarVaders.Tooltip tooltip) => tooltip != null ? Lines(tooltip._nestedTooltips) : new List<string>();
+        /// <summary>What an artifact's or spell's tooltip shows beside it, once it is filled: its
+        /// keywords, then the unit it creates (<see cref="Nested"/>).</summary>
+        public static List<string> Of(StarVaders.Tooltip tooltip)
+        {
+            if (tooltip == null) return new List<string>();
+            var lines = Lines(tooltip._nestedTooltips);
+            Nested(lines, tooltip.NestedEntityTooltipObject, tooltip.NestedEntityToolTip);
+            return lines;
+        }
 
-        /// <summary>The keywords a unit's tooltip shows, once it is filled.</summary>
-        public static List<string> Of(EntityTooltip tooltip) => tooltip != null ? Lines(tooltip._nestedTooltips) : new List<string>();
+        /// <summary>What a unit's tooltip shows beside it, once it is filled: its keywords, then the
+        /// unit it creates (<see cref="Nested"/>).</summary>
+        public static List<string> Of(EntityTooltip tooltip)
+        {
+            if (tooltip == null) return new List<string>();
+            var lines = Lines(tooltip._nestedTooltips);
+            Nested(lines, tooltip.NestedEntityTooltipObject, tooltip.NestedEntityToolTip);
+            return lines;
+        }
+
+        // The unit a unit or artifact creates (its definition's NestedEntity: the Weaver's Web), whose
+        // whole tooltip the game draws beside the other while it is switched on: "Web: When scored:
+        // ...", its rarity, its strength, its own keywords.
+        private static void Nested(List<string> lines, UnityEngine.GameObject shown, EntityTooltip nested)
+        {
+            if (shown == null || nested == null || !shown.activeSelf) return;
+            try
+            {
+                string title = null;
+                foreach (var tmp in new TMPro.TMP_Text[] { nested.TitleLongerText, nested.TitleText })
+                    if (title == null && tmp != null && tmp.gameObject.activeSelf) title = GameText.Of(tmp);
+                string desc = nested.DescriptionText != null && nested.DescriptionText.gameObject.activeSelf ? GameText.Of(nested.DescriptionText) : null;
+                if (title == null && desc == null) return;
+                lines.Add(title != null && desc != null ? title + ": " + desc : title ?? desc);
+                if (nested.RarityText != null && nested.RarityText.gameObject.activeSelf)
+                {
+                    string rarity = GameText.Of(nested.RarityText);
+                    if (rarity != null) lines.Add(rarity);
+                }
+                if (nested.AttackScoreText != null && nested.AttackScoreText.gameObject.activeInHierarchy)
+                {
+                    string strength = GameText.Of(nested.AttackScoreText);
+                    if (strength != null) lines.Add(DiceVoders.Core.Strings.Strings.EncStrength(strength));
+                }
+                foreach (var line in Lines(nested._nestedTooltips)) if (!lines.Contains(line)) lines.Add(line);
+            }
+            catch (Exception e) { CoreLog.Warning("Keywords: reading a nested unit's tooltip failed: " + e.Message); }
+        }
 
         private static readonly System.Text.RegularExpressions.Regex Coloured =
             new System.Text.RegularExpressions.Regex(@"<color=#([0-9A-Fa-f]{6})>([^<]*)</color>");
