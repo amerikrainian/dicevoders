@@ -119,6 +119,10 @@ namespace DiceVoders.Core.Strings
             D("main.credits", "Credits"),
             // The run's delete icon beside Resume Game (the game draws only its key prompt).
             D("main.delete_run", "Delete run"),
+            // The credits: which page of how many ({0} of {1}), and the page arrows (drawn with only their key prompts).
+            D("credits.page", "Page {0}/{1}"),
+            D("credits.prev", "Previous page"),
+            D("credits.next", "Next page"),
             // The role word for a modal dialog context.
             D("role.dialog", "dialog"),
 
@@ -323,6 +327,9 @@ namespace DiceVoders.Core.Strings
         public static string MainDiscord => Get("main.discord");
         public static string MainCredits => Get("main.credits");
         public static string MainDeleteRun => Get("main.delete_run");
+        public static string CreditsPage(int page, int count) => F("credits.page", page, count);
+        public static string CreditsPrevious => Get("credits.prev");
+        public static string CreditsNext => Get("credits.next");
         public static string RoleDialog => Get("role.dialog");
 
         public static string ScreenModMenu => Get("screen.mod_menu");

@@ -136,6 +136,17 @@ sends `keybd_event`.
     choosers' lists (opened and left with Escape), Escape out. Not exercised: picking a different
     resolution or screen type, a rebind (needs real keys), Reset to Default (resets at once, no
     prompt), the profile slots and Delete Current Profile (they change the save), options in a run.
+  - `CreditsScreen` (`CreditsController`, CreditsScene): six pages, one shown
+    (`PageList[currentPageIndex]`). One stop: the page's lines under a "Page 2/6" context, then
+    Previous page (`UpButton`), Next page (`DownButton`), Exit (`ExitButton`, last page only), each
+    while shown; a turn (`OnPressNext/PreviousPageButton`, ignored by the game while
+    `IsTransitioning`; the index moves at once) focuses the new page's first line. Lines: a heading
+    with a `Name` child pairs as "heading: name" (a `Name` with a nested `Name` is two names of a
+    team row, read apart); " | " in a text is a separator; the localization page's legend
+    ("<sprite Budge> : Translator") is not read but names the icons in its entries ("Español (es),
+    Translator, LQA: ..."). "Music By" has no text name (the composer is drawn as an image; the
+    Audio options page names plasterbrain); Art Direction's name is drawn as `"Text Settings"`,
+    quotes and all. Escape is `OnPressExitButton`, from any page, as the game's cancel.
   - `ConfirmPromptScreen` (`ConfirmPromptController`, layer 37): starvaders', compiled against this
     game's controller (focus start from `GetFirstActiveViewItemToStartAt`), not yet seen live.
   - `ModMenuScreen`, `HelpScreen`, `KeyCaptureScreen`: the mod's own, unchanged.
