@@ -119,7 +119,7 @@ namespace DiceVoders.Module.Screens
             {
                 if (!t.name.StartsWith("Name")) name = t.Find("Name");
                 string title = Text(own, icons);
-                string named = name != null ? Text(name.GetComponent<TMP_Text>(), icons) : null;
+                string named = name != null ? Text(name.GetComponent<TMP_Text>(), icons) : Logo(t);
                 string line = title != null && named != null ? title + ": " + named : title ?? named;
                 if (line != null) lines.Add(line);
             }
@@ -128,6 +128,22 @@ namespace DiceVoders.Module.Screens
                 var child = t.GetChild(i);
                 if (child != name && child.gameObject.activeSelf) Walk(child, lines, icons);
             }
+        }
+
+        // A name drawn as a logo under a heading ("Music By" over the "plasterbrain-logo" sprite):
+        // the sprite's name without its suffix, or null.
+        private static string Logo(Transform heading)
+        {
+            for (int i = 0; i < heading.childCount; i++)
+            {
+                var child = heading.GetChild(i);
+                if (!child.gameObject.activeSelf) continue;
+                var image = child.GetComponent<UnityEngine.UI.Image>();
+                string sprite = image != null && image.sprite != null ? image.sprite.name : null;
+                if (sprite != null && sprite.EndsWith("-logo", StringComparison.OrdinalIgnoreCase))
+                    return sprite.Substring(0, sprite.Length - "-logo".Length);
+            }
+            return null;
         }
 
         // The text's parts (its lines, and the " | " the game draws between a language and its

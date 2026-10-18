@@ -144,8 +144,8 @@ sends `keybd_event`.
     with a `Name` child pairs as "heading: name" (a `Name` with a nested `Name` is two names of a
     team row, read apart); " | " in a text is a separator; the localization page's legend
     ("<sprite Budge> : Translator") is not read but names the icons in its entries ("Español (es),
-    Translator, LQA: ..."). "Music By" has no text name (the composer is drawn as an image; the
-    Audio options page names plasterbrain); Art Direction's name is drawn as `"Text Settings"`,
+    Translator, LQA: ..."); a heading with no `Name` but a `*-logo` image under it names it by the
+    sprite ("Music By: plasterbrain"). Art Direction's name is drawn as `"Text Settings"`,
     quotes and all. Escape is `OnPressExitButton`, from any page, as the game's cancel.
   - `ConfirmPromptScreen` (`ConfirmPromptController`, layer 37): starvaders', compiled against this
     game's controller (focus start from `GetFirstActiveViewItemToStartAt`), not yet seen live.
