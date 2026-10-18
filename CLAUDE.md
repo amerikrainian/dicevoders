@@ -206,7 +206,10 @@ sends `keybd_event`.
     tooltips, so a text counts only by its own `activeSelf` (spells have no scaling line). Enter
     buys (the game's click); F freezes. Selections (`SelectionController.IsSelecting`): cells whose
     `TileView` or unit `EntityView`, and headers whose slot view (`ArtifactViewObjects[x]`, the
-    first 6 the columns'), pass `IsSatisfied` read "target" first and take Enter; focus goes to the
+    first 6 the columns'), pass `IsSatisfied` read "target" first and take Enter (a targeted column slot then says what placing
+    does, the game's mark under its `Selectionhighlight`: `LevelUpObject` "Level Up!" for the same
+    artifact, else `SwapObject`'s `ReplaceObject` caption "Replace", drawn only on the hovered slot but
+    read on all; an empty slot draws an arrow and says nothing; one artifact per column); focus goes to the
     first on the selection's start; Escape is the game's Cancel. Landings: the shop's first choice
     as it opens, the first die (silent) at a new turn; the strip's nodes `QuietVanish`. Readouts
     checked by reflection over the module (`Invoke` on `EncounterScreen.ChoiceText`...) with a tip

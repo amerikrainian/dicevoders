@@ -475,6 +475,26 @@ namespace DiceVoders.Module.Encounter
             return null;
         }
 
+        /// <summary>What placing on the slot does, as the game marks a targeted one: "Level Up!" for
+        /// the same artifact, "Replace" for another (<see cref="ArtifactView.SelectionHighlight"/>
+        /// switches the two); null for an empty slot (an arrow) or none drawn. The swap mark is an
+        /// icon whose "Replace" caption (<c>ReplaceObject</c>) shows only on the hovered slot: read
+        /// whether shown or not.</summary>
+        public static string SlotMark(int x)
+        {
+            var view = SlotView(x);
+            if (view == null) return null;
+            try
+            {
+                if (view.LevelUpObject != null && view.LevelUpObject.activeInHierarchy)
+                    return GameText.Of(view.LevelUpObject.GetComponentInChildren<TMPro.TMP_Text>(false));
+                if (view.SwapObject != null && view.SwapObject.activeInHierarchy && view.ReplaceObject != null)
+                    return GameText.Of(view.ReplaceObject.GetComponentInChildren<TMPro.TMP_Text>(true));
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading slot " + x + "'s mark failed: " + e.Message); }
+            return null;
+        }
+
         public static ArtifactView SlotView(int x)
         {
             var slots = View?.ArtifactViewObjects;
