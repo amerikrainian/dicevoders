@@ -106,7 +106,7 @@ sends `keybd_event`.
     Resume, the delete icon, Strategy Guide, Compendium and Wishlist were hidden on this profile
     (no run, new save): untested.
   - `WelcomePopupScreen` (`PopupCanvas`, layer 5, exclusive; shown every launch): dialog named by
-    the visible `Title`, its prose lines (focus lands there), then Join Discord and Got It; Escape is
+    the visible `Title`, one stop: its prose lines (focus lands on the first), then Join Discord and Got It; Escape is
     Got It.
   - `LanguageScreen` (`LanguageSelector`, layer 10, exclusive; up on the first launch over the
     popup, and from Change Language): dialog named by "Select Language", the `Page/Grid` languages

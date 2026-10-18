@@ -67,8 +67,9 @@ namespace DiceVoders.Module.Screens
 
     /// <summary>
     /// The main menu's welcome popup (<see cref="MainMenuController.PopupCanvas"/>, "Welcome to
-    /// Dicevaders!"): a dialog named by the shown panel's title, its prose one line per drawn line
-    /// (focus lands there), then its buttons (Join Discord, Got It). Escape is Got It.
+    /// Dicevaders!"): a dialog named by the shown panel's title, one stop of its prose, one line per
+    /// drawn line (focus lands on the first), with its buttons (Join Discord, Got It) at the bottom.
+    /// Escape is Got It.
     /// </summary>
     public sealed class WelcomePopupScreen : Screen
     {
@@ -99,7 +100,6 @@ namespace DiceVoders.Module.Screens
                 string line = lines[i];
                 b.AddItem(ControlId.Structural("welcome:line:" + i), GameNodes.Text(() => line));
             }
-            b.BeginStop("buttons");
             foreach (var item in popup.GetComponentsInChildren<AViewItem>(false))
                 if (item.TryCast<IClickable>() != null)
                     b.AddItem(ControlId.Structural("welcome:" + item.transform.parent.name), ViewNodes.Button(item));
