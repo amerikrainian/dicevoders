@@ -117,6 +117,7 @@ enc.level={0} Stufe {1}
 enc.tile_built=neues Feld auf {0}
 enc.clear=klar
 enc.shop_items=Laden: {0}
+enc.xp={0}/{1} EP
 bind.enc.budge_up=Hochschieben
 bind.enc.budge_down=Runterschieben
 bind.enc.freeze=Einfrieren

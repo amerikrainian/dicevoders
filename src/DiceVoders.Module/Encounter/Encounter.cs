@@ -250,16 +250,22 @@ namespace DiceVoders.Module.Encounter
 
         /// <summary>The artifact's tooltip as the game fills it (<see cref="StarVaders.Tooltip.SetArtifactText"/>
         /// on its view's tooltip): the description, the rarity and the scaling lines.</summary>
-        public static List<string> ArtifactLines(ArtifactModel artifact)
+        public static List<string> ArtifactLines(ArtifactModel artifact) => ArtifactTooltip(artifact).Lines;
+
+        /// <summary>The artifact's tooltip as the game fills it: its title ("Meteor [9/10 XP]", null when
+        /// it has none) and the lines after it.</summary>
+        public static (string Title, List<string> Lines) ArtifactTooltip(ArtifactModel artifact)
         {
             var lines = new List<string>();
-            if (artifact == null) return lines;
+            string title = null;
+            if (artifact == null) return (null, lines);
             var tooltip = ArtifactView(artifact)?.Tooltip;
             try
             {
                 if (tooltip != null)
                 {
                     tooltip.SetArtifactText(artifact, false, Model);
+                    if (tooltip.TitleText != null && tooltip.TitleText.gameObject.activeSelf) title = GameText.Of(tooltip.TitleText);
                     foreach (var tmp in new TMPro.TMP_Text[] { tooltip.DescriptionText, tooltip.RarityText, tooltip.ScalingText })
                     {
                         if (tmp == null || !tmp.gameObject.activeSelf) continue;
@@ -274,7 +280,21 @@ namespace DiceVoders.Module.Encounter
                 string desc = GameLoc.Get(artifact.ArtifactName + "_Arti_Desc");
                 if (desc != null) lines.Add(desc);
             }
-            return lines;
+            return (title, lines);
+        }
+
+        /// <summary>The artifact's level, XP and the XP its next level takes
+        /// (<see cref="ArtifactModel.GetLevelXPRequirement"/>); null for one that gains none (the
+        /// starter perk's XP reads -1).</summary>
+        public static (int Level, int Xp, int Needed)? ArtifactXp(ArtifactModel artifact)
+        {
+            if (artifact == null) return null;
+            try
+            {
+                if (artifact.CurrentXP < 0) return null;
+                return (artifact.Level, artifact.CurrentXP, ArtifactModel.GetLevelXPRequirement(artifact.Level, artifact.ArtifactType));
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading an artifact's XP failed: " + e.Message); return null; }
         }
 
         // ---- the dice ----

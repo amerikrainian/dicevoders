@@ -126,8 +126,13 @@ namespace DiceVoders.Module.Encounter
                 for (int slot = 0; slot < (model.ArtifactSlots?.Count ?? 0); slot++)
                 {
                     var artifact = Encounter.Artifact(slot);
-                    if (artifact != null)
-                        s.Artifacts.Add(new ArtifactSnap { Id = artifact.ArtifactID.Number, Name = Encounter.ArtifactName(artifact), Slot = slot, Level = artifact.Level });
+                    if (artifact == null) continue;
+                    var xp = Encounter.ArtifactXp(artifact);
+                    s.Artifacts.Add(new ArtifactSnap
+                    {
+                        Id = artifact.ArtifactID.Number, Name = Encounter.ArtifactName(artifact), Slot = slot, Level = artifact.Level,
+                        Xp = xp?.Xp ?? -1, XpNeeded = xp?.Needed ?? 0,
+                    });
                 }
                 for (int x = 0; x < Encounter.Columns; x++)
                 {

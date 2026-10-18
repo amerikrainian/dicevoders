@@ -158,7 +158,9 @@ sends `keybd_event`.
     (`DicePanel/ProceedKnob/ProceedLine/LaunchPanel/LaunchButton`). Focus lands on the first die.
     Backspace on a unit runs the game's `EntityTooltip.UpdateTooltip` on the tile's own tooltip
     (a hidden one holds prefab placeholders: "Mutantenschwamm", Legendary) and reads it; an
-    artifact's runs `Tooltip.SetArtifactText`. The status: an action tip while one shows, target
+    artifact's runs `Tooltip.SetArtifactText` and leads with its title ("Meteor [9/10 XP]"). An
+    artifact reads "Meteor, 9/10 XP" (", LV. 2" past level 1: `Level`, `CurrentXP`,
+    `ArtifactModel.GetLevelXPRequirement`; a starter perk's XP is -1 and reads none). The status: an action tip while one shows, target
     and act, "0/100 attack" (`TotalScore` over `TargetTributeScore`: the score panel's two), turns, hearts, Budge, Chrono, Swap, Mini-Dice, Cash, Mult, the non-column artifacts.
     A tip waiting for an action ("Press the LAUNCH button") is said once on arrival
     (`OnUpdate`). `ModelItemDict` and `ArtifactViewDict` are keyed by the boxed `ID`: artifacts
@@ -181,7 +183,7 @@ sends `keybd_event`.
     "shop", a new turn ("3 Turns, rolled 2, 4, 6"), a reroll; and every other settled change: a new
     target (its round's resets unsaid), attack, units destroyed/added/moved (keyed
     `EntityName#Number`), strength ("all units +5 strength" when alike), states and charge,
-    artifacts added/removed/moved/levelled (keyed `ArtifactID.Number`), new tiles, clouds, honey,
+    artifacts added/removed/moved/levelled/XP (keyed `ArtifactID.Number`), new tiles, clouds, honey,
     tokens ("Chrono 4"), Mult rising, the shop's offer rerolled (a purchase only removes), turns
     left changing within a phase. Mini-dice faces lead the scoring line ("Mini-Dice 6, column 6:
     30, ..."): caught by a Harmony postfix on `MiniDiceSpawner.LaunchDiceToColumn` (a face is the

@@ -117,6 +117,7 @@ enc.level={0} nivel {1}
 enc.tile_built=nueva casilla en {0}
 enc.clear=despejado
 enc.shop_items=tienda: {0}
+enc.xp={0}/{1} XP
 bind.enc.budge_up=Ajustar arriba
 bind.enc.budge_down=Ajustar abajo
 bind.enc.freeze=Congelar

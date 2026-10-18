@@ -117,6 +117,7 @@ enc.level={0} 레벨 {1}
 enc.tile_built={0}에 새 칸
 enc.clear=맑음
 enc.shop_items=상점: {0}
+enc.xp={0}/{1} XP
 bind.enc.budge_up=위로 조정
 bind.enc.budge_down=아래로 조정
 bind.enc.freeze=얼리기

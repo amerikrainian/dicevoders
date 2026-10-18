@@ -191,6 +191,8 @@ namespace DiceVoders.Core.Strings
             D("enc.clear", "clear"),
             // The shop's offer after a reroll; {0} = the items.
             D("enc.shop_items", "shop: {0}"),
+            // An artifact's XP; {0} = what it has, {1} = what its next level takes.
+            D("enc.xp", "{0}/{1} XP"),
             D("bind.enc.budge_up", "Budge up"),
             D("bind.enc.budge_down", "Budge down"),
             D("bind.enc.freeze", "Freeze"),
@@ -455,6 +457,7 @@ namespace DiceVoders.Core.Strings
         public static string EncTileBuilt(string place) => F("enc.tile_built", place);
         public static string EncClear => Get("enc.clear");
         public static string EncShopItems(string items) => F("enc.shop_items", items);
+        public static string EncXp(int xp, int needed) => F("enc.xp", xp, needed);
 
         public static string ScreenModMenu => Get("screen.mod_menu");
         public static string ModSettings => Get("mod.settings");

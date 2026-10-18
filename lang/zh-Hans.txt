@@ -117,6 +117,7 @@ enc.level={0} 等级 {1}
 enc.tile_built={0} 新格子
 enc.clear=晴朗
 enc.shop_items=商店: {0}
+enc.xp={0}/{1} 经验
 bind.enc.budge_up=向上微调
 bind.enc.budge_down=向下微调
 bind.enc.freeze=冻结

@@ -171,10 +171,22 @@ namespace DiceVoders.Tests
         {
             var prev = Snap("Draft");
             var now = Snap("Draft");
-            prev.Artifacts.Add(new ArtifactSnap { Id = 7, Name = "Meteor", Slot = 4, Level = 1 });
-            now.Artifacts.Add(new ArtifactSnap { Id = 7, Name = "Meteor", Slot = 2, Level = 2 });
+            prev.Artifacts.Add(new ArtifactSnap { Id = 7, Name = "Meteor", Slot = 4, Level = 1, Xp = 9, XpNeeded = 10 });
+            now.Artifacts.Add(new ArtifactSnap { Id = 7, Name = "Meteor", Slot = 2, Level = 2, Xp = 4, XpNeeded = 20 });
             now.Artifacts.Add(new ArtifactSnap { Id = 9, Name = "Pyramid", Slot = 0, Level = 1 });
-            Assert.Equal(new[] { "Meteor moved to column 3", "Meteor level 2", "Pyramid added, column 1" }, EncounterDiff.Lines(prev, now));
+            Assert.Equal(new[] { "Meteor moved to column 3", "Meteor level 2", "Meteor: 4/20 XP", "Pyramid added, column 1" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void Xp_gained_is_said_and_none_for_an_artifact_without_it()
+        {
+            var prev = Snap("Draft");
+            var now = Snap("Draft");
+            prev.Artifacts.Add(new ArtifactSnap { Id = 7, Name = "Meteor", Slot = 4, Level = 1, Xp = 4, XpNeeded = 10 });
+            now.Artifacts.Add(new ArtifactSnap { Id = 7, Name = "Meteor", Slot = 4, Level = 1, Xp = 9, XpNeeded = 10 });
+            prev.Artifacts.Add(new ArtifactSnap { Id = 1, Name = "The Tutorial", Slot = 9, Level = 1, Xp = -1 });
+            now.Artifacts.Add(new ArtifactSnap { Id = 1, Name = "The Tutorial", Slot = 9, Level = 1, Xp = -1 });
+            Assert.Equal(new[] { "Meteor: 9/10 XP" }, EncounterDiff.Lines(prev, now));
         }
 
         [Fact]

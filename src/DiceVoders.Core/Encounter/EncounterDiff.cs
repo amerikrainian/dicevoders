@@ -17,7 +17,7 @@ namespace DiceVoders.Core.Encounter
     /// <item>units: destroyed ("Time Angel at 6, 1 destroyed"), added ("Migo added at 4, 1"), moved
     /// ("Migo moved to 3, 2"), strength ("all units +5 strength" when every one that stayed changed
     /// alike, else "Migo at 2, 1: 20 strength"), states gained and lost, charge;</item>
-    /// <item>artifacts: added ("Meteor added, column 5"), removed, moved, levelled;</item>
+    /// <item>artifacts: added ("Meteor added, column 5"), removed, moved, levelled, XP ("Meteor: 9/10 XP");</item>
     /// <item>tiles: new ones, clouds coming and going, honey;</item>
     /// <item>the tokens that changed ("Chrono 4"), Mult rising;</item>
     /// <item>the shop opening, its offer changing other than by a purchase ("shop: Comet, Migo");</item>
@@ -167,6 +167,7 @@ namespace DiceVoders.Core.Encounter
                 }
                 if (was.Slot != a.Slot && a.Slot < 6) lines.Add(S.EncMoved(a.Name, S.EncColumn(a.Slot + 1)));
                 if (a.Level > was.Level) lines.Add(S.EncLevel(a.Name, a.Level));
+                if (a.Xp >= 0 && (a.Xp != was.Xp || a.XpNeeded != was.XpNeeded)) lines.Add(S.EncAt(a.Name, S.EncXp(a.Xp, a.XpNeeded)));
             }
         }
 

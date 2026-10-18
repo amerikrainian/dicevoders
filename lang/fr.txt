@@ -117,6 +117,7 @@ enc.level={0} niveau {1}
 enc.tile_built=nouvelle case en {0}
 enc.clear=dégagé
 enc.shop_items=boutique : {0}
+enc.xp={0}/{1} XP
 bind.enc.budge_up=Ajuster vers le haut
 bind.enc.budge_down=Ajuster vers le bas
 bind.enc.freeze=Geler

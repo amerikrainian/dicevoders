@@ -75,5 +75,7 @@ namespace DiceVoders.Core.Encounter
         /// <summary>Its slot: 0 to 5 are the columns'.</summary>
         public int Slot;
         public int Level;
+        /// <summary>Its XP and what its next level takes; -1 for one that gains none.</summary>
+        public int Xp, XpNeeded;
     }
 }

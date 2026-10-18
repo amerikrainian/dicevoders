@@ -117,6 +117,7 @@ enc.level={0} レベル {1}
 enc.tile_built={0}に新しいマス
 enc.clear=晴れ
 enc.shop_items=ショップ: {0}
+enc.xp={0}/{1} XP
 bind.enc.budge_up=上に調整
 bind.enc.budge_down=下に調整
 bind.enc.freeze=凍結

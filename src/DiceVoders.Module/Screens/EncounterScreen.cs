@@ -280,7 +280,7 @@ namespace DiceVoders.Module.Screens
             int power = EncounterState.DicePower(x);
             if (power > 0) parts.Add(Strings.EncFigure(GameLoc.Get("DicePower_Misc") ?? "Dice Power", power.ToString()));
             if (EncounterState.Honey(x)) parts.Add(Strings.EncHoney);
-            string artifact = EncounterState.ArtifactName(EncounterState.Artifact(x));
+            string artifact = ArtifactLabel(EncounterState.Artifact(x));
             if (artifact != null) parts.Add(artifact);
             return string.Join(", ", parts);
         }
@@ -362,13 +362,32 @@ namespace DiceVoders.Module.Screens
             if (rarity != null) yield return rarity;
         }
 
+        /// <summary>"Meteor, LV. 2, 9/20 XP": the artifact's name, its level past the first, its XP;
+        /// null for none.</summary>
+        internal static string ArtifactLabel(ArtifactModel artifact)
+        {
+            string name = EncounterState.ArtifactName(artifact);
+            if (name == null) return null;
+            var parts = new List<string> { name };
+            var xp = EncounterState.ArtifactXp(artifact);
+            if (xp.HasValue)
+            {
+                if (xp.Value.Level > 1)
+                    parts.Add(Strings.EncFigure((GameLoc.Get("LevelShortened_Misc") ?? "LV.").Trim(), xp.Value.Level.ToString()));
+                parts.Add(Strings.EncXp(xp.Value.Xp, xp.Value.Needed));
+            }
+            return string.Join(", ", parts);
+        }
+
+        // "Meteor [9/10 XP]: After you score a pair...", the game's title (its XP) leading, then the
+        // rarity and scaling.
         private static IEnumerable<string> ArtifactDetails(ArtifactModel artifact)
         {
             if (artifact == null) yield break;
-            string name = EncounterState.ArtifactName(artifact);
-            var lines = EncounterState.ArtifactLines(artifact);
-            if (lines.Count == 0) { yield return name; yield break; }
-            yield return name + ": " + lines[0];
+            var (title, lines) = EncounterState.ArtifactTooltip(artifact);
+            title = title ?? EncounterState.ArtifactName(artifact);
+            if (lines.Count == 0) { yield return title; yield break; }
+            yield return title + ": " + lines[0];
             for (int i = 1; i < lines.Count; i++) yield return lines[i];
         }
 
@@ -526,7 +545,7 @@ namespace DiceVoders.Module.Screens
                 b.AddItem(ControlId.Structural("enc:artifact:" + slot), new NodeVtable
                 {
                     ControlType = ControlTypes.Text,
-                    Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(() => EncounterState.ArtifactName(EncounterState.Artifact(s))) },
+                    Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(() => ArtifactLabel(EncounterState.Artifact(s))) },
                     SearchText = () => EncounterState.ArtifactName(EncounterState.Artifact(s)),
                     OnFocus = () => { var view = EncounterState.ArtifactView(EncounterState.Artifact(s)); if (view != null) EncounterState.Hover(view); },
                     Details = () => ArtifactDetails(EncounterState.Artifact(s)),
