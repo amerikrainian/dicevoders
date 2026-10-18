@@ -166,7 +166,8 @@ namespace DiceVoders.Module.Screens
             _reward = rewardPtr;
             _selecting = selecting;
             if (EncounterEvents.Settled || selecting) _phase = phase;
-            if (_pendingLanding != null && Navigation.Active?.MoveTo(_pendingLanding, _pendingSpeak) == true) _pendingLanding = null;
+            // Queued: the game caused it, and the lines saying so (the scoring, "Shop") come first.
+            if (_pendingLanding != null && Navigation.Active?.MoveTo(_pendingLanding, _pendingSpeak, interrupt: false) == true) _pendingLanding = null;
         }
 
         // The first cell or header the running selection takes, reading order (headers, then the

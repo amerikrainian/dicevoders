@@ -73,8 +73,10 @@ namespace DiceVoders.Core.UI
         /// (interrupting, the contexts crossed read as an arrow's are): a screen's own key that lands
         /// somewhere. False when the node is not in the render or is the focused one already, so the
         /// caller stays silent as at an edge. With <paramref name="speak"/> false the move is silent
-        /// (its caller says something else) and taken as spoken.</summary>
-        public virtual bool MoveTo(Graph.ControlId id, bool speak = true) => false;
+        /// (its caller says something else) and taken as spoken. With <paramref name="interrupt"/>
+        /// false it queues after what is being said (a landing the game caused, after the lines
+        /// announcing it).</summary>
+        public virtual bool MoveTo(Graph.ControlId id, bool speak = true, bool interrupt = true) => false;
 
         /// <summary>Whether the current render has a focusable node in that Tab-stop: a screen offers
         /// a jump key (Alt+B for the board) only where its stop is on show.</summary>
@@ -159,7 +161,7 @@ namespace DiceVoders.Core.UI
 
         public static void FocusStop(object stopKey) => Active?.FocusStop(stopKey);
 
-        public static bool MoveTo(Graph.ControlId id, bool speak = true) => Active != null && Active.MoveTo(id, speak);
+        public static bool MoveTo(Graph.ControlId id, bool speak = true, bool interrupt = true) => Active != null && Active.MoveTo(id, speak, interrupt);
 
         public static object FocusedStopKey => Active?.FocusedStopKey;
 

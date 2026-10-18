@@ -136,7 +136,7 @@ namespace DiceVoders.Core.UI
 
         public override object FocusedStopKey => _graph?.CurrentNode?.StopKey;
 
-        public override bool MoveTo(ControlId id, bool speak = true)
+        public override bool MoveTo(ControlId id, bool speak = true, bool interrupt = true)
         {
             if (id == null || _graph == null || !_graph.Rerender()) return false;
             var from = _graph.CurrentNode;
@@ -146,7 +146,7 @@ namespace DiceVoders.Core.UI
             if (node == null) return false;
             PlayHover(node);
             FireFocus(node);
-            if (speak) Speak(ComposeMove(from, node, entry: false), interrupt: true);
+            if (speak) Speak(ComposeMove(from, node, entry: false), interrupt: interrupt);
             _lastSpokenKey = node.Id;
             _lastSpokenNode = node;
             return true;
