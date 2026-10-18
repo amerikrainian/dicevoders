@@ -137,6 +137,7 @@ namespace DiceVoders.Module
             ScreenManager.Register(new ConfirmPromptScreen());
             ScreenManager.Register(new SettingsScreen());
             ScreenManager.Register(new CreditsScreen());
+            ScreenManager.Register(new TipScreen());
             ScreenManager.Register(new ModMenuScreen());
             ScreenManager.Register(new HelpScreen());
         }

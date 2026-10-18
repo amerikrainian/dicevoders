@@ -147,6 +147,12 @@ sends `keybd_event`.
     Translator, LQA: ..."); a heading with no `Name` but a `*-logo` image under it names it by the
     sprite ("Music By: plasterbrain"). Art Direction's name is drawn as `"Text Settings"`,
     quotes and all. Escape is `OnPressExitButton`, from any page, as the game's cancel.
+  - `TipScreen` (`TipManager.CurrentTip`, layer 40, exclusive; `UI/Tips`): a tutorial tip that
+    waits for a click (its `ClickToContinue` line shows) as one text node; Enter is
+    `TipManager.ClickTipBox` (ignored by the game until `TipBox._isFinished`, set when the box has
+    popped in). Tip01 ("Welcome to DiceVaders!...") shows over the first encounter after Start Game
+    on a new save. Tips without the line (waiting for an action) are not read. Dismissing not yet
+    exercised.
   - `ConfirmPromptScreen` (`ConfirmPromptController`, layer 37): starvaders', compiled against this
     game's controller (focus start from `GetFirstActiveViewItemToStartAt`), not yet seen live.
   - `ModMenuScreen`, `HelpScreen`, `KeyCaptureScreen`: the mod's own, unchanged.
