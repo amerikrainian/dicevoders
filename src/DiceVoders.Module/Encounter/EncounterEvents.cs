@@ -56,9 +56,12 @@ namespace DiceVoders.Module.Encounter
 
         // The mini-dice launched since the last snapshot: their faces are the columns they go to,
         // caught as the game sends each (they roll and land mid-scoring, never on a settled frame).
+        // Each goes through MiniDicePart.LaunchDiceToColumn, from ProcessMiniDiceTask (and from
+        // MiniDiceSpawner.LaunchDiceToColumn, which nothing calls in this build: patched there, none
+        // were ever caught).
         private static readonly List<int> _miniDice = new List<int>();
 
-        [HarmonyPatch(typeof(MiniDiceSpawner), nameof(MiniDiceSpawner.LaunchDiceToColumn))]
+        [HarmonyPatch(typeof(MiniDicePart), nameof(MiniDicePart.LaunchDiceToColumn))]
         internal static class MiniDiceLaunch
         {
             [HarmonyPostfix]
