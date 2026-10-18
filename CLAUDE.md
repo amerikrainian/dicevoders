@@ -230,8 +230,11 @@ sends `keybd_event`.
     the board's `TooltipTriggerView` hovers (`HeartTooltipTrigger` "Commander Hearts",
     `ScoreTooltipTrigger` "Objective", `PilotPanelTooltipTrigger` in a pilot fight else
     `MapTooltipTrigger`, both "VICTORY CONDITION"); the shop strip has "Shop rarity, +0 %"
-    (`DraftPanel/BG/RarityObject`, its `RarityNumber`) with its hover, whose chances are coloured by
-    rarity and read as bare figures ("84% | 13% | 6% | 0%").
+    (`DraftPanel/BG/RarityObject`, its `RarityNumber`) with its hover, whose chances the game tells apart
+    by colour alone: a figure coloured as a rarity (`ContentGetter.GetRarityTextColor`, matched for
+    Common/Uncommon/Rare/Legendary) reads with its name, bars as commas ("Current chances: Common 84%,
+    Uncommon 13%, Rare 6%, Legendary 0%"). Seen live in the shop, with the choices' keywords (Comet:
+    Base Dice, Mult; Shooter: Repeat; the spells carry none).
   - `PauseScreen` (`EncounterController.PauseMenuController`, layer 33, exclusive; up while
     `PausePanel` is active and `IsPaused`): "Game Menu". Escape on the encounter opens it: the
     navigator's `BackFallback` is the game's Menu key handler (`EncounterKeyInputController.OnMenu`:

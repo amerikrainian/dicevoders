@@ -50,8 +50,45 @@ namespace DiceVoders.Module.UI
         /// <summary>The keywords a unit's tooltip shows, once it is filled.</summary>
         public static List<string> Of(EntityTooltip tooltip) => tooltip != null ? Lines(tooltip._nestedTooltips) : new List<string>();
 
+        private static readonly System.Text.RegularExpressions.Regex Coloured =
+            new System.Text.RegularExpressions.Regex(@"<color=#([0-9A-Fa-f]{6})>([^<]*)</color>");
+        private static readonly System.Text.RegularExpressions.Regex Bar =
+            new System.Text.RegularExpressions.Regex(@"\s*\|\s*");
+        private static readonly Rarity[] Rarities = { Rarity.Common, Rarity.Uncommon, Rarity.Rare, Rarity.Legendary };
+
+        // A line whose figures the game tells apart by rarity colour alone
+        // (<see cref="ContentGetter.GetRarityTextColor"/>): each named ("Common 84%"), its bars commas.
+        private static string RarityFigures(string line)
+        {
+            bool named = false;
+            string text = Coloured.Replace(line, m =>
+            {
+                string name = RarityOfColour(m.Groups[1].Value);
+                if (name == null) return m.Value;
+                named = true;
+                return name + " " + m.Groups[2].Value.Trim();
+            });
+            return named ? Bar.Replace(text, ", ") : line;
+        }
+
+        private static string RarityOfColour(string hex)
+        {
+            try
+            {
+                foreach (var rarity in Rarities)
+                {
+                    var c = (UnityEngine.Color32)ContentGetter.GetRarityTextColor(rarity);
+                    if (string.Equals(c.r.ToString("X2") + c.g.ToString("X2") + c.b.ToString("X2"), hex, StringComparison.OrdinalIgnoreCase))
+                        return GameLoc.Get(rarity + "_Misc") ?? rarity.ToString();
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("Keywords: matching a rarity colour failed: " + e.Message); }
+            return null;
+        }
+
         /// <summary>A hover tooltip on the board as drawn: "title: description" (each further line of
-        /// the description its own), then its keywords. Empty when it has none.</summary>
+        /// the description its own), then its keywords. Empty when it has none. Figures coloured as a
+        /// rarity read with its name (shop rarity's "Current chances: Common 84%, Uncommon 13%, ...").</summary>
         public static List<string> Trigger(UnityEngine.Transform trigger)
         {
             var lines = new List<string>();
@@ -67,7 +104,7 @@ namespace DiceVoders.Module.UI
                 if (raw != null)
                     foreach (var part in raw.Split('\n'))
                     {
-                        string line = GameText.Clean(part)?.Trim();
+                        string line = GameText.Clean(RarityFigures(part))?.Trim();
                         if (!string.IsNullOrEmpty(line) && !GameText.IsMissing(line) && System.Linq.Enumerable.Any(line, char.IsLetterOrDigit)) desc.Add(line);
                     }
                 if (desc.Count == 0) { if (title != null) lines.Add(title); }
