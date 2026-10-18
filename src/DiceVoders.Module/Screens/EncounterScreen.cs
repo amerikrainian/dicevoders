@@ -330,16 +330,26 @@ namespace DiceVoders.Module.Screens
             var parts = new List<string> { EncounterState.Name(unit) };
             string strength = EncounterState.Strength(unit);
             if (strength != null) parts.Add(Strings.EncStrength(strength));
-            try
-            {
-                if (unit.IsNegative) parts.Add(Strings.EncNegative);
-                if (unit.IsShielded) parts.Add(GameLoc.Get("Shielded_Keyword") ?? "Shielded");
-                if (unit.IsShocked) parts.Add(GameLoc.Get("Shock_Keyword") ?? "Shock");
-                if (unit.MaxCharge > 0) parts.Add(Strings.EncCharge(unit.Charge, unit.MaxCharge));
-            }
-            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's state failed: " + e.Message); }
+            parts.AddRange(UnitStates(unit));
+            try { if (unit.MaxCharge > 0) parts.Add(Strings.EncCharge(unit.Charge, unit.MaxCharge)); }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's charge failed: " + e.Message); }
             parts.RemoveAll(string.IsNullOrEmpty);
             return string.Join(", ", parts);
+        }
+
+        /// <summary>A unit's named states, charge apart: negative, Shielded, Shock.</summary>
+        internal static List<string> UnitStates(EntityModel unit)
+        {
+            var states = new List<string>();
+            try
+            {
+                if (unit.IsNegative) states.Add(Strings.EncNegative);
+                if (unit.IsShielded) states.Add(GameLoc.Get("Shielded_Keyword") ?? "Shielded");
+                if (unit.IsShocked) states.Add(GameLoc.Get("Shock_Keyword") ?? "Shock");
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's state failed: " + e.Message); }
+            states.RemoveAll(string.IsNullOrEmpty);
+            return states;
         }
 
         private static IEnumerable<string> CellDetails(int x, int y)

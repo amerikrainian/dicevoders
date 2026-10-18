@@ -169,6 +169,28 @@ namespace DiceVoders.Core.Strings
             D("enc.cost", "{0} cash"),
             D("enc.cursed", "cursed"),
             D("enc.cant_afford", "can't afford"),
+            // Events. {0} = a unit's name, {1} = its tile ("2, 1").
+            D("enc.unit_removed", "{0} at {1} destroyed"),
+            D("enc.unit_added", "{0} added at {1}"),
+            // {0} = a unit or artifact, {1} = where it went (a tile, a column).
+            D("enc.moved", "{0} moved to {1}"),
+            // Every unit's strength changed alike; {0} = the change, signed ("+5").
+            D("enc.all_strength", "all units {0} strength"),
+            // Something and what happened to it ("Migo at 2, 1: Shielded"): {0} = the thing, {1} = the news.
+            D("enc.at", "{0}: {1}"),
+            D("enc.unit_at", "{0} at {1}"),
+            // A state or thing gone; {0} = it ("Shielded lost").
+            D("enc.lost", "{0} lost"),
+            D("enc.artifact_added", "{0} added"),
+            D("enc.artifact_removed", "{0} removed"),
+            // {0} = an artifact, {1} = its new level.
+            D("enc.level", "{0} level {1}"),
+            // {0} = the tile.
+            D("enc.tile_built", "new tile at {0}"),
+            // A tile's cloud gone.
+            D("enc.clear", "clear"),
+            // The shop's offer after a reroll; {0} = the items.
+            D("enc.shop_items", "shop: {0}"),
             D("bind.enc.budge_up", "Budge up"),
             D("bind.enc.budge_down", "Budge down"),
             D("bind.enc.freeze", "Freeze"),
@@ -420,6 +442,19 @@ namespace DiceVoders.Core.Strings
         public static string EncCost(int cost) => F("enc.cost", cost);
         public static string EncCursed => Get("enc.cursed");
         public static string EncCantAfford => Get("enc.cant_afford");
+        public static string EncUnitRemoved(string name, string place) => F("enc.unit_removed", name, place);
+        public static string EncUnitAdded(string name, string place) => F("enc.unit_added", name, place);
+        public static string EncMoved(string what, string where) => F("enc.moved", what, where);
+        public static string EncAllStrength(string delta) => F("enc.all_strength", delta);
+        public static string EncAt(string what, string news) => F("enc.at", what, news);
+        public static string EncUnitAt(string name, string place) => F("enc.unit_at", name, place);
+        public static string EncLost(string what) => F("enc.lost", what);
+        public static string EncArtifactAdded(string name) => F("enc.artifact_added", name);
+        public static string EncArtifactRemoved(string name) => F("enc.artifact_removed", name);
+        public static string EncLevel(string name, int level) => F("enc.level", name, level);
+        public static string EncTileBuilt(string place) => F("enc.tile_built", place);
+        public static string EncClear => Get("enc.clear");
+        public static string EncShopItems(string items) => F("enc.shop_items", items);
 
         public static string ScreenModMenu => Get("screen.mod_menu");
         public static string ModSettings => Get("mod.settings");

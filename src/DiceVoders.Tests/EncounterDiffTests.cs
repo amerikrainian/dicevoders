@@ -76,5 +76,121 @@ namespace DiceVoders.Tests
         {
             Assert.Contains("Hearts 4", EncounterDiff.Lines(Snap("Draft", hearts: 5), Snap("Draft", hearts: 4)));
         }
+
+        private static UnitSnap Unit(string id, string name, int x, int y, double strength, params string[] states) => new UnitSnap
+        {
+            Id = id, Name = name, X = x, Y = y, Strength = strength, StrengthText = strength.ToString(), States = new List<string>(states),
+        };
+
+        [Fact]
+        public void A_token_change_says_the_token()
+        {
+            var prev = Snap("Draft");
+            prev.Tokens.Add(new Figure { Key = "chrono", Label = "Chrono", Value = 2 });
+            var now = Snap("Draft");
+            now.Tokens.Add(new Figure { Key = "chrono", Label = "Chrono", Value = 4 });
+            Assert.Equal(new[] { "Chrono 4" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void A_unit_gone_is_destroyed_where_it_stood()
+        {
+            var prev = Snap("Draft");
+            prev.Units.Add(Unit("TimeAngel#1", "Time Angel", 5, 0, 10));
+            Assert.Equal(new[] { "Time Angel at 6, 1 destroyed" }, EncounterDiff.Lines(prev, Snap("Draft")));
+        }
+
+        [Fact]
+        public void A_unit_placed_is_added_where_it_stands()
+        {
+            var now = Snap("Draft");
+            now.Units.Add(Unit("Migo#4", "Migo", 3, 0, 10));
+            Assert.Equal(new[] { "Migo added at 4, 1" }, EncounterDiff.Lines(Snap("Draft"), now));
+        }
+
+        [Fact]
+        public void Every_unit_gaining_alike_is_one_line()
+        {
+            var prev = Snap("Draft");
+            var now = Snap("Draft");
+            prev.Units.Add(Unit("Migo#1", "Migo", 1, 0, 10)); prev.Units.Add(Unit("Migo#2", "Migo", 2, 0, 10));
+            now.Units.Add(Unit("Migo#1", "Migo", 1, 0, 15)); now.Units.Add(Unit("Migo#2", "Migo", 2, 0, 15));
+            Assert.Equal(new[] { "all units +5 strength" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void One_unit_gaining_says_its_new_strength()
+        {
+            var prev = Snap("Draft");
+            var now = Snap("Draft");
+            prev.Units.Add(Unit("Migo#1", "Migo", 1, 0, 10)); prev.Units.Add(Unit("Migo#2", "Migo", 2, 0, 10));
+            now.Units.Add(Unit("Migo#1", "Migo", 1, 0, 25)); now.Units.Add(Unit("Migo#2", "Migo", 2, 0, 10));
+            Assert.Equal(new[] { "Migo at 2, 1: 25 strength" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void States_gained_and_lost_are_said()
+        {
+            var prev = Snap("Draft");
+            var now = Snap("Draft");
+            prev.Units.Add(Unit("Migo#1", "Migo", 1, 0, 10, "Shock"));
+            now.Units.Add(Unit("Migo#1", "Migo", 1, 0, 10, "Shielded"));
+            Assert.Equal(new[] { "Migo at 2, 1: Shielded", "Migo at 2, 1: Shock lost" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void A_unit_moved_says_where_to()
+        {
+            var prev = Snap("Draft");
+            var now = Snap("Draft");
+            prev.Units.Add(Unit("Migo#1", "Migo", 1, 0, 10));
+            now.Units.Add(Unit("Migo#1", "Migo", 2, 1, 10));
+            Assert.Equal(new[] { "Migo moved to 3, 2" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void Artifacts_added_moved_and_levelled_are_said()
+        {
+            var prev = Snap("Draft");
+            var now = Snap("Draft");
+            prev.Artifacts.Add(new ArtifactSnap { Id = 7, Name = "Meteor", Slot = 4, Level = 1 });
+            now.Artifacts.Add(new ArtifactSnap { Id = 7, Name = "Meteor", Slot = 2, Level = 2 });
+            now.Artifacts.Add(new ArtifactSnap { Id = 9, Name = "Pyramid", Slot = 0, Level = 1 });
+            Assert.Equal(new[] { "Meteor moved to column 3", "Meteor level 2", "Pyramid added, column 1" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void A_new_tile_is_said()
+        {
+            var now = Snap("Draft");
+            now.Built.Add((3, 0));
+            Assert.Equal(new[] { "new tile at 4, 1" }, EncounterDiff.Lines(Snap("Draft"), now));
+        }
+
+        [Fact]
+        public void A_purchase_is_no_shop_change_but_a_reroll_is()
+        {
+            var prev = Snap("Draft");
+            prev.Shop.AddRange(new[] { "Migo", "Comet", "Build Tile" });
+            var bought = Snap("Draft");
+            bought.Shop.AddRange(new[] { "Migo", "Build Tile" });
+            Assert.Empty(EncounterDiff.Lines(prev, bought));
+            var rerolled = Snap("Draft");
+            rerolled.Shop.AddRange(new[] { "Pyramid", "Swap or Move" });
+            Assert.Equal(new[] { "shop: Pyramid, Swap or Move" }, EncounterDiff.Lines(prev, rerolled));
+        }
+
+        [Fact]
+        public void A_new_target_is_said_and_its_resets_are_not()
+        {
+            var prev = Snap("Simulation", total: 110, turns: 1);
+            prev.TargetName = "Defeat the P.O.G.";
+            prev.Tokens.Add(new Figure { Key = "cash", Label = "Cash", Value = 0 });
+            var now = Snap("Draft", total: 0, turns: 4);
+            now.TargetName = "Defeat the N.B.S.";
+            now.Act = "Act 1-2";
+            now.Tokens.Add(new Figure { Key = "cash", Label = "Cash", Value = 3 });
+            Assert.Equal(new[] { "Defeat the N.B.S., Act 1-2", "shop" }, EncounterDiff.Lines(prev, now));
+        }
     }
 }

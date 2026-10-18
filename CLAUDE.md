@@ -178,7 +178,12 @@ sends `keybd_event`.
     leaving the player phase, one line ("column 3: 20, column 5: 10, 30/100 attack": the column's
     units' `AttackGainedLastTurn` summed, `...ThisTurn` while still scoring; `AtkPerCol` reads all 0
     once the shop opens; the raw figures are logged beside it), target reached, a heart lost,
-    "shop", a new turn ("3 Turns, rolled 2, 4, 6"), a reroll. Verified live: the refusals with a tip
+    "shop", a new turn ("3 Turns, rolled 2, 4, 6"), a reroll; and every other settled change: a new
+    target (its round's resets unsaid), attack, units destroyed/added/moved (keyed
+    `EntityName#Number`), strength ("all units +5 strength" when alike), states and charge,
+    artifacts added/removed/moved/levelled (keyed `ArtifactID.Number`), new tiles, clouds, honey,
+    tokens ("Chrono 4"), Mult rising, the shop's offer rerolled (a purchase only removes), turns
+    left changing within a phase. Not narrated: the mini-dice faces (only their scoring). Verified live: the refusals with a tip
     up, a launch (20 + 10 = 30 in the tutorial). Not exercised: a real budge, freeze, reroll, cancel.
     Tiles: only `GridModel.BuiltCoords` exist (the tutorial starts with the bottom row less column
     4, plus 2,2); others read "no tile"; `GetBuildableCoords` is where Build Tile can add one. The

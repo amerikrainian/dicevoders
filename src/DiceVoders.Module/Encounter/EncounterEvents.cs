@@ -84,15 +84,81 @@ namespace DiceVoders.Module.Encounter
                     TotalText = Encounter.Big(EncounterValue.TotalScore),
                     TargetText = Encounter.Big(EncounterValue.TargetTributeScore),
                     TargetReachedText = GameLoc.Get("TargetReached_Misc"),
+                    TargetName = Screens.EncounterScreen.Target(),
+                    Act = GameText.Of(Encounter.View?.MapPanel?.actText),
+                    Mult = model.GetBigDoubleValue(EncounterValue.GlobalMult).ToDouble(),
+                    MultText = Encounter.Big(EncounterValue.GlobalMult),
+                    MultLabel = GameLoc.Get("GlobalMult_Keyword") ?? "Mult",
+                    CloudLabel = GameLoc.Get("Cloudy_TooltipTitle") ?? "Cloudy",
                 };
                 foreach (var die in Encounter.Dice()) s.Dice.Add(die.isRolling ? 0 : die.Value);
                 ColumnAttack(model, s.ColumnAttack);
+                Tokens(s.Tokens);
+                Units(model, s.Units);
+                for (int slot = 0; slot < (model.ArtifactSlots?.Count ?? 0); slot++)
+                {
+                    var artifact = Encounter.Artifact(slot);
+                    if (artifact != null)
+                        s.Artifacts.Add(new ArtifactSnap { Id = artifact.ArtifactID.Number, Name = Encounter.ArtifactName(artifact), Slot = slot, Level = artifact.Level });
+                }
+                for (int x = 0; x < Encounter.Columns; x++)
+                {
+                    if (Encounter.Honey(x)) s.Honey.Add(x);
+                    for (int y = 0; y < Encounter.Rows; y++)
+                    {
+                        if (!Encounter.Built(x, y)) continue;
+                        s.Built.Add((x, y));
+                        if (Encounter.Cloud(x, y)) s.Clouds.Add((x, y));
+                    }
+                }
+                if (Encounter.Phase == Phase.Draft)
+                    foreach (var choice in Encounter.Choices()) s.Shop.Add(Screens.EncounterScreen.ChoiceName(choice));
                 return s;
             }
             catch (Exception e)
             {
                 CoreLog.Warning("EncounterEvents: taking the snapshot failed: " + e.Message);
                 return null;
+            }
+        }
+
+        private static void Tokens(List<Figure> into)
+        {
+            void Add(string key, string label, EncounterValue value)
+            {
+                int? n = Encounter.Int(value);
+                if (n.HasValue) into.Add(new Figure { Key = key, Label = label, Value = n.Value });
+            }
+            Add("budge", GameLoc.Get("Budge_Keyword") ?? "Budge", EncounterValue.BudgeToken);
+            Add("chrono", GameLoc.Get("Chrono_Keyword") ?? "Chrono", EncounterValue.ChronoToken);
+            Add("swap", Core.Strings.Strings.EncSwap, EncounterValue.SwapToken);
+            Add("minidice", GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice", EncounterValue.MiniDice);
+            Add("cash", GameLoc.Get("ShopToken_TooltipTitle") ?? "Cash", EncounterValue.ShopToken);
+        }
+
+        // The units on the grid, by the game's id (name and number: stable while the unit lives).
+        private static void Units(EncounterModel model, List<UnitSnap> into)
+        {
+            foreach (var kv in model.ModelItemDict)
+            {
+                var unit = kv.Value?.TryCast<EntityModel>();
+                if (unit == null) continue;
+                var id = unit.EntityID;
+                if (!model.GridModel.IsEntityOnGrid(id)) continue;
+                var c = model.GridModel.GetEntityCoord(id, false);
+                var strength = unit.GetCurrentValue(model);
+                into.Add(new UnitSnap
+                {
+                    Id = id.EntityName + "#" + id.Number,
+                    Name = Encounter.Name(unit),
+                    X = c.x,
+                    Y = c.y,
+                    Strength = strength.ToDouble(),
+                    StrengthText = strength.ToString(),
+                    States = Screens.EncounterScreen.UnitStates(unit),
+                    Charge = unit.Charge,
+                    MaxCharge = unit.MaxCharge,
+                });
             }
         }
 
