@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using DiceVoders.Core;
+using DiceVoders.Core.UI;
 using DiceVoders.Core.Strings;
 using Il2CppInterop.Runtime;
 using UnityEngine;
@@ -124,6 +125,9 @@ namespace DiceVoders.Module
             bool first = _applied == null;
             _applied = code;
             Load(code);
+            // Every live part the navigator watches now reads in the new language: a rewording, not
+            // a change of state (the language picker's "selected" would otherwise be said twice).
+            if (!first) Navigation.LanguageChanged();
             if (!first || _onFirstLanguage == null) return;
             try { _onFirstLanguage(); }
             catch (Exception e) { CoreLog.Error("LanguageSync: the first-language callback failed: " + e); }

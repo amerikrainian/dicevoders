@@ -112,7 +112,9 @@ sends `keybd_event`.
     popup, and from Change Language): dialog named by "Select Language", the `Page/Grid` languages
     as radio buttons (selected = the item's `Selected` child), Apply & Exit; Enter picks (the locale
     switches at once, and the mod's strings with it), landing picks nothing; Escape is Apply & Exit.
-    Known wrinkle: picking a language says "selected" in the old language and again in the new.
+    Enter says "selected" at once (the radio's `StateText`); the switch then rewords every live part,
+    which `LanguageSync` tells the navigator (`Navigation.LanguageChanged`: a silent re-baseline), so
+    it is said once, in whichever language was in effect when the click returned.
   - `SettingsScreen` (`SettingsSceneController`, SettingsMenuScene, layer 35, exclusive; named by
     its `BackgroundPanel/TitleText`, "Options & Extras"): three Tab-stops. The tab strip
     (`CategoryButtons/*/Button`, captions beside them) is a row entered at `_currentTab`; landing on

@@ -88,6 +88,11 @@ namespace DiceVoders.Core.UI
         /// <summary>The Tab-stop the focused node belongs to, or null.</summary>
         public virtual object FocusedStopKey => null;
 
+        /// <summary>The mod's strings were just reloaded in another language. What the live watch
+        /// remembers of the focused node is the old wording of the same state ("selected" for
+        /// "sélectionné"), so it takes the new wording as its baseline without speaking.</summary>
+        public virtual void LanguageChanged() { }
+
         // interrupt: true for focus MOVES (so held key-repeat reads the item you land on instead of
         // backing up a queue); false for screen-entry / landing readouts.
         protected static void Speak(string text, bool interrupt = false)
@@ -157,6 +162,9 @@ namespace DiceVoders.Core.UI
         public static bool MoveTo(Graph.ControlId id, bool speak = true) => Active != null && Active.MoveTo(id, speak);
 
         public static object FocusedStopKey => Active?.FocusedStopKey;
+
+        /// <summary>See <see cref="Navigator.LanguageChanged"/>.</summary>
+        public static void LanguageChanged() => Active?.LanguageChanged();
 
         /// <summary>The focused node of the graph navigator, or null (no focus, or another navigator).</summary>
         public static Graph.GraphNode FocusedNode => (Active as GraphNavigator)?.FocusedNode;

@@ -317,6 +317,8 @@ namespace DiceVoders.Core.UI
         private bool _liveReadoutDirty;
         private float _liveReadoutDue;
 
+        public override void LanguageChanged() => _liveKey = null;
+
         private void WatchLive(GraphNode node)
         {
             if (node.Vtable != null && node.Vtable.LiveReadout)

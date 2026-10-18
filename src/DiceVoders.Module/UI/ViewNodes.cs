@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using StarVaders;
 using DiceVoders.Core;
 using DiceVoders.Core.Graph;
+using DiceVoders.Core.Strings;
 using DiceVoders.Core.UI;
 using DiceVoders.Module.Interop;
 using TMPro;
@@ -77,8 +78,8 @@ namespace DiceVoders.Module.UI
         }
 
         /// <summary>A view item that is one choice of a set (a language): "label, radio button[,
-        /// selected]", selected while <paramref name="selected"/> says so. Enter is the game's click;
-        /// landing selects nothing.</summary>
+        /// selected]", selected while <paramref name="selected"/> says so. Enter is the game's click,
+        /// answered at once with "selected" (the item's state after it); landing selects nothing.</summary>
         public static NodeVtable Radio(AViewItem item, Func<bool> selected, Func<string> label = null)
         {
             var vt = Button(item, label);
@@ -86,6 +87,7 @@ namespace DiceVoders.Module.UI
             var parts = new List<NodeAnnouncement>(vt.Announcements);
             parts.Insert(1, GameNodes.SelectedPart(selected));
             vt.Announcements = parts;
+            vt.StateText = () => selected() ? Strings.StateSelected : null;
             return vt;
         }
 

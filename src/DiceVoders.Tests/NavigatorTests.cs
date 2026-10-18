@@ -230,6 +230,120 @@ namespace DiceVoders.Tests
             }
         }
 
+        // The language picker: one choice whose Enter selects it and switches the language, the
+        // "selected" word coming from the strings table (Word), which the switch rewrites.
+        private sealed class LanguageScreen : Screen
+        {
+            public bool Selected;
+            public string Word = "selected";
+            public System.Action OnPick; // the game's click: selects, and maybe switches the language at once
+            public override string Key => "test.language";
+            public override bool IsActive() => true;
+            public override void Build(GraphBuilder b)
+            {
+                b.AddItem(ControlId.Structural("fr"), new NodeVtable
+                {
+                    ControlType = ControlTypes.RadioButton,
+                    Announcements = new[]
+                    {
+                        new NodeAnnouncement(() => "Français", kind: AnnouncementKinds.Label),
+                        new NodeAnnouncement(() => Selected ? Word : null, live: true, kind: AnnouncementKinds.Selected),
+                    },
+                    OnActivate = () => { Selected = true; OnPick?.Invoke(); },
+                    StateText = () => Selected ? Word : null,
+                });
+            }
+        }
+
+        [Fact]
+        public void PickingALanguageSaysSelectedOnceWhenTheSwitchComesLater()
+        {
+            var spoken = new List<string>();
+            var input = new FakeNavInput { FrameCount = 1 };
+            Speech.Speak = (t, i) => spoken.Add(t);
+            NavInput.Current = input;
+            try
+            {
+                var nav = new GraphNavigator();
+                var screen = new LanguageScreen();
+                nav.Attach(screen);
+                nav.EnsureFocus();
+                spoken.Clear();
+
+                Assert.True(nav.OnInputJustPressed(Action(UiActions.Activate)));
+                Assert.Equal(new[] { "selected" }, spoken);
+                input.FrameCount += 30;
+                nav.EnsureFocus();
+
+                // The game's locale event, a few frames on: the same state, reworded.
+                screen.Word = "sélectionné";
+                nav.LanguageChanged();
+                input.FrameCount += 30;
+                nav.EnsureFocus();
+                Assert.Equal(new[] { "selected" }, spoken);
+            }
+            finally
+            {
+                Speech.Speak = (t, i) => { };
+            }
+        }
+
+        [Fact]
+        public void PickingALanguageSaysSelectedOnceWhenTheSwitchComesInsideTheClick()
+        {
+            var spoken = new List<string>();
+            var input = new FakeNavInput { FrameCount = 1 };
+            Speech.Speak = (t, i) => spoken.Add(t);
+            NavInput.Current = input;
+            try
+            {
+                var nav = new GraphNavigator();
+                var screen = new LanguageScreen();
+                screen.OnPick = () => { screen.Word = "sélectionné"; nav.LanguageChanged(); };
+                nav.Attach(screen);
+                nav.EnsureFocus();
+                spoken.Clear();
+
+                Assert.True(nav.OnInputJustPressed(Action(UiActions.Activate)));
+                input.FrameCount += 30;
+                nav.EnsureFocus();
+                Assert.Equal(new[] { "sélectionné" }, spoken);
+            }
+            finally
+            {
+                Speech.Speak = (t, i) => { };
+            }
+        }
+
+        [Fact]
+        public void ALiveStateThatChangesAfterALanguageSwitchIsStillSpoken()
+        {
+            var spoken = new List<string>();
+            var input = new FakeNavInput { FrameCount = 1 };
+            Speech.Speak = (t, i) => spoken.Add(t);
+            NavInput.Current = input;
+            try
+            {
+                var nav = new GraphNavigator();
+                var screen = new LanguageScreen();
+                nav.Attach(screen);
+                nav.EnsureFocus();
+                nav.LanguageChanged();
+                input.FrameCount += 30;
+                nav.EnsureFocus();
+                spoken.Clear();
+
+                screen.Selected = true; // selected by the game, not by Enter
+                input.FrameCount += 30;
+                nav.EnsureFocus();
+                Assert.Equal(new[] { "selected" }, spoken);
+            }
+            finally
+            {
+                Speech.Speak = (t, i) => { };
+            }
+        }
+
         [Fact]
         public void ALiveReadoutNodeRereadsItselfWhenItsStateChangesOncePerWindow()
         {
