@@ -33,8 +33,13 @@ player, so every catch logs, and nothing caches game state.
 - **Localization**: Unity Localization, table `Everything` (`LocalizationUtils.LocalizeSynchronous`).
   Locales: `en fr zh-Hans ja ko es es-MX de pt-BR ru zh-TW tr` (plus a pseudo-locale coded `en`);
   the picker offers all but `tr`. `lang/<code>.txt` per locale, `LangFilesTests` checks them; `es-MX`
-  started as a copy of `es`. Inline icons in game strings: Attack, Budge, Chrono, MiniDice,
-  ShopToken (`UI/GameText`).
+  started as a copy of `es`. Inline icons in game strings (`UI/GameText`): an icon inside
+  `<nobr>` before a word is a keyword's decoration (`<nobr><Chrono> Chrono</nobr>`), dropped;
+  elsewhere it reads as its word unless its own word follows (Charge's title). ShopToken reads Cash
+  (`ShopToken_TooltipTitle`); the scoring line's Target reads "When scored" (quoted in the guide's
+  `Guide_Scoring_1`), with a colon when it opens a line; Arrow (trigger condition, then effect:
+  `Guide_Triggers_2`) and React keep their names, as the game's explanations quote them. A run of
+  one icon is a count ("Spend 2 Charge").
 - **BepInEx**: the vendored 6.0.0-be.788 boots the game as is (Cpp2IL reads v39; one warning,
   "Class::Init signatures have been exhausted, using a substitute!", harmless so far). StarVaders'
   preloader patcher (a Unity 2020 GetMethod hook bug) is NOT needed here and was not ported.
