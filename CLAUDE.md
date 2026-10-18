@@ -154,22 +154,47 @@ sends `keybd_event`.
     `ArtifactSlots[x]`, the first 6 slots being the columns', `GetColumnArtifacts`), the 6x3 grid
     top row first ("2, 1, Migo, 10 strength": tiles "x, y" 1-based, row 1 at the bottom; the
     model's y 0 IS the bottom, each `GridColumn`'s layout being reversed), then a strict strip:
-    in `Phase.Player` the dice in `DiceVisualOrder` ("die 3, frozen") and Launch
+    in `Phase.Player` the dice in `DiceVisualOrder` ("3, frozen") and Launch
     (`DicePanel/ProceedKnob/ProceedLine/LaunchPanel/LaunchButton`). Focus lands on the first die.
     Backspace on a unit runs the game's `EntityTooltip.UpdateTooltip` on the tile's own tooltip
     (a hidden one holds prefab placeholders: "Mutantenschwamm", Legendary) and reads it; an
     artifact's runs `Tooltip.SetArtifactText`. The status: an action tip while one shows, target
-    and act, Target Defense (`TargetTributeScore`), Total Attack (`TotalScore`: the score panel's
-    two), turns, hearts, Budge, Chrono, Swap, Mini-Dice, Cash, Mult, the non-column artifacts.
+    and act, "0/100 attack" (`TotalScore` over `TargetTributeScore`: the score panel's two), turns, hearts, Budge, Chrono, Swap, Mini-Dice, Cash, Mult, the non-column artifacts.
     A tip waiting for an action ("Press the LAUNCH button") is said once on arrival
     (`OnUpdate`). `ModelItemDict` and `ArtifactViewDict` are keyed by the boxed `ID`: artifacts
     are matched by `ArtifactID.Number` instead. Keys (`EncounterKeys`, Game category): C
-    coordinates, Ctrl+A attack and defense, Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice,
+    coordinates, Ctrl+A attack ("0/100 attack"), Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice,
     Ctrl+O target, Home/End row ends, PgUp/PgDn grid top and bottom. The game's encounter keys
     (defaults, `EncounterInputHandler`'s PlayerInput): W/Space Click, Q Cancel, E Proceed
     (launch, leave the shop), R Reroll (Chrono), A Decrement and S Increment (budge), F Freeze,
-    T ShowGuide, D NavigateNext, 1-3 SelectCard, Tab UINavigation; not taken yet. Not built: the
-    shop strip, budge/freeze/reroll/launch keys, scoring narration, selections (placing a unit).
+    T ShowGuide, D NavigateNext, 1-3 SelectCard, Tab UINavigation. Ours for S, A, F, R, E, Q
+    (`GameKeyBinding`, rebinds carry over) call `EncounterKeyInputController`'s own handlers
+    (`OnIncrement`...), which read nothing of the context, with the focused die hovered first:
+    they return at once while `TipManager.IsShowingTip()` (any tip, the action tips included).
+    Pass `new InputAction.CallbackContext()`: the interop type is a reference wrapper, `default` is
+    null and the call throws. A budge or freeze says the die after ("4, Budge 2"); a refusal
+    says "can't budge/freeze/reroll"; off a die they do nothing. Narration (`EncounterEvents`,
+    starvaders' FightEvents: settled snapshots, Core `EncounterDiff`, tested): the turn's scoring on
+    leaving the player phase, one line ("column 3: 20, column 5: 10, 30/100 attack": the column's
+    units' `AttackGainedLastTurn` summed, `...ThisTurn` while still scoring; `AtkPerCol` reads all 0
+    once the shop opens; the raw figures are logged beside it), target reached, a heart lost,
+    "shop", a new turn ("3 Turns, rolled 2, 4, 6"), a reroll. Verified live: the refusals with a tip
+    up, a launch (20 + 10 = 30 in the tutorial). Not exercised: a real budge, freeze, reroll, cancel.
+    Tiles: only `GridModel.BuiltCoords` exist (the tutorial starts with the bottom row less column
+    4, plus 2,2); others read "no tile"; `GetBuildableCoords` is where Build Tile can add one. The
+    shop (`Phase.Draft`) strip: `DraftPanel.DraftChoices` still `IsActive` ("Meteor, Artifact, 2
+    cash[, Uncommon][, cursed][, frozen][, can't afford]": `tempRarity`, `isCursed`, `IsLocked`,
+    `CantBuyCostIcon`), then Proceed (`BG/ProceedButton`) and Skip remaining turns
+    (`SkipTurns/ProceedLine/SkipButton`, when shown). A choice's text is in `EntityTooltip` for a unit
+    (title in `TitleLongerText`), `Tooltip` otherwise (the other holds prefab placeholders); hidden
+    tooltips, so a text counts only by its own `activeSelf` (spells have no scaling line). Enter
+    buys (the game's click); F freezes. Selections (`SelectionController.IsSelecting`): cells whose
+    `TileView` or unit `EntityView`, and headers whose slot view (`ArtifactViewObjects[x]`, the
+    first 6 the columns'), pass `IsSatisfied` read "target" first and take Enter; focus goes to the
+    first on the selection's start; Escape is the game's Cancel. Landings: the shop's first choice
+    as it opens, the first die (silent) at a new turn; the strip's nodes `QuietVanish`. Readouts
+    checked by reflection over the module (`Invoke` on `EncounterScreen.ChoiceText`...) with a tip
+    up; buying, placing, Proceed not exercised.
   - `TipScreen` (`TipManager.CurrentTip`, layer 40, exclusive; `UI/Tips`): a tutorial tip that
     waits for a click (its `ClickToContinue` line shows) as one text node; Enter is
     `TipManager.ClickTipBox` (ignored by the game until `TipBox._isFinished`, set when the box has

@@ -19,9 +19,13 @@ namespace DiceVoders.Module.Screens
     /// Guards)"). Two stops. The board: a header row, one per column ("column 3, Dice Power 2", then
     /// its honey and the column's artifact), the grid top row first ("2, 1, Migo, 10 strength"), then
     /// a strip under the bottom row with what the phase puts there: in the player phase the dice in
-    /// the tray's order ("die 3, frozen") and Launch. All rows share a key, so Up and Down keep the
-    /// column; the strip is strict (item n under column n). Focus first lands on the first die. The
-    /// status: the target, Target Defense, Total Attack, turns left, hearts, the tokens, Mult, and
+    /// the tray's order ("3, frozen") and Launch; in the shop its choices ("Meteor, Artifact, 2 cash")
+    /// and Proceed. All rows share a key, so Up and Down keep the column; the strip is strict (item n
+    /// under column n). A tile the grid does not have yet reads "no tile". While the game waits on a
+    /// target (a unit to place, a tile to build, a column for an artifact), the cells and headers it
+    /// takes read "target" first and Enter gives them; focus goes to the first; Escape cancels. A new
+    /// turn puts focus on the first die (silently: the roll is said), the shop on its first choice. The
+    /// status: the target, the attack against the target ("0/100 attack"), turns left, hearts, the tokens, Mult, and
     /// the artifacts outside the columns. Units and artifacts give their tooltips on Backspace and in
     /// the ui buffer.
     /// </summary>
@@ -42,15 +46,34 @@ namespace DiceVoders.Module.Screens
 
         public override string ScreenName => Target();
 
+        // Escape cancels a target choice, as the game's Cancel; otherwise it is the navigator's.
+        public override IEnumerable<ElementAction> GetActions()
+        {
+            if (EncounterState.Selecting)
+                yield return new ElementAction(ActionIds.Back, Strings.Get("bind.ui.back"), _ => EncounterKeys.CancelSelection());
+        }
+
         // The name and the landing wait while the encounter moves or a tip is on its way: the
         // tutorial's tips come one after another over the board.
-        public override bool HoldsArrival => EncounterState.Busy || Tips.Coming;
+        public override bool HoldsArrival => !EncounterEvents.Settled || Tips.Coming;
 
         internal const string BoardStop = "enc:board";
 
         public static ControlId TileId(int x, int y) => ControlId.Structural("enc:tile:" + x + "," + y);
         public static ControlId ColumnId(int x) => ControlId.Structural("enc:col:" + x);
         private static ControlId DieId(Dice die) => ControlId.Structural("enc:die:" + die.GetInstanceID());
+        private static ControlId ChoiceId(DraftChoice choice) => ControlId.Structural("enc:choice:" + choice.GetInstanceID());
+
+        /// <summary>The shop choice the focus is on, or null.</summary>
+        public static DraftChoice FocusedChoice()
+        {
+            string id = FocusedKey();
+            if (id == null || !id.StartsWith("enc:choice:")) return null;
+            int instance = int.Parse(id.Substring("enc:choice:".Length));
+            foreach (var choice in EncounterState.Choices())
+                if (choice.GetInstanceID() == instance) return choice;
+            return null;
+        }
 
         /// <summary>The 0-based tile the focus is on, or null off the grid.</summary>
         public static (int X, int Y)? FocusedTile()
@@ -70,6 +93,17 @@ namespace DiceVoders.Module.Screens
             return id != null && id.StartsWith("enc:col:") ? int.Parse(id.Substring("enc:col:".Length)) : (int?)null;
         }
 
+        /// <summary>The die the focus is on, or null.</summary>
+        public static Dice FocusedDie()
+        {
+            string id = FocusedKey();
+            if (id == null || !id.StartsWith("enc:die:")) return null;
+            int instance = int.Parse(id.Substring("enc:die:".Length));
+            foreach (var die in EncounterState.Dice())
+                if (die.GetInstanceID() == instance) return die;
+            return null;
+        }
+
         private static string FocusedKey() =>
             (Navigation.Active as GraphNavigator)?.FocusedNode?.Id?.StructuralKey as string;
 
@@ -85,7 +119,59 @@ namespace DiceVoders.Module.Screens
         // while it shows. By native pointer: a proxy is a fresh object per read.
         private IntPtr _tipSaid;
 
+        // The phase and selection last seen, for the landings they cause; a landing is retried each
+        // frame until the node it wants is in the render.
+        private Phase _phase = Phase.None;
+        private bool _selecting;
+        private ControlId _pendingLanding;
+        private bool _pendingSpeak;
+
         public override void OnUpdate()
+        {
+            Landings();
+            SayActionTip();
+        }
+
+        private void Landings()
+        {
+            var phase = EncounterState.Phase;
+            bool selecting = EncounterState.Selecting;
+            if (selecting && !_selecting)
+            {
+                var first = FirstTarget();
+                if (first != null) { _pendingLanding = first; _pendingSpeak = true; }
+            }
+            else if (!selecting && phase != _phase && EncounterEvents.Settled)
+            {
+                if (phase == Phase.Draft)
+                {
+                    var choices = EncounterState.Choices();
+                    if (choices.Count > 0) { _pendingLanding = ChoiceId(choices[0]); _pendingSpeak = true; }
+                }
+                else if (phase == Phase.Player)
+                {
+                    var dice = EncounterState.Dice();
+                    if (dice.Count > 0) { _pendingLanding = DieId(dice[0]); _pendingSpeak = false; }
+                }
+            }
+            _selecting = selecting;
+            if (EncounterEvents.Settled || selecting) _phase = phase;
+            if (_pendingLanding != null && Navigation.Active?.MoveTo(_pendingLanding, _pendingSpeak) == true) _pendingLanding = null;
+        }
+
+        // The first cell or header the running selection takes, reading order (headers, then the
+        // grid top row first).
+        private static ControlId FirstTarget()
+        {
+            for (int x = 0; x < EncounterState.Columns; x++)
+                if (EncounterState.SlotTarget(x) != null) return ColumnId(x);
+            for (int y = EncounterState.Rows - 1; y >= 0; y--)
+                for (int x = 0; x < EncounterState.Columns; x++)
+                    if (EncounterState.TargetAt(x, y) != null) return TileId(x, y);
+            return null;
+        }
+
+        private void SayActionTip()
         {
             var tip = ActionTip();
             if (tip == null) { _tipSaid = IntPtr.Zero; return; }
@@ -121,11 +207,18 @@ namespace DiceVoders.Module.Screens
             BuildStrip(b);
         }
 
-        // The strip under the grid: the dice and Launch while the player rolls; nothing in the other
-        // phases yet (the shop comes next).
+        // The strip under the grid: the dice and Launch while the player rolls, the shop's choices and
+        // its buttons in the shop. Its nodes vanish quietly: launching takes the dice away, and the
+        // landing that causes is no news (the scoring is said).
         private static void BuildStrip(GraphBuilder b)
         {
-            if (EncounterState.Phase != Phase.Player) return;
+            var phase = EncounterState.Phase;
+            if (phase == Phase.Player) BuildDice(b);
+            else if (phase == Phase.Draft) BuildShop(b);
+        }
+
+        private static void BuildDice(GraphBuilder b)
+        {
             var dice = EncounterState.Dice();
             var launch = EncounterState.LaunchButton();
             if (dice.Count == 0 && launch == null) return;
@@ -134,7 +227,25 @@ namespace DiceVoders.Module.Screens
             for (int i = 0; i < dice.Count; i++)
                 b.AddItem(DieId(dice[i]), Die(dice[i], i == 0));
             if (launch != null)
-                b.AddItem(ControlId.Structural("enc:launch"), Launch(launch));
+                b.AddItem(ControlId.Structural("enc:launch"), StripButton(launch, () => ViewNodes.Label(launch) ?? GameLoc.Get("Launch_Misc")));
+            b.EndRow();
+            b.PopContext();
+        }
+
+        private static void BuildShop(GraphBuilder b)
+        {
+            var choices = EncounterState.Choices();
+            var proceed = EncounterState.ShopButton("BG/ProceedButton");
+            var skip = EncounterState.ShopButton("SkipTurns/ProceedLine/SkipButton");
+            if (choices.Count == 0 && proceed == null && skip == null) return;
+            b.PushContext(null);
+            b.StartRow(BoardStop, strictColumns: true);
+            for (int i = 0; i < choices.Count; i++)
+                b.AddItem(ChoiceId(choices[i]), Choice(choices[i], i == 0));
+            if (proceed != null)
+                b.AddItem(ControlId.Structural("enc:proceed"), StripButton(proceed, () => GameLoc.Get("Proceed_Misc") ?? "Proceed"));
+            if (skip != null)
+                b.AddItem(ControlId.Structural("enc:skip"), StripButton(skip, () => (GameLoc.Get("SkipTurns_Misc") ?? "Skip remaining turns").TrimEnd(':', ' ')));
             b.EndRow();
             b.PopContext();
         }
@@ -149,7 +260,13 @@ namespace DiceVoders.Module.Screens
                 SpeaksOwnPosition = true,
                 Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
                 SearchText = label,
-                OnFocus = () => { var view = EncounterState.ArtifactView(EncounterState.Artifact(x)); if (view != null) EncounterState.Hover(view); },
+                OnFocus = () =>
+                {
+                    var target = EncounterState.SlotTarget(x);
+                    var view = target ?? (AViewItem)EncounterState.ArtifactView(EncounterState.Artifact(x));
+                    if (view != null) EncounterState.Hover(view);
+                },
+                OnActivate = () => { var target = EncounterState.SlotTarget(x); if (target != null) EncounterState.Click(target); },
                 Details = () => ArtifactDetails(EncounterState.Artifact(x)),
                 OnSecondary = () => SayDetails(ArtifactDetails(EncounterState.Artifact(x))),
             };
@@ -157,7 +274,9 @@ namespace DiceVoders.Module.Screens
 
         internal static string HeaderText(int x)
         {
-            var parts = new List<string> { Strings.EncColumn(x + 1) };
+            var parts = new List<string>();
+            if (EncounterState.SlotTarget(x) != null) parts.Add(Strings.EncTarget);
+            parts.Add(Strings.EncColumn(x + 1));
             int power = EncounterState.DicePower(x);
             if (power > 0) parts.Add(Strings.EncFigure(GameLoc.Get("DicePower_Misc") ?? "Dice Power", power.ToString()));
             if (EncounterState.Honey(x)) parts.Add(Strings.EncHoney);
@@ -175,17 +294,29 @@ namespace DiceVoders.Module.Screens
                 // One part: the coordinates, then what is there.
                 Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(() => CellText(x, y)) },
                 SearchText = () => Strings.EncCoord(x + 1, y + 1),
-                OnFocus = () => { var tile = EncounterState.Tile(x, y); if (tile != null) EncounterState.Hover(tile); },
+                OnFocus = () =>
+                {
+                    var view = EncounterState.TargetAt(x, y) ?? (AViewItem)EncounterState.Tile(x, y);
+                    if (view != null) EncounterState.Hover(view);
+                },
+                // Enter gives the cell to a running selection when it takes it; otherwise nothing.
+                OnActivate = () => { var target = EncounterState.TargetAt(x, y); if (target != null) EncounterState.Click(target); },
                 Details = () => CellDetails(x, y),
                 OnSecondary = () => SayDetails(CellDetails(x, y)),
             };
         }
 
-        internal static string CellText(int x, int y) => Strings.EncCoord(x + 1, y + 1) + ", " + CellContents(x, y);
+        internal static string CellText(int x, int y)
+        {
+            string text = Strings.EncCoord(x + 1, y + 1) + ", " + CellContents(x, y);
+            return EncounterState.TargetAt(x, y) != null ? Strings.EncTarget + ", " + text : text;
+        }
 
-        /// <summary>"Migo, 10 strength, shielded" or "empty", then a cloud.</summary>
+        /// <summary>"Migo, 10 strength, shielded", "empty", or "no tile" where the grid has none yet,
+        /// then a cloud.</summary>
         internal static string CellContents(int x, int y)
         {
+            if (!EncounterState.Built(x, y)) return Strings.EncNoTile;
             var parts = new List<string>();
             var unit = EncounterState.At(x, y);
             parts.Add(unit != null ? Describe(unit) : Strings.EncEmpty);
@@ -233,7 +364,7 @@ namespace DiceVoders.Module.Screens
 
         // ---- the dice ----
 
-        // "die 3, frozen": the face (the column it scores) and the die's state.
+        // "3, frozen": the face (the column it scores) and the die's state.
         private static NodeVtable Die(Dice die, bool first)
         {
             Func<string> label = () => DieText(die);
@@ -243,6 +374,7 @@ namespace DiceVoders.Module.Screens
                 Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
                 SearchText = label,
                 IsSelected = () => first,
+                QuietVanish = true,
                 OnFocus = () => EncounterState.Hover(die),
             };
         }
@@ -252,7 +384,7 @@ namespace DiceVoders.Module.Screens
             var parts = new List<string>();
             try
             {
-                parts.Add(die.isRolling ? Strings.EncRolling : Strings.EncDie(die.Value));
+                parts.Add(die.isRolling ? Strings.EncRolling : die.Value.ToString());
                 if (die.IsDangerDice) parts.Add(Strings.EncPilotDie);
                 if (die.IsPermaFrozen) parts.Add(Strings.EncPermafrozen);
                 else if (die.IsLockedIn) parts.Add(Strings.EncFrozen);
@@ -263,12 +395,97 @@ namespace DiceVoders.Module.Screens
             return string.Join(", ", parts);
         }
 
-        private static NodeVtable Launch(AViewItem launch)
+        private static NodeVtable StripButton(AViewItem item, Func<string> label)
         {
-            var vt = GameNodes.Button(() => ViewNodes.Label(launch) ?? GameLoc.Get("Launch_Misc"), () => EncounterState.Click(launch));
-            vt.OnFocus = () => EncounterState.Hover(launch);
+            var vt = GameNodes.Button(label, () => EncounterState.Click(item));
+            vt.OnFocus = () => EncounterState.Hover(item);
+            vt.QuietVanish = true;
             return vt;
         }
+
+        // ---- the shop ----
+
+        // "Meteor, Artifact, 2 cash, frozen": the name, the kind, the price, then what stands out.
+        // Enter buys it (the game's click; a unit, a tile or a swap then asks for its target on the
+        // board); Backspace reads its tooltip.
+        private static NodeVtable Choice(DraftChoice choice, bool first)
+        {
+            Func<string> label = () => ChoiceText(choice);
+            return new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                SearchText = () => ChoiceName(choice),
+                IsSelected = () => first,
+                QuietVanish = true,
+                OnFocus = () => EncounterState.Hover(choice),
+                OnActivate = () => EncounterState.Click(choice),
+                Details = () => ChoiceDetails(choice),
+                OnSecondary = () => SayDetails(ChoiceDetails(choice)),
+            };
+        }
+
+        internal static string ChoiceName(DraftChoice choice)
+        {
+            try
+            {
+                switch (choice.DraftType)
+                {
+                    case DraftType.Entity:
+                        return GameLoc.Get(choice.EntityName + "_Entity_Title") ?? choice.EntityName.ToString();
+                    case DraftType.Artifact:
+                        return GameLoc.Get(choice.ArtifactName + "_Arti_Title") ?? choice.ArtifactName.ToString();
+                    default:
+                        return GameText.Of(choice.Tooltip != null ? choice.Tooltip.TitleText : null) ?? choice.DraftType.ToString();
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: naming a shop choice failed: " + e.Message); return null; }
+        }
+
+        internal static string ChoiceText(DraftChoice choice)
+        {
+            var parts = new List<string> { ChoiceName(choice) };
+            try
+            {
+                if (choice.DraftType == DraftType.Entity) parts.Add(GameLoc.Get("Unit_Misc"));
+                else if (choice.DraftType == DraftType.Artifact) parts.Add(GameLoc.Get("Artifact_Misc"));
+                parts.Add(Strings.EncCost(choice.DraftCost));
+                if (choice.tempRarity != Rarity.Common) parts.Add(GameLoc.Get(choice.tempRarity + "_Misc") ?? choice.tempRarity.ToString());
+                if (choice.isCursed) parts.Add(Strings.EncCursed);
+                if (choice.IsLocked) parts.Add(Strings.EncFrozen);
+                if (choice.CantBuyCostIcon != null && choice.CantBuyCostIcon.activeInHierarchy) parts.Add(Strings.EncCantAfford);
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a shop choice failed: " + e.Message); }
+            parts.RemoveAll(string.IsNullOrEmpty);
+            return string.Join(", ", parts);
+        }
+
+        // A unit's tooltip is its EntityTooltip; anything else's its Tooltip (the other holds the
+        // prefab's placeholder text): "title: description" (an artifact's title with its XP, a unit's
+        // the longer one it draws), then the rarity and the scaling, each only where switched on.
+        private static IEnumerable<string> ChoiceDetails(DraftChoice choice)
+        {
+            var lines = new List<string>();
+            try
+            {
+                bool unit = choice.DraftType == DraftType.Entity && choice.EntityTooltip != null;
+                if (!unit && choice.Tooltip == null) return lines;
+                var titles = unit ? new TMPro.TMP_Text[] { choice.EntityTooltip.TitleText, choice.EntityTooltip.TitleLongerText } : new TMPro.TMP_Text[] { choice.Tooltip.TitleText };
+                var rest = unit ? new TMPro.TMP_Text[] { choice.EntityTooltip.RarityText } : new TMPro.TMP_Text[] { choice.Tooltip.RarityText, choice.Tooltip.ScalingText };
+                string title = null;
+                foreach (var tmp in titles) if (title == null) title = Shown(tmp);
+                string description = Shown(unit ? choice.EntityTooltip.DescriptionText : choice.Tooltip.DescriptionText);
+                title = title ?? ChoiceName(choice);
+                lines.Add(description != null ? title + ": " + description : title);
+                foreach (var tmp in rest) { string text = Shown(tmp); if (text != null) lines.Add(text); }
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a shop choice's tooltip failed: " + e.Message); }
+            return lines;
+        }
+
+        // A tooltip text switched on for this kind (a spell has no scaling line): the tooltip itself
+        // is hidden, so by its own switch.
+        private static string Shown(TMPro.TMP_Text tmp) => tmp != null && tmp.gameObject.activeSelf ? GameText.Of(tmp) : null;
 
         // ---- the status ----
 
@@ -279,7 +496,6 @@ namespace DiceVoders.Module.Screens
             if (ActionTip() != null)
                 b.AddItem(ControlId.Structural("enc:tip"), Stat(() => { var tip = ActionTip(); return tip != null ? Tips.Text(tip) : null; }));
             b.AddItem(ControlId.Structural("enc:target"), Stat(TargetLine));
-            b.AddItem(ControlId.Structural("enc:defense"), Stat(Defense));
             b.AddItem(ControlId.Structural("enc:attack"), Stat(Attack));
             b.AddItem(ControlId.Structural("enc:turns"), Stat(Turns));
             b.AddItem(ControlId.Structural("enc:hearts"), Stat(Hearts));
@@ -332,11 +548,9 @@ namespace DiceVoders.Module.Screens
             return target != null && act != null ? target + ", " + act : target ?? act;
         }
 
-        public static string Defense() =>
-            Strings.EncFigure(GameLoc.Get("TargetDefense_Misc") ?? "Target Defense", EncounterState.Big(EncounterValue.TargetTributeScore));
-
+        /// <summary>"30/100 attack": Total Attack against Target Defense, the score panel's two.</summary>
         public static string Attack() =>
-            Strings.EncFigure(GameLoc.Get("TotalAttack_Misc") ?? "Total Attack", EncounterState.Big(EncounterValue.TotalScore));
+            Strings.EncAttack(EncounterState.Big(EncounterValue.TotalScore), EncounterState.Big(EncounterValue.TargetTributeScore));
 
         /// <summary>"4 Turns", the game's words.</summary>
         public static string Turns()
@@ -354,12 +568,15 @@ namespace DiceVoders.Module.Screens
         /// <summary>The tokens, in the game's words: Budge, Chrono, Swap, Mini-Dice, the shop's Cash.</summary>
         public static List<KeyValuePair<string, Func<string>>> TokenLines() => new List<KeyValuePair<string, Func<string>>>
         {
-            new KeyValuePair<string, Func<string>>("budge", () => Figure(GameLoc.Get("Budge_Keyword") ?? "Budge", EncounterValue.BudgeToken)),
-            new KeyValuePair<string, Func<string>>("chrono", () => Figure(GameLoc.Get("Chrono_Keyword") ?? "Chrono", EncounterValue.ChronoToken)),
+            new KeyValuePair<string, Func<string>>("budge", Budge),
+            new KeyValuePair<string, Func<string>>("chrono", Chrono),
             new KeyValuePair<string, Func<string>>("swap", () => Figure(Strings.EncSwap, EncounterValue.SwapToken)),
             new KeyValuePair<string, Func<string>>("minidice", () => Figure(GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice", EncounterValue.MiniDice)),
             new KeyValuePair<string, Func<string>>("cash", () => Figure(GameLoc.Get("ShopToken_TooltipTitle") ?? "Cash", EncounterValue.ShopToken)),
         };
+
+        public static string Budge() => Figure(GameLoc.Get("Budge_Keyword") ?? "Budge", EncounterValue.BudgeToken);
+        public static string Chrono() => Figure(GameLoc.Get("Chrono_Keyword") ?? "Chrono", EncounterValue.ChronoToken);
 
         private static string Figure(string label, EncounterValue value)
         {

@@ -262,6 +262,7 @@ namespace DiceVoders.Module.Encounter
                     tooltip.SetArtifactText(artifact, false, Model);
                     foreach (var tmp in new TMPro.TMP_Text[] { tooltip.DescriptionText, tooltip.RarityText, tooltip.ScalingText })
                     {
+                        if (tmp == null || !tmp.gameObject.activeSelf) continue;
                         string text = GameText.Of(tmp);
                         if (text != null) lines.Add(text);
                     }
@@ -293,6 +294,127 @@ namespace DiceVoders.Module.Encounter
             }
             catch (Exception e) { CoreLog.Warning("Encounter: reading the dice failed: " + e.Message); }
             return dice;
+        }
+
+        // ---- the grid's tiles ----
+
+        /// <summary>Whether the tile exists (<see cref="GridModel.BuiltCoords"/>): the grid grows by
+        /// the shop's Build Tile, a column at a time from the bottom.</summary>
+        public static bool Built(int x, int y)
+        {
+            try
+            {
+                var built = Model?.GridModel?.BuiltCoords;
+                if (built == null) return true;
+                foreach (var c in built)
+                    if (c.x == x && c.y == y) return true;
+                return false;
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading the built tiles failed: " + e.Message); return true; }
+        }
+
+        // ---- the shop ----
+
+        /// <summary>The shop's choices still on offer (a bought one goes inactive), in its order.</summary>
+        public static List<DraftChoice> Choices()
+        {
+            var choices = new List<DraftChoice>();
+            var panel = Controller?.DraftPanel;
+            if (panel == null || panel.DraftChoices == null) return choices;
+            try
+            {
+                foreach (var choice in panel.DraftChoices)
+                    if (choice != null && choice.IsActive && choice.gameObject.activeInHierarchy) choices.Add(choice);
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading the shop failed: " + e.Message); }
+            return choices;
+        }
+
+        public static AViewItem ShopButton(string path)
+        {
+            var panel = Controller?.DraftPanel;
+            var t = panel != null ? panel.transform.Find(path) : null;
+            var item = t != null ? t.GetComponent<AViewItem>() : null;
+            return ViewNodes.IsShown(item) ? item : null;
+        }
+
+        // ---- selections ----
+
+        /// <summary>Whether the game waits on a choice of target (a unit to place, a tile to build).</summary>
+        public static bool Selecting
+        {
+            get
+            {
+                try { return Controller?.SelectionController?.IsSelecting == true; }
+                catch (Exception e) { CoreLog.Warning("Encounter: reading the selection failed: " + e.Message); return false; }
+            }
+        }
+
+        private static int _targetsFrame = -1;
+        private static readonly List<AEncounterViewItem> _targets = new List<AEncounterViewItem>();
+
+        /// <summary>The view items the running selection takes, by the game's own test
+        /// (<see cref="SelectionController.IsSatisfied"/>), read once a frame.</summary>
+        public static List<AEncounterViewItem> Targets()
+        {
+            if (_targetsFrame == Time.frameCount) return _targets;
+            _targetsFrame = Time.frameCount;
+            _targets.Clear();
+            var c = Controller;
+            var sc = c?.SelectionController;
+            if (sc == null || !Selecting) return _targets;
+            try
+            {
+                foreach (var item in c.EncounterView.ViewsItems)
+                {
+                    if (item == null || !item.gameObject.activeInHierarchy) continue;
+                    bool ok;
+                    try { ok = sc.IsSatisfied(item); } catch { ok = false; }
+                    if (ok) _targets.Add(item);
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: listing the targets failed: " + e.Message); }
+            return _targets;
+        }
+
+        /// <summary>The target the selection takes at the tile: the tile itself or the unit on it; null.</summary>
+        public static AEncounterViewItem TargetAt(int x, int y)
+        {
+            foreach (var item in Targets())
+            {
+                var tile = item.TryCast<TileView>();
+                if (tile != null && tile.TileModel != null && tile.TileModel.Coord.x == x && tile.TileModel.Coord.y == y) return item;
+                var unit = item.TryCast<EntityView>();
+                if (unit != null && unit.EntityModel != null)
+                {
+                    try
+                    {
+                        var grid = Model.GridModel;
+                        if (!grid.IsEntityOnGrid(unit.EntityModel.EntityID)) continue;
+                        var c = grid.GetEntityCoord(unit.EntityModel.EntityID, false);
+                        if (c.x == x && c.y == y) return item;
+                    }
+                    catch (Exception e) { CoreLog.Warning("Encounter: placing a target failed: " + e.Message); }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>The column's artifact slot (<see cref="EncounterView.ArtifactViewObjects"/>, the
+        /// first 6 being the columns'), when the selection takes it; null.</summary>
+        public static AEncounterViewItem SlotTarget(int x)
+        {
+            var slot = SlotView(x);
+            if (slot == null) return null;
+            foreach (var item in Targets())
+                if (item.Pointer == slot.Pointer) return item;
+            return null;
+        }
+
+        public static ArtifactView SlotView(int x)
+        {
+            var slots = View?.ArtifactViewObjects;
+            return slots != null && x < slots.Count ? slots[x] : null;
         }
 
         /// <summary>The tray's Launch button, when drawn.</summary>

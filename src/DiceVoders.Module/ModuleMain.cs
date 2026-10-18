@@ -149,6 +149,7 @@ namespace DiceVoders.Module
             Safe(LanguageSync.Tick, "language");
             FocusMode.Tick();
             InputManager.Tick();
+            Safe(Encounter.EncounterEvents.Tick, "encounter events");
             ScreenManager.Tick();
             Safe(TextEdit.Tick, "text edit");
             if (!TextEdit.OwnsKeyboard) Navigation.TickTypeahead();

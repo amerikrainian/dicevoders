@@ -139,8 +139,6 @@ namespace DiceVoders.Core.Strings
             D("enc.negative", "negative"),
             // A unit's charges; {0} = left, {1} = the most it holds.
             D("enc.charge", "charge {0}/{1}"),
-            // A die in the tray; {0} = its face, the column it scores.
-            D("enc.die", "die {0}"),
             D("enc.rolling", "rolling"),
             D("enc.frozen", "frozen"),
             D("enc.permafrozen", "permafrozen"),
@@ -149,10 +147,36 @@ namespace DiceVoders.Core.Strings
             D("enc.pilot_die", "pilot die"),
             // Dice Power a die adds on top of its own; {0} = the amount.
             D("enc.added_power", "plus {0} power"),
+            // The attack gathered against the target: {0} = Total Attack, {1} = Target Defense.
+            D("enc.attack", "{0}/{1} attack"),
             D("enc.hearts", "Hearts"),
             D("enc.swap", "Swap"),
+            // The game refused a budge (no Budge left, the face at its end, already budged this roll).
+            D("enc.cant_budge", "can't budge"),
+            D("enc.cant_freeze", "can't freeze"),
+            D("enc.cant_reroll", "can't reroll"),
+            // The dice after a roll; {0} = the faces in the tray's order.
+            D("enc.rolled", "rolled {0}"),
+            // What a column scored this turn; {0} = its 1-based number, {1} = the attack.
+            D("enc.column_attack", "column {0}: {1}"),
+            // The shop phase opening after a turn.
+            D("enc.shop", "shop"),
+            // A tile the grid does not have yet (the shop's Build Tile adds them).
+            D("enc.no_tile", "no tile"),
+            // A cell or column the game is asking for (a unit to place, a tile to build).
+            D("enc.target", "target"),
+            // A shop item's price; {0} = the shop tokens (the game's Cash).
+            D("enc.cost", "{0} cash"),
+            D("enc.cursed", "cursed"),
+            D("enc.cant_afford", "can't afford"),
+            D("bind.enc.budge_up", "Budge up"),
+            D("bind.enc.budge_down", "Budge down"),
+            D("bind.enc.freeze", "Freeze"),
+            D("bind.enc.reroll", "Reroll"),
+            D("bind.enc.proceed", "Proceed"),
+            D("bind.enc.cancel", "Cancel"),
             D("bind.enc.coords", "Coordinates"),
-            D("bind.enc.attack", "Attack and defense"),
+            D("bind.enc.attack", "Attack"),
             D("bind.enc.turns", "Turns and hearts"),
             D("bind.enc.tokens", "Tokens"),
             D("bind.enc.dice", "Dice"),
@@ -376,15 +400,26 @@ namespace DiceVoders.Core.Strings
         public static string EncHoney => Get("enc.honey");
         public static string EncNegative => Get("enc.negative");
         public static string EncCharge(int left, int max) => F("enc.charge", left, max);
-        public static string EncDie(int face) => F("enc.die", face);
         public static string EncRolling => Get("enc.rolling");
         public static string EncFrozen => Get("enc.frozen");
         public static string EncPermafrozen => Get("enc.permafrozen");
         public static string EncCracked => Get("enc.cracked");
         public static string EncPilotDie => Get("enc.pilot_die");
         public static string EncAddedPower(int amount) => F("enc.added_power", amount);
+        public static string EncAttack(string total, string target) => F("enc.attack", total, target);
         public static string EncHearts => Get("enc.hearts");
         public static string EncSwap => Get("enc.swap");
+        public static string EncCantBudge => Get("enc.cant_budge");
+        public static string EncCantFreeze => Get("enc.cant_freeze");
+        public static string EncCantReroll => Get("enc.cant_reroll");
+        public static string EncRolled(string faces) => F("enc.rolled", faces);
+        public static string EncColumnAttack(int column, string attack) => F("enc.column_attack", column, attack);
+        public static string EncShop => Get("enc.shop");
+        public static string EncNoTile => Get("enc.no_tile");
+        public static string EncTarget => Get("enc.target");
+        public static string EncCost(int cost) => F("enc.cost", cost);
+        public static string EncCursed => Get("enc.cursed");
+        public static string EncCantAfford => Get("enc.cant_afford");
 
         public static string ScreenModMenu => Get("screen.mod_menu");
         public static string ModSettings => Get("mod.settings");
