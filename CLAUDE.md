@@ -172,7 +172,11 @@ sends `keybd_event`.
     artifact's runs `Tooltip.SetArtifactText` and leads with its title ("Meteor [9/10 XP]"). An
     artifact reads "Meteor, 9/10 XP" (", LV. 2" past level 1: `Level`, `CurrentXP`,
     `ArtifactModel.GetLevelXPRequirement`; a starter perk's XP is -1 and reads none). The status: an action tip while one shows, target
-    and act, "0/100 attack" (`TotalScore` over `TargetTributeScore`: the score panel's two), turns, hearts, Budge, Chrono, Swap, Mini-Dice, Cash, Mult, the non-column artifacts.
+    and act, "0/100 attack" (`TotalScore` over `TargetTributeScore`: the score panel's two), turns, hearts, Budge, Chrono, Swap, Mini-Dice, Cash, Mult, a pilot's artifact alone, then the perks (the
+    other non-column slots, the starter perk among them) as a row under "Perks" (the compendium's
+    heading `Powers_Subtitle_1`, "Perks (1-24)", its range dropped: the game has no other plural), in
+    slot order, as drawn left to right. The driver's `/input` readout includes a row's context on
+    every move; speech says it only on entering.
     A tip waiting for an action ("Press the LAUNCH button") is said once on arrival
     (`OnUpdate`). `ModelItemDict` and `ArtifactViewDict` are keyed by the boxed `ID`: artifacts
     are matched by `ArtifactID.Number` instead. Keys (`EncounterKeys`, Game category): C

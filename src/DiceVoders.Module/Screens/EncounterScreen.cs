@@ -572,29 +572,54 @@ namespace DiceVoders.Module.Screens
                 b.AddItem(ControlId.Structural("enc:token:" + line.Key), Stat(line.Value, TokenKeyword(line.Key)));
             }
             b.AddItem(ControlId.Structural("enc:mult"), Stat(Mult, () => GameNodes.Lines(Keywords.Line(NestedTooltipName.GlobalMult))));
-            // The artifacts outside the columns' slots.
+            // The artifacts outside the columns' slots: a pilot alone, then the perks as a row, in
+            // slot order as drawn.
             var model = EncounterState.Model;
             int slots = model?.ArtifactSlots?.Count ?? 0;
+            var perks = new List<int>();
             for (int slot = EncounterState.Columns; slot < slots; slot++)
             {
                 var artifact = EncounterState.Artifact(slot);
                 if (artifact == null) continue;
-                int s = slot;
-                b.AddItem(ControlId.Structural("enc:artifact:" + slot), new NodeVtable
-                {
-                    ControlType = ControlTypes.Text,
-                    Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(() => ArtifactLabel(EncounterState.Artifact(s))) },
-                    SearchText = () => EncounterState.ArtifactName(EncounterState.Artifact(s)),
-                    OnFocus = () => { var view = EncounterState.ArtifactView(EncounterState.Artifact(s)); if (view != null) EncounterState.Hover(view); },
-                    Details = () => ArtifactDetails(EncounterState.Artifact(s)),
-                    OnSecondary = () => SayDetails(ArtifactDetails(EncounterState.Artifact(s))),
-                });
+                if (EncounterState.PilotName(artifact) != null) b.AddItem(ControlId.Structural("enc:artifact:" + slot), SlotArtifact(slot));
+                else perks.Add(slot);
+            }
+            if (perks.Count > 0)
+            {
+                b.PushContext(Perks());
+                b.StartRow("enc:status");
+                foreach (int slot in perks) b.AddItem(ControlId.Structural("enc:artifact:" + slot), SlotArtifact(slot));
+                b.EndRow();
+                b.PopContext();
             }
             // Constellations (once unlocked): the button draws only its constellations' initials.
             var constellations = EncounterState.Controller?.ConstellationController?.ConstellationButtonObject?.GetComponent<ButtonView>();
             if (ViewNodes.IsShown(constellations))
                 b.AddItem(ControlId.Structural("enc:constellations"), ViewNodes.Button(constellations, () => GameLoc.Get("Constellations_Misc") ?? "Constellations"));
             b.PopContext();
+        }
+
+        // An artifact in a slot outside the columns, read live from the slot.
+        private static NodeVtable SlotArtifact(int s) => new NodeVtable
+        {
+            ControlType = ControlTypes.Text,
+            Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(() => ArtifactLabel(EncounterState.Artifact(s))) },
+            SearchText = () => EncounterState.ArtifactName(EncounterState.Artifact(s)),
+            OnFocus = () => { var view = EncounterState.ArtifactView(EncounterState.Artifact(s)); if (view != null) EncounterState.Hover(view); },
+            Details = () => ArtifactDetails(EncounterState.Artifact(s)),
+            OnSecondary = () => SayDetails(ArtifactDetails(EncounterState.Artifact(s))),
+        };
+
+        private static readonly System.Text.RegularExpressions.Regex Range =
+            new System.Text.RegularExpressions.Regex(@"\s*[(（][^)）]*[)）]\s*$");
+
+        // "Perks": the game's word, from its compendium's page heading "Perks (1-24)", the range
+        // dropped (it has no other plural).
+        private static string Perks()
+        {
+            string heading = GameLoc.Get("Powers_Subtitle_1");
+            string word = heading != null ? Range.Replace(heading, "").Trim() : null;
+            return string.IsNullOrEmpty(word) ? "Perks" : word;
         }
 
         private static NodeVtable Stat(Func<string> text, Func<IEnumerable<string>> details = null) => new NodeVtable
