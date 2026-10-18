@@ -275,12 +275,8 @@ namespace DiceVoders.Module.Screens
         internal static string HeaderText(int x)
         {
             var parts = new List<string>();
-            if (EncounterState.SlotTarget(x) != null)
-            {
-                parts.Add(Strings.EncTarget);
-                string mark = EncounterState.SlotMark(x);
-                if (mark != null) parts.Add(mark);
-            }
+            // A target: the game's mark for what placing does ("Replace", "Level Up!"), else "target".
+            if (EncounterState.SlotTarget(x) != null) parts.Add(EncounterState.SlotMark(x) ?? Strings.EncTarget);
             parts.Add(Strings.EncColumn(x + 1));
             int power = EncounterState.DicePower(x);
             if (power > 0) parts.Add(Strings.EncFigure(GameLoc.Get("DicePower_Misc") ?? "Dice Power", power.ToString()));
