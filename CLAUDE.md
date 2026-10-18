@@ -183,7 +183,10 @@ sends `keybd_event`.
     `EntityName#Number`), strength ("all units +5 strength" when alike), states and charge,
     artifacts added/removed/moved/levelled (keyed `ArtifactID.Number`), new tiles, clouds, honey,
     tokens ("Chrono 4"), Mult rising, the shop's offer rerolled (a purchase only removes), turns
-    left changing within a phase. Not narrated: the mini-dice faces (only their scoring). Verified live: the refusals with a tip
+    left changing within a phase. Mini-dice faces lead the scoring line ("Mini-Dice 6, column 6:
+    30, ..."): caught by a Harmony postfix on `MiniDiceSpawner.LaunchDiceToColumn` (a face is the
+    column it goes to; they land mid-scoring, never on a settled frame); the Mini-Dice count is left
+    out of that diff. Verified live: the refusals with a tip
     up, a launch (20 + 10 = 30 in the tutorial). Not exercised: a real budge, freeze, reroll, cancel.
     Tiles: only `GridModel.BuiltCoords` exist (the tutorial starts with the bottom row less column
     4, plus 2,2); others read "no tile"; `GetBuildableCoords` is where Build Tile can add one. The

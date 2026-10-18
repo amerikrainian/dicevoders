@@ -6,6 +6,7 @@ using DiceVoders.Core;
 using DiceVoders.Core.Encounter;
 using DiceVoders.Module.Interop;
 using DiceVoders.Module.UI;
+using HarmonyLib;
 
 namespace DiceVoders.Module.Encounter
 {
@@ -43,6 +44,7 @@ namespace DiceVoders.Module.Encounter
 
             var now = Take();
             if (now == null) return;
+            _miniDice.Clear();
             if (_last != null)
             {
                 var lines = EncounterDiff.Lines(_last, now);
@@ -50,6 +52,30 @@ namespace DiceVoders.Module.Encounter
                 foreach (var line in lines) Speech.Say(line);
             }
             _last = now;
+        }
+
+        // The mini-dice launched since the last snapshot: their faces are the columns they go to,
+        // caught as the game sends each (they roll and land mid-scoring, never on a settled frame).
+        private static readonly List<int> _miniDice = new List<int>();
+
+        [HarmonyPatch(typeof(MiniDiceSpawner), nameof(MiniDiceSpawner.LaunchDiceToColumn))]
+        internal static class MiniDiceLaunch
+        {
+            [HarmonyPostfix]
+            private static void Postfix(GridColumn gridColumn)
+            {
+                try
+                {
+                    if (gridColumn == null) return;
+                    for (int x = 0; x < Encounter.Columns; x++)
+                    {
+                        var column = Encounter.Column(x);
+                        if (column != null && column.Pointer == gridColumn.Pointer) { _miniDice.Add(x + 1); return; }
+                    }
+                    CoreLog.Warning("EncounterEvents: a mini-die went to a column not on the grid");
+                }
+                catch (Exception e) { CoreLog.Warning("EncounterEvents: reading a mini-die failed: " + e.Message); }
+            }
         }
 
         /// <summary>Take the encounter as it is now as the baseline, so what a key has just said
@@ -92,6 +118,8 @@ namespace DiceVoders.Module.Encounter
                     CloudLabel = GameLoc.Get("Cloudy_TooltipTitle") ?? "Cloudy",
                 };
                 foreach (var die in Encounter.Dice()) s.Dice.Add(die.isRolling ? 0 : die.Value);
+                s.MiniDice.AddRange(_miniDice);
+                s.MiniDiceLabel = GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice";
                 ColumnAttack(model, s.ColumnAttack);
                 Tokens(s.Tokens);
                 Units(model, s.Units);

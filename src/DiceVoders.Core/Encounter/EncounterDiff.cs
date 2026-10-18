@@ -10,8 +10,9 @@ namespace DiceVoders.Core.Encounter
     /// <list type="number">
     /// <item>a new target ("Defeat the N.B.S. (Neptune Base Security), Act 1-2"), after which the
     /// round's resets (attack, turns, cash) go unsaid;</item>
-    /// <item>the turn's scoring once the player phase is left with more attack, one line ("column 3:
-    /// 20, column 5: 10, 30/100 attack"); attack changing otherwise ("40/100 attack");</item>
+    /// <item>the turn's scoring once the player phase is left with more attack, one line, the mini-dice
+    /// launched first ("Mini-Dice 6, 2, column 3: 20, column 5: 10, 30/100 attack"); mini-dice and
+    /// attack changing otherwise ("40/100 attack");</item>
     /// <item>the target reached, a heart lost;</item>
     /// <item>units: destroyed ("Time Angel at 6, 1 destroyed"), added ("Migo added at 4, 1"), moved
     /// ("Migo moved to 3, 2"), strength ("all units +5 strength" when every one that stayed changed
@@ -39,9 +40,12 @@ namespace DiceVoders.Core.Encounter
                 lines.Add(string.IsNullOrEmpty(now.Act) ? now.TargetName : now.TargetName + ", " + now.Act);
 
             bool scored = wasPlayer && !isPlayer && now.Total > prev.Total;
+            string mini = now.MiniDice.Count > 0 && !string.IsNullOrEmpty(now.MiniDiceLabel)
+                ? S.EncFigure(now.MiniDiceLabel, string.Join(", ", now.MiniDice)) : null;
             if (scored)
             {
                 var parts = new List<string>();
+                if (mini != null) parts.Add(mini);
                 for (int i = 0; i < now.ColumnAttack.Count; i++)
                 {
                     string attack = now.ColumnAttack[i];
@@ -50,8 +54,11 @@ namespace DiceVoders.Core.Encounter
                 parts.Add(S.EncAttack(now.TotalText, now.TargetText));
                 lines.Add(string.Join(", ", parts));
             }
-            else if (!newTarget && now.Total != prev.Total)
-                lines.Add(S.EncAttack(now.TotalText, now.TargetText));
+            else
+            {
+                if (mini != null) lines.Add(mini);
+                if (!newTarget && now.Total != prev.Total) lines.Add(S.EncAttack(now.TotalText, now.TargetText));
+            }
             if (!newTarget && prev.Total < prev.Target && now.Total >= now.Target && now.Target > 0 && !string.IsNullOrEmpty(now.TargetReachedText))
                 lines.Add(now.TargetReachedText);
             if (now.Hearts < prev.Hearts)
@@ -65,8 +72,10 @@ namespace DiceVoders.Core.Encounter
             {
                 var before = prev.Tokens.Find(t => t.Key == token.Key);
                 if (before == null || before.Value == token.Value) continue;
-                // A new round's fresh Cash is no news.
+                // A new round's fresh Cash is no news; nor the Mini-Dice count where their faces are said
+                // ("Mini-Dice 0" after "Mini-Dice 6" would read as the same thing).
                 if (newTarget && token.Key == "cash") continue;
+                if (mini != null && token.Key == "minidice") continue;
                 lines.Add(S.EncFigure(token.Label, token.Value.ToString()));
             }
             if (now.Mult > prev.Mult && now.Mult > 1 && !string.IsNullOrEmpty(now.MultLabel))

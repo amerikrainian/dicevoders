@@ -83,6 +83,24 @@ namespace DiceVoders.Tests
         };
 
         [Fact]
+        public void The_mini_dice_lead_the_scoring()
+        {
+            var now = Snap("Draft", total: 30, turns: 3);
+            now.ColumnAttack[5] = "30";
+            now.MiniDice.Add(6);
+            now.MiniDiceLabel = "Mini-Dice";
+            now.Tokens.Add(new Figure { Key = "minidice", Label = "Mini-Dice", Value = 0 });
+            Assert.Equal(new[] { "Mini-Dice 6, column 6: 30, 30/100 attack", "shop" },
+                EncounterDiff.Lines(WithMiniDice(Snap("Player", dice: new[] { 6, 1, 6 }), 1), now));
+        }
+
+        private static EncounterSnapshot WithMiniDice(EncounterSnapshot s, int count)
+        {
+            s.Tokens.Add(new Figure { Key = "minidice", Label = "Mini-Dice", Value = count });
+            return s;
+        }
+
+        [Fact]
         public void A_token_change_says_the_token()
         {
             var prev = Snap("Draft");
