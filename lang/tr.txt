@@ -20,6 +20,7 @@ role.edit=düzenleme alanı
 state.disabled=devre dışı
 state.locked=kilitli
 state.completed=tamamlandı
+cs.random=Rastgele komutan
 state.selected=seçili
 state.on=açık
 state.off=kapalı

@@ -20,6 +20,7 @@ role.edit=エディット
 state.disabled=無効
 state.locked=ロック中
 state.completed=クリア済み
+cs.random=ランダムな司令官
 state.selected=選択
 state.on=オン
 state.off=オフ

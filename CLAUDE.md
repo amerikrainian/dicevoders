@@ -128,13 +128,16 @@ sends `keybd_event`.
     of `DifficultyNames[_index]`, locked = `IsLocked`, completed = a shown `CompletedObjects`,
     selected = `IsSelected`, Enter = its click) and the chosen chapter's `DifficultyPanelFlavor` and
     `Chapter1TutObject` lines (its headings, repeating the name, and its arrows, the row's
-    neighbours, left out); the mission panel (`TutorialCompletePanel`, else `MissionPanel`: "Current
+    neighbours, left out), the challenges once unlocked (`ChallengeNodes`, a row: `<ChallengeName>_Title`,
+    locked, completed, selected = `IsSelected`, Backspace `_Desc` and the `Mod` rules, Enter its
+    click); the mission panel (`TutorialCompletePanel`, else `MissionPanel`: "Current
     Mission", "Win CH1 with any commander") as prose then its buttons ("New Chapter Unlocked!" =
     `OnPressCompleteTutorial`, writes the save); the shown `CommanderIcons` as a row by x (unlocked:
     "The Captain, New!": `<Commander>_Misc`, `_Arti_Title` being its perk's, Backspace the perk's
     name; "New!" from the `NewText` field's child text, the field being `UnlockIcon`; locked: the
     `Tooltip` title "Locked - The Invasion Begins!", Backspace "Reach Chapter 1 to unlock!";
-    selected = `SelectedObject`); the chosen commander's panel (`Frame`): "The Captain, LV. 2"
+    selected = `SelectedObject`), the row ending with `RandomIcon` (`OnPressRandom`, drawn only as its
+    key prompt: the mod's "Random commander"); the chosen commander's panel (`Frame`): "The Captain, LV. 2"
     (`CommanderText`, `LevelTextObject` or `LevelTextObjectChinese`), the starting perk
     (`CommanderArtifactView`, as on the board, Backspace with keywords), the unique artifacts as
     drawn, rows by height top first, left to right (index i: `LockedArtifactItems[i]` shown = locked,
@@ -143,7 +146,9 @@ sends `keybd_event`.
     "Monocle", Backspace its tooltip with the game's unlock text, as `SetArtifacts` sets it
     (`SetModel(model, true)`: "You now have a chance to find this perk during a run with this
     commander!", its dashed divider dropped): not a choice, a perk added to the run's pool); every other shown clickable in hierarchy order (Launch!, `StartButton`); Back
-    (`OnExitPressed`) last, Escape too. Seen live: after the tutorial, after New Chapter Unlocked
+    (`OnExitPressed`) last, Escape too. `GameScenes.Items` can hold items destroyed since (a unique's
+    lock, once unlocked): every loop skips `item == null` first, and the build is guarded so one
+    failure does not leave the screen without nodes (it did: arrows went dead). Seen live: after the tutorial, after New Chapter Unlocked
     (CH1 open, three commanders unlocked), The Captain chosen. Not seen: a unique ready to unlock
     ("Press to unlock!", whose click reveals it and writes the save), the challenges, the missions'
     commander images, Launch!.

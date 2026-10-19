@@ -39,7 +39,13 @@ namespace DiceVoders.Module.Screens
             if (c == null || items == null) return;
             var taken = new HashSet<IntPtr>();
             b.PushContext(null);
+            try { BuildAll(b, c, items, taken); }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: building failed: " + e); }
+            b.PopContext();
+        }
 
+        private static void BuildAll(GraphBuilder b, CharacterSelectionController c, IReadOnlyList<AViewItem> items, HashSet<IntPtr> taken)
+        {
             // The chapter: Select Challenge, the toggle of the chapter panel (expanded while it is
             // open), with the chosen chapter's name while it is shut; open, the chapters as a row
             // ("CH1 - First Contact", locked, completed) entered at the chosen one, and its
@@ -47,6 +53,8 @@ namespace DiceVoders.Module.Screens
             // the row's neighbours: both left out.
             foreach (var item in items)
             {
+                // Items gathered with the scene can be destroyed since (a unique's lock, once unlocked).
+                if (item == null) continue;
                 if (item.transform.parent != null && item.transform.parent.name == "Title" && item.TryCast<ButtonView>() != null)
                     taken.Add(item.Pointer);
                 if (item.gameObject.name != "DifficultyDropdownButton" || !ViewNodes.IsShown(item)) continue;
@@ -75,6 +83,19 @@ namespace DiceVoders.Module.Screens
                 if (tmp == null || !tmp.gameObject.activeInHierarchy) continue;
                 var text = tmp;
                 b.AddItem(ControlId.Structural("cs:chapterline:" + tmp.gameObject.name), GameNodes.Text(() => GameText.Of(text)));
+            }
+            // The challenges (once unlocked, on the chapter panel's map): a row, by name ("Strange
+            // World"), locked, completed, selected as chosen; Backspace its description and rules.
+            var challenges = new List<DifficultyNode>();
+            if (c.ChallengeNodes != null)
+                foreach (var node in c.ChallengeNodes)
+                    if (node != null && node.gameObject.activeInHierarchy) { challenges.Add(node); taken.Add(node.Pointer); }
+            challenges.Sort((l, r) => l._index.CompareTo(r._index));
+            if (challenges.Count > 0)
+            {
+                b.StartRow("cs:challenges", entry: () => Math.Max(0, challenges.FindIndex(n => n.IsSelected)));
+                foreach (var node in challenges) b.AddItem(ControlId.Structural("cs:challenge:" + node.ChallengeName), Challenge(node));
+                b.EndRow();
             }
 
             // The mission panel (the tutorial's "Mission Complete!", later the chapter's): its lines,
@@ -110,6 +131,13 @@ namespace DiceVoders.Module.Screens
                     taken.Add(icon.Pointer);
                     b.AddItem(ControlId.Structural("cs:commander:" + icon.CommanderName), Commander(icon));
                 }
+                // The random commander, at the list's end: it draws only its key prompt.
+                foreach (var item in items)
+                {
+                    if (item == null || item.gameObject.name != "RandomIcon" || !ViewNodes.IsShown(item)) continue;
+                    taken.Add(item.Pointer);
+                    b.AddItem(ControlId.Structural("cs:random"), ViewNodes.Button(item, () => Strings.Get("cs.random")));
+                }
                 b.EndRow();
             }
 
@@ -120,13 +148,38 @@ namespace DiceVoders.Module.Screens
             AViewItem back = null;
             foreach (var item in items)
             {
-                if (!ViewNodes.IsShown(item) || item.TryCast<IClickable>() == null || !taken.Add(item.Pointer)) continue;
+                if (item == null || !ViewNodes.IsShown(item) || item.TryCast<IClickable>() == null || !taken.Add(item.Pointer)) continue;
                 if (item.gameObject.name == "BackButton") { back = item; continue; }
                 b.AddItem(ControlId.Structural("cs:" + item.gameObject.name + ":" + item.GetInstanceID()), ViewNodes.Button(item));
             }
             if (back != null)
                 b.AddItem(ControlId.Structural("cs:back"), ViewNodes.Button(back, () => GameLoc.Get("Back_Misc") ?? "Back"));
-            b.PopContext();
+        }
+
+        private static NodeVtable Challenge(DifficultyNode node)
+        {
+            string key = node.ChallengeName.ToString();
+            Func<string> label = () =>
+            {
+                var parts = new List<string> { GameLoc.Get(key + "_Title") ?? key };
+                if (node.IsLocked) parts.Add(Strings.StateLocked);
+                bool done = false;
+                try { if (node.CompletedObjects != null) foreach (var o in node.CompletedObjects) if (o != null && o.activeInHierarchy) done = true; }
+                catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading a challenge failed: " + e.Message); }
+                if (done) parts.Add(Strings.StateCompleted);
+                return string.Join(", ", parts);
+            };
+            Func<IEnumerable<string>> details = () => GameNodes.Lines(GameLoc.Get(key + "_Desc"), GameLoc.Get(key + "Mod_Title"), GameLoc.Get(key + "Mod_Desc"));
+            return new NodeVtable
+            {
+                ControlType = ControlTypes.RadioButton,
+                Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label), GameNodes.SelectedPart(() => node.IsSelected) },
+                SearchText = label,
+                OnFocus = () => ViewNodes.Hover(node),
+                OnActivate = () => ViewNodes.Click(node),
+                Details = details,
+                OnSecondary = () => SayDetails(details()),
+            };
         }
 
         // "Select Challenge, CH1 - First Contact": the caption, and the chosen chapter's name drawn

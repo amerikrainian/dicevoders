@@ -22,6 +22,7 @@ role.edit=edit
 state.disabled=disabled
 state.locked=locked
 state.completed=completed
+cs.random=Random commander
 state.selected=selected
 state.on=on
 state.off=off

@@ -20,6 +20,7 @@ role.edit=편집
 state.disabled=사용 불가
 state.locked=잠김
 state.completed=완료
+cs.random=무작위 사령관
 state.selected=선택됨
 state.on=켜짐
 state.off=꺼짐

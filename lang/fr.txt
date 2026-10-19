@@ -20,6 +20,7 @@ role.edit=zone d'édition
 state.disabled=non disponible
 state.locked=verrouillé
 state.completed=terminé
+cs.random=Commandant aléatoire
 state.selected=sélectionné
 state.on=activé
 state.off=désactivé

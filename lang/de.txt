@@ -20,6 +20,7 @@ role.edit=Eingabefeld
 state.disabled=nicht verfügbar
 state.locked=gesperrt
 state.completed=abgeschlossen
+cs.random=Zufälliger Kommandant
 state.selected=ausgewählt
 state.on=ein
 state.off=aus

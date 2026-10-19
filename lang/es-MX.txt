@@ -20,6 +20,7 @@ role.edit=cuadro de edición
 state.disabled=no disponible
 state.locked=bloqueado
 state.completed=completado
+cs.random=Comandante aleatorio
 state.selected=seleccionado
 state.on=activado
 state.off=desactivado
