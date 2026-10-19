@@ -51,6 +51,7 @@ namespace DiceVoders.Module.Screens
         {
             var c = Controller();
             if (c == null) return;
+            if (c.IsConstellationPanelActive()) { BuildConstellations(b, c); return; }
             var pages = c.Canvas.transform.Find("Pages");
             if (pages == null) return;
             b.PushContext(null);
@@ -85,9 +86,45 @@ namespace DiceVoders.Module.Screens
                 else BuildEntries(b, shown.transform);
             }
 
+            // Constellations (once unlocked), beside Exit.
+            var constellations = c.CompendiumButton != null && c.CompendiumButton.activeInHierarchy ? c.CompendiumButton.GetComponentInChildren<ButtonView>(false) : null;
+            if (ViewNodes.IsShown(constellations))
+                b.AddItem(ControlId.Structural("comp:constellations"), ViewNodes.Button(constellations, () => GameLoc.Get("Constellations_Misc") ?? "Constellations"));
             var exit = pages.Find("BG/Exit/ExitButton");
             var exitItem = exit != null ? exit.GetComponent<AViewItem>() : null;
             if (ViewNodes.IsShown(exitItem)) b.AddItem(ControlId.Structural("comp:exit"), ViewNodes.Button(exitItem));
+            b.PopContext();
+        }
+
+        // The constellations panel (OnConstellationPressed): "1-3 / 30", the shown three as the
+        // encounter's scene reads them (title and description, Backspace the set), the page arrows
+        // (drawn with no caption: the credits' "Previous page"/"Next page"), Exit; Escape too.
+        private static void BuildConstellations(GraphBuilder b, CompendiumController c)
+        {
+            b.PushContext(GameLoc.Get("Constellations_Misc"));
+            var page = c.ConstellationsPageNumber;
+            if (page != null && page.gameObject.activeInHierarchy)
+                b.AddItem(ControlId.Structural("comp:cons:page"), GameNodes.Text(() => GameText.Of(page)));
+            int i = 0;
+            if (c.Constellations != null)
+                foreach (var con in c.Constellations)
+                    if (con != null && con.gameObject.activeInHierarchy)
+                        b.AddItem(ControlId.Structural("comp:cons:" + i++), ConstellationScreen.Node(con));
+            var arrows = page != null ? page.transform.parent : null;
+            foreach (var (name, key) in new[] { ("LeftArrow", "credits.prev"), ("RightArrow", "credits.next") })
+            {
+                var t = arrows != null ? arrows.Find(name) : null;
+                var item = t != null ? t.GetComponent<AViewItem>() : null;
+                if (!ViewNodes.IsShown(item)) continue;
+                var vt = ViewNodes.Button(item, () => Strings.Get(key));
+                var arrow = item;
+                // A turn lands on the page line, the new page's figure ("4-6 / 30").
+                vt.OnActivate = () => { ViewNodes.Click(arrow); Navigation.MoveTo(ControlId.Structural("comp:cons:page")); };
+                b.AddItem(ControlId.Structural("comp:cons:" + name), vt);
+            }
+            var exit = c.ConstellationExitButton;
+            // Its caption is drawn beside it (Exit/Mover/Top): the game's "Exit".
+            if (ViewNodes.IsShown(exit)) b.AddItem(ControlId.Structural("comp:cons:exit"), ViewNodes.Button(exit, () => GameLoc.Get("Exit_Misc") ?? "Exit"));
             b.PopContext();
         }
 
@@ -305,6 +342,11 @@ namespace DiceVoders.Module.Screens
             yield return new ElementAction(ActionIds.Back, Strings.Get("bind.ui.back"), _ =>
             {
                 var c = Controller();
+                if (c != null && c.IsConstellationPanelActive())
+                {
+                    if (ViewNodes.IsShown(c.ConstellationExitButton)) ViewNodes.Click(c.ConstellationExitButton);
+                    return;
+                }
                 var exit = c != null ? c.Canvas.transform.Find("Pages/BG/Exit/ExitButton") : null;
                 var item = exit != null ? exit.GetComponent<AViewItem>() : null;
                 if (ViewNodes.IsShown(item)) ViewNodes.Click(item);

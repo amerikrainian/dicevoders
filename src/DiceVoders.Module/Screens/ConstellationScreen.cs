@@ -126,7 +126,7 @@ namespace DiceVoders.Module.Screens
 
         // A constellation: its drawn texts, the reveal button's caption last while it shows (Enter is
         // then its click). One kind of node either way, so a reveal rewords it in place.
-        private static NodeVtable Node(Constellation con)
+        internal static NodeVtable Node(Constellation con)
         {
             var reveal = con.transform.Find("Parallaxer/RevealObject")?.GetComponent<ButtonView>();
             Func<string> label = () => Label(con, reveal);

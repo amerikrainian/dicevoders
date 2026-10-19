@@ -167,8 +167,15 @@ sends `keybd_event`.
     children in hierarchy order, rows of its `constraintCount` (8 on the perks pages; world
     positions are 1.5 apart and useless for rows): an `ArtifactView` by name (Backspace its tooltip
     and keywords), an `InvaderCompendiumEntry` by name (Backspace its `EntityTooltip`), a
-    `Locked*` placeholder "locked" (a bare picture with prefab text). Exit (`Pages/BG/Exit/ExitButton`,
-    `OnExitPressed`), Escape too. Not read: the constellations panel (`IsConstellationPanelActive`).
+    `Locked*` placeholder "locked" (a bare picture with prefab text). Constellations (`CompendiumButton`'s
+    `ConstellationButton`, `OnConstellationPressed`, once unlocked), Exit (`Pages/BG/Exit/ExitButton`,
+    `OnExitPressed`), Escape too. The constellations panel (`IsConstellationPanelActive`), under the
+    context "Constellations": `ConstellationsPageNumber` ("1-3 / 30"), the shown `Constellations`
+    as the encounter's scene reads them (`ConstellationScreen.Node`: "Aegis, You can find these unique
+    SHIELD related artifacts during this run.", Backspace the set's artifacts and keywords), the
+    `LeftArrow`/`RightArrow` (no caption: the credits' "Previous page"/"Next page"; a turn lands on
+    the page line), Exit (`ConstellationExitButton`, its caption drawn beside it: `Exit_Misc`),
+    Escape too. Seen live with Unlock All on: 30 constellations, pages turned both ways.
   - `SettingsScreen` (`SettingsSceneController`, SettingsMenuScene, layer 35, exclusive; named by
     its `BackgroundPanel/TitleText`, "Options & Extras"): three Tab-stops. The tab strip
     (`CategoryButtons/*/Button`, captions beside them) is a row entered at `_currentTab`; landing on
