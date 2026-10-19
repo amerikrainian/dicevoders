@@ -45,8 +45,26 @@ namespace DiceVoders.Module.Screens
             b.PopContext();
             b.PushContext(null);
             foreach (var item in edge)
-                b.AddItem(ControlId.Structural("main:" + item.gameObject.name), ViewNodes.Button(item));
+            {
+                var icon = item;
+                b.AddItem(ControlId.Structural("main:" + item.gameObject.name), ViewNodes.Button(item, () => EdgeLabel(icon)));
+            }
             b.PopContext();
+        }
+
+        // An icon by its hover tooltip's name, with a figure it draws ("Compendium, 12%", its unlocked
+        // share): the icon's caption alone would be the figure.
+        private static string EdgeLabel(AViewItem item)
+        {
+            string label = ViewNodes.Label(item);
+            var button = item.TryCast<ButtonView>();
+            var tip = button != null ? button.Tooltip : null;
+            string name = null;
+            if (tip != null)
+                foreach (var tmp in tip.GetComponentsInChildren<TMPro.TMP_Text>(true))
+                    if (name == null) name = GameText.Of(tmp);
+            if (name == null || name == label) return label;
+            return label != null && label != item.gameObject.name ? name + ", " + label : name;
         }
 
         // The popup and the language picker are screens of their own over this one.

@@ -287,7 +287,7 @@ namespace DiceVoders.Module.Screens
         // A commander: locked, its tooltip's lock title ("Locked - The Invasion Begins!"), Backspace the
         // condition; unlocked, its name ("Mothership", the game's <c>_Arti_Title</c>), selected by the
         // game's highlight. Enter is the game's click.
-        private static NodeVtable Commander(CommanderIconView icon)
+        internal static NodeVtable Commander(CommanderIconView icon)
         {
             Func<string> label = () => CommanderLabel(icon);
             Func<IEnumerable<string>> details = () => CommanderDetails(icon);

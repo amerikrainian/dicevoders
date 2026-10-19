@@ -147,6 +147,22 @@ sends `keybd_event`.
     (CH1 open, three commanders unlocked), The Captain chosen. Not seen: a unique ready to unlock
     ("Press to unlock!", whose click reveals it and writes the save), the challenges, the missions'
     commander images, Launch!.
+  - `CompendiumScreen` (`CompendiumController`, CompendiumSceneAdditive over the main menu, from its
+    Compendium icon, `GlossaryIcon`, which reads "Compendium, 12%": an edge icon is its tooltip's
+    name with its caption; layer 10, exclusive; up while `Canvas` shows), named by `Pages/Title`.
+    One stop: "Unlocked: 12%", "Completion: 0%" (a label text with its value as a child text); the
+    10 `Pages` as a row of tabs named by their keys (`GameStats_Misc`, `Powers_Subtitle_1..3`,
+    `<Rarity>Arti_Subtitle`, `Units_Subtitle`, `WarpedUnits_Subtitle`: a page not yet shown holds
+    its prefab's subtitle), landing turns to it (`SetPage`); then the page. Stats: `General`'s
+    figures ("Runs played: 1"), "0 / 19 Challenges Completed", the chapters (`DifficultyNodes`,
+    `Chapter<n>_Title`, locked, completed) and the challenges (`ChallengeNodes`, `<ChallengeName>_Title`,
+    Backspace `_Desc` and the `<Name>Mod_Title`/`_Desc` rules) as rows, "Won with 0 / 10
+    Commanders", the commanders as a row (the hub's nodes). Other pages: each `GridLayoutGroup`'s
+    children in hierarchy order, rows of its `constraintCount` (8 on the perks pages; world
+    positions are 1.5 apart and useless for rows): an `ArtifactView` by name (Backspace its tooltip
+    and keywords), an `InvaderCompendiumEntry` by name (Backspace its `EntityTooltip`), a
+    `Locked*` placeholder "locked" (a bare picture with prefab text). Exit (`Pages/BG/Exit/ExitButton`,
+    `OnExitPressed`), Escape too. Not read: the constellations panel (`IsConstellationPanelActive`).
   - `SettingsScreen` (`SettingsSceneController`, SettingsMenuScene, layer 35, exclusive; named by
     its `BackgroundPanel/TitleText`, "Options & Extras"): three Tab-stops. The tab strip
     (`CategoryButtons/*/Button`, captions beside them) is a row entered at `_currentTab`; landing on
