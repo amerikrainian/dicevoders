@@ -176,6 +176,19 @@ sends `keybd_event`.
     `LeftArrow`/`RightArrow` (no caption: the credits' "Previous page"/"Next page"; a turn lands on
     the page line), Exit (`ConstellationExitButton`, its caption drawn beside it: `Exit_Misc`),
     Escape too. Seen live with Unlock All on: 30 constellations, pages turned both ways.
+  - `GuideScreen` (`StrategyGuideController`, StrategyGuideSceneAdditive, from the main menu or the game
+    menu; layer 36, exclusive; up while its `Pages`' canvas shows), "Strategy Guide"
+    (`StrategyGuide_Misc`). One stop: the `GuideButtons` as a row of tabs, landing turns
+    (`SetPage`); a label is its caption and the icons pictured around it (separate Images:
+    `T_RB_budgeicon`, `T_RB_rerollicon`, `T_RB_minidiceicon`, `Arrow`, `Target`) left to right as their
+    words, "Budge + Chrono", "Mult & Mini-Dice", "When scored & Repeats"; locked, New! (its `NewText`).
+    Then the page group by group (the page's children: a paragraph with its example beside it, top
+    to bottom): the paragraph (a text that is the group or its direct child) as one line, its line
+    breaks being layout; then the example's texts by height (a text with texts drawn in it as one
+    line, left to right: "11 / 11 pages discovered!"; one-letter key prompts dropped) and its
+    `ArtifactView`s as a row (Backspace their tooltips: page 5's quiz); the page's own buttons (the
+    last page's Join Discord); Exit (`Pages/BG/Exit/ExitButton`), Escape too. Seen live from the main
+    menu: pages 0, 1, 3, 5, 10.
   - `SettingsScreen` (`SettingsSceneController`, SettingsMenuScene, layer 35, exclusive; named by
     its `BackgroundPanel/TitleText`, "Options & Extras"): three Tab-stops. The tab strip
     (`CategoryButtons/*/Button`, captions beside them) is a row entered at `_currentTab`; landing on
