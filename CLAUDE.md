@@ -120,6 +120,15 @@ sends `keybd_event`.
     Enter says "selected" at once (the radio's `StateText`); the switch then rewords every live part,
     which `LanguageSync` tells the navigator (`Navigation.LanguageChanged`: a silent re-baseline), so
     it is said once, in whichever language was in effect when the click returned.
+  - `CharacterSelectScreen` (`CharacterSelectionController`, CharacterSelectionScene: the hub, where the
+    unlocks show): one stop: the top right panel (`TutorialCompletePanel`, else `MissionPanel`) as
+    prose then its buttons ("New Chapter Unlocked!" = `OnPressCompleteTutorial`, writes the save), the
+    shown `CommanderIcons` as a row by x (a locked one by its `Tooltip` title "Locked - The Invasion
+    Begins!", Backspace the condition "Reach Chapter 1 to unlock!", as a sighted player sees only a
+    locked square; unlocked by `<Commander>_Arti_Title`, Backspace `_Misc` "The Captain" and
+    `_Arti_Desc`; selected = `SelectedObject`), every other shown clickable in hierarchy order, Back
+    (`OnExitPressed`) last, Escape too. Seen live only after the tutorial (three locked commanders,
+    no Start, the hub's big panel hidden).
   - `SettingsScreen` (`SettingsSceneController`, SettingsMenuScene, layer 35, exclusive; named by
     its `BackgroundPanel/TitleText`, "Options & Extras"): three Tab-stops. The tab strip
     (`CategoryButtons/*/Button`, captions beside them) is a row entered at `_currentTab`; landing on
