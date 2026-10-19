@@ -47,6 +47,8 @@ namespace DiceVoders.Core.Strings
 
             // Control states.
             D("state.disabled", "disabled"),
+            D("state.locked", "locked"),
+            D("state.completed", "completed"),
             D("state.selected", "selected"),
             D("state.on", "on"),
             D("state.off", "off"),
@@ -375,6 +377,8 @@ namespace DiceVoders.Core.Strings
         public static string RoleHeading => Get("role.heading");
 
         public static string StateDisabled => Get("state.disabled");
+        public static string StateLocked => Get("state.locked");
+        public static string StateCompleted => Get("state.completed");
         public static string StateSelected => Get("state.selected");
         public static string StateOn => Get("state.on");
         public static string StateOff => Get("state.off");

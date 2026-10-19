@@ -121,14 +121,22 @@ sends `keybd_event`.
     which `LanguageSync` tells the navigator (`Navigation.LanguageChanged`: a silent re-baseline), so
     it is said once, in whichever language was in effect when the click returned.
   - `CharacterSelectScreen` (`CharacterSelectionController`, CharacterSelectionScene: the hub, where the
-    unlocks show): one stop: the top right panel (`TutorialCompletePanel`, else `MissionPanel`) as
-    prose then its buttons ("New Chapter Unlocked!" = `OnPressCompleteTutorial`, writes the save), the
-    shown `CommanderIcons` as a row by x (a locked one by its `Tooltip` title "Locked - The Invasion
-    Begins!", Backspace the condition "Reach Chapter 1 to unlock!", as a sighted player sees only a
-    locked square; unlocked by `<Commander>_Arti_Title`, Backspace `_Misc` "The Captain" and
-    `_Arti_Desc`; selected = `SelectedObject`), every other shown clickable in hierarchy order, Back
-    (`OnExitPressed`) last, Escape too. Seen live only after the tutorial (three locked commanders,
-    no Start, the hub's big panel hidden).
+    unlocks show), one stop as drawn: the chapters as a row (`DifficultyNodes` by `_index`, "CH1 -
+    First Contact" = `<DifficultyName>_Title` of `DifficultyNames[_index]`, locked = `IsLocked`,
+    completed = a shown `CompletedObjects`, selected = `IsSelected`, Enter = its click), the chosen
+    chapter's `DifficultyPanelFlavor` and `Chapter1TutObject` lines (its headings, which repeat the
+    name, and its arrows, the row's neighbours, left out), Select Challenge
+    (`OnPressDifficultyPanelButton`); the mission panel (`TutorialCompletePanel`, else `MissionPanel`:
+    "Current Mission", "Win CH1 with any commander") as prose then its buttons ("New Chapter
+    Unlocked!" = `OnPressCompleteTutorial`, writes the save); the shown `CommanderIcons` as a row by x
+    (unlocked: "The Captain, New!": `<Commander>_Misc`, `_Arti_Title` being its perk's, Backspace the
+    perk's name; "New!" from the `NewText` field's child text, the field being `UnlockIcon`; locked:
+    the `Tooltip` title "Locked - The Invasion Begins!", Backspace "Reach Chapter 1 to unlock!", as
+    a sighted player sees only a locked square; selected = `SelectedObject`); every other shown
+    clickable in hierarchy order; Back (`OnExitPressed`) last, Escape too. Seen live: after the
+    tutorial, and after New Chapter Unlocked (CH1 open, three commanders unlocked and New!). Not
+    seen: a commander selected (`BigPanelMover`, `StartButtonMover` stay hidden till then), the
+    challenges, the missions' commander images.
   - `SettingsScreen` (`SettingsSceneController`, SettingsMenuScene, layer 35, exclusive; named by
     its `BackgroundPanel/TitleText`, "Options & Extras"): three Tab-stops. The tab strip
     (`CategoryButtons/*/Button`, captions beside them) is a row entered at `_currentTab`; landing on
