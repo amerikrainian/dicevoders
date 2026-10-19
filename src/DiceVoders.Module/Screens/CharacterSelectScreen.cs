@@ -22,7 +22,7 @@ namespace DiceVoders.Module.Screens
     /// Begins!") with its condition for Backspace, as a sighted player sees only a locked square; an
     /// unlocked one by name; then every other button shown, in hierarchy order, by caption; Back
     /// (<see cref="CharacterSelectionController.OnExitPressed"/>) last, Escape too. Seen live only with
-    /// the tutorial's panel up (no commander unlocked, no Start): the rest is generic until read.
+    /// the tutorial's panel up and after it: see CLAUDE.md for what has been read.
     /// </summary>
     public sealed class CharacterSelectScreen : Screen
     {
@@ -40,10 +40,25 @@ namespace DiceVoders.Module.Screens
             var taken = new HashSet<IntPtr>();
             b.PushContext(null);
 
-            // The chapter: the chapters as a row ("CH1 - First Contact", locked, completed), entered
-            // at the one chosen; the chosen one's description; Select Challenge. The panel's own
-            // headings repeat the chosen chapter's name and are left out; so are its arrows, the
-            // row's neighbours.
+            // The chapter: Select Challenge, the toggle of the chapter panel (expanded while it is
+            // open), with the chosen chapter's name while it is shut; open, the chapters as a row
+            // ("CH1 - First Contact", locked, completed) entered at the chosen one, and its
+            // description. The panel's headings repeat the chosen chapter's name and its arrows are
+            // the row's neighbours: both left out.
+            foreach (var item in items)
+            {
+                if (item.transform.parent != null && item.transform.parent.name == "Title" && item.TryCast<ButtonView>() != null)
+                    taken.Add(item.Pointer);
+                if (item.gameObject.name != "DifficultyDropdownButton" || !ViewNodes.IsShown(item)) continue;
+                taken.Add(item.Pointer);
+                var toggle = item;
+                var vt = ViewNodes.Button(toggle, () => ChallengeLabel(c, toggle));
+                vt.Announcements = new List<NodeAnnouncement>(vt.Announcements)
+                {
+                    new NodeAnnouncement(() => Strings.Get(c.IsDifficultyPanelActive ? "state.expanded" : "state.collapsed"), live: true),
+                };
+                b.AddItem(ControlId.Structural("cs:challenge"), vt);
+            }
             var nodes = new List<DifficultyNode>();
             if (c.DifficultyNodes != null)
                 foreach (var node in c.DifficultyNodes)
@@ -60,17 +75,6 @@ namespace DiceVoders.Module.Screens
                 if (tmp == null || !tmp.gameObject.activeInHierarchy) continue;
                 var text = tmp;
                 b.AddItem(ControlId.Structural("cs:chapterline:" + tmp.gameObject.name), GameNodes.Text(() => GameText.Of(text)));
-            }
-            foreach (var item in items)
-            {
-                if (!ViewNodes.IsShown(item)) continue;
-                if (item.gameObject.name == "DifficultyDropdownButton")
-                {
-                    taken.Add(item.Pointer);
-                    b.AddItem(ControlId.Structural("cs:challenge"), ViewNodes.Button(item));
-                }
-                else if (item.transform.parent != null && item.transform.parent.name == "Title" && item.TryCast<ButtonView>() != null)
-                    taken.Add(item.Pointer);
             }
 
             // The mission panel (the tutorial's "Mission Complete!", later the chapter's): its lines,
@@ -109,7 +113,10 @@ namespace DiceVoders.Module.Screens
                 b.EndRow();
             }
 
-            // Whatever else is shown and clickable, Back last.
+            // The chosen commander's panel: name and level, the starting perk, its unique artifacts.
+            BuildCommander(b, c, taken);
+
+            // Whatever else is shown and clickable (Launch!), Back last.
             AViewItem back = null;
             foreach (var item in items)
             {
@@ -120,6 +127,114 @@ namespace DiceVoders.Module.Screens
             if (back != null)
                 b.AddItem(ControlId.Structural("cs:back"), ViewNodes.Button(back, () => GameLoc.Get("Back_Misc") ?? "Back"));
             b.PopContext();
+        }
+
+        // "Select Challenge, CH1 - First Contact": the caption, and the chosen chapter's name drawn
+        // above it while the chapter panel is shut.
+        private static string ChallengeLabel(CharacterSelectionController c, AViewItem toggle)
+        {
+            string caption = ViewNodes.Label(toggle);
+            if (c.IsDifficultyPanelActive) return caption;
+            var panel = toggle.transform.parent != null ? toggle.transform.parent.parent : null;
+            var header = panel != null ? panel.Find("Image/Text (TMP)") : null;
+            string chapter = header != null && header.gameObject.activeInHierarchy ? GameText.Of(header.GetComponent<TMPro.TMP_Text>()) : null;
+            return chapter != null ? caption + ", " + chapter : caption;
+        }
+
+        // The commander panel (Frame, shown once a commander is chosen): "The Captain, LV. 2"; the
+        // starting perk as the board reads it, Backspace its tooltip; the unique artifacts as drawn,
+        // three rows top to bottom of left and right: an unlocked one by name (Backspace its tooltip),
+        // a locked one by its tooltip's title ("Locked LV.3 Unique"), Backspace its condition
+        // ("Defeat 4 pilots with this commander to level up and unlock this! (2/4)"); Enter is the
+        // game's click (an unlockable one's reveal).
+        private static void BuildCommander(GraphBuilder b, CharacterSelectionController c, HashSet<IntPtr> taken)
+        {
+            if (c.Frame == null || !c.Frame.gameObject.activeInHierarchy) return;
+            b.AddItem(ControlId.Structural("cs:commandername"), GameNodes.Text(() => CommanderTitle(c)));
+            var starting = c.CommanderArtifactView;
+            if (starting != null && starting.gameObject.activeInHierarchy && Model(starting) != null)
+                b.AddItem(ControlId.Structural("cs:starting"), ArtifactNode(starting, null));
+            var slots = new List<(Transform At, NodeVtable Node, string Id)>();
+            for (int i = 0; i < (c.LockedArtifactItems?.Count ?? 0); i++)
+            {
+                var locked = c.LockedArtifactItems[i];
+                var unlocked = c.UnlockedArtifactObjects != null && i < c.UnlockedArtifactObjects.Count ? c.UnlockedArtifactObjects[i] : null;
+                var view = c.UnlockedArtifactViews != null && i < c.UnlockedArtifactViews.Count ? c.UnlockedArtifactViews[i] : null;
+                if (locked != null && locked.gameObject.activeInHierarchy)
+                {
+                    taken.Add(locked.Pointer);
+                    slots.Add((locked.transform, LockedNode(locked), "cs:unique:" + i));
+                }
+                else if (unlocked != null && unlocked.activeInHierarchy && view != null && Model(view) != null)
+                    slots.Add((view.transform, ArtifactNode(view, null), "cs:unique:" + i));
+            }
+            // Rows by height, top first; left to right within one.
+            slots.Sort((l, r) => Math.Abs(l.At.position.y - r.At.position.y) > 5f ? r.At.position.y.CompareTo(l.At.position.y) : l.At.position.x.CompareTo(r.At.position.x));
+            int k = 0;
+            while (k < slots.Count)
+            {
+                float y = slots[k].At.position.y;
+                b.StartRow("cs:uniques");
+                while (k < slots.Count && Math.Abs(slots[k].At.position.y - y) <= 5f) { b.AddItem(ControlId.Structural(slots[k].Id), slots[k].Node); k++; }
+                b.EndRow();
+            }
+        }
+
+        private static string CommanderTitle(CharacterSelectionController c)
+        {
+            var parts = new List<string>();
+            string name = GameText.Of(c.CommanderText);
+            if (name != null) parts.Add(name);
+            var level = c.LevelTextObjectChinese != null && c.LevelTextObjectChinese.activeInHierarchy ? c.LevelTextObjectChinese : c.LevelTextObject;
+            if (level != null && level.activeInHierarchy)
+            {
+                var words = new List<string>();
+                foreach (var tmp in level.GetComponentsInChildren<TMPro.TMP_Text>(false)) { string w = GameText.Of(tmp); if (w != null) words.Add(w.Trim()); }
+                if (words.Count > 0) parts.Add(string.Join(" ", words));
+            }
+            return string.Join(", ", parts);
+        }
+
+        private static ArtifactModel Model(ArtifactView view)
+        {
+            var model = view.ArtifactModel;
+            return model != null && model.ArtifactName != ArtifactName.None ? model : null;
+        }
+
+        private static NodeVtable ArtifactNode(ArtifactView view, AViewItem click)
+        {
+            Func<string> label = () => EncounterScreen.ArtifactLabel(Model(view));
+            Func<IEnumerable<string>> details = () => EncounterScreen.ArtifactDetails(Model(view), view);
+            return new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                SearchText = label,
+                OnFocus = () => ViewNodes.Hover(view),
+                Details = details,
+                OnSecondary = () => SayDetails(details()),
+            };
+        }
+
+        private static NodeVtable LockedNode(LockedArtifactItemView item)
+        {
+            Func<string> label = () => LockedText(item, true) ?? ViewNodes.Label(item);
+            Func<IEnumerable<string>> details = () => GameNodes.Lines(LockedText(item, false));
+            var vt = ViewNodes.Button(item, label);
+            vt.Details = details;
+            vt.OnSecondary = () => SayDetails(details());
+            return vt;
+        }
+
+        private static string LockedText(LockedArtifactItemView item, bool title)
+        {
+            try
+            {
+                var tip = item.Tooltip;
+                var tmp = tip != null ? (title ? tip.TitleText : tip.DescriptionText) : null;
+                return tmp != null && tmp.gameObject.activeSelf ? GameText.Of(tmp) : null;
+            }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading a locked artifact failed: " + e.Message); return null; }
         }
 
         // A chapter: "CH1 - First Contact" (<DifficultyName>_Title), locked, completed; selected as
