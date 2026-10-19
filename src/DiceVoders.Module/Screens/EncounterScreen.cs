@@ -423,10 +423,10 @@ namespace DiceVoders.Module.Screens
 
         // "Meteor [9/10 XP]: After you score a pair...", the game's title (its XP) leading, then the
         // rarity and scaling, then the keywords the game explains beside it.
-        internal static IEnumerable<string> ArtifactDetails(ArtifactModel artifact, ArtifactView view = null)
+        internal static IEnumerable<string> ArtifactDetails(ArtifactModel artifact, ArtifactView view = null, bool withUnlockText = false)
         {
             if (artifact == null) yield break;
-            var (title, lines, keywords) = EncounterState.ArtifactTooltip(artifact, view);
+            var (title, lines, keywords) = EncounterState.ArtifactTooltip(artifact, view, withUnlockText);
             title = title ?? EncounterState.ArtifactName(artifact);
             yield return lines.Count > 0 ? title + ": " + lines[0] : title;
             for (int i = 1; i < lines.Count; i++) yield return lines[i];

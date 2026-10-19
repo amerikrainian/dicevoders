@@ -140,7 +140,9 @@ sends `keybd_event`.
     drawn, rows by height top first, left to right (index i: `LockedArtifactItems[i]` shown = locked,
     by its `Tooltip` condition "Defeat 4 pilots with this commander to level up and unlock this!
     (2/4)" (the slot draws a bare lock), Backspace its title "Locked LV.3 Unique", Enter its click; else `UnlockedArtifactViews[i]` by name,
-    "Monocle"); every other shown clickable in hierarchy order (Launch!, `StartButton`); Back
+    "Monocle", Backspace its tooltip with the game's unlock text, as `SetArtifacts` sets it
+    (`SetModel(model, true)`: "You now have a chance to find this perk during a run with this
+    commander!", its dashed divider dropped): not a choice, a perk added to the run's pool); every other shown clickable in hierarchy order (Launch!, `StartButton`); Back
     (`OnExitPressed`) last, Escape too. Seen live: after the tutorial, after New Chapter Unlocked
     (CH1 open, three commanders unlocked), The Captain chosen. Not seen: a unique ready to unlock
     ("Press to unlock!", whose click reveals it and writes the save), the challenges, the missions'

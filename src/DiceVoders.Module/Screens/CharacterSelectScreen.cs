@@ -153,7 +153,7 @@ namespace DiceVoders.Module.Screens
             b.AddItem(ControlId.Structural("cs:commandername"), GameNodes.Text(() => CommanderTitle(c)));
             var starting = c.CommanderArtifactView;
             if (starting != null && starting.gameObject.activeInHierarchy && Model(starting) != null)
-                b.AddItem(ControlId.Structural("cs:starting"), ArtifactNode(starting, null));
+                b.AddItem(ControlId.Structural("cs:starting"), ArtifactNode(starting, false));
             var slots = new List<(Transform At, NodeVtable Node, string Id)>();
             for (int i = 0; i < (c.LockedArtifactItems?.Count ?? 0); i++)
             {
@@ -166,7 +166,7 @@ namespace DiceVoders.Module.Screens
                     slots.Add((locked.transform, LockedNode(locked), "cs:unique:" + i));
                 }
                 else if (unlocked != null && unlocked.activeInHierarchy && view != null && Model(view) != null)
-                    slots.Add((view.transform, ArtifactNode(view, null), "cs:unique:" + i));
+                    slots.Add((view.transform, ArtifactNode(view, true), "cs:unique:" + i));
             }
             // Rows by height, top first; left to right within one.
             slots.Sort((l, r) => Math.Abs(l.At.position.y - r.At.position.y) > 5f ? r.At.position.y.CompareTo(l.At.position.y) : l.At.position.x.CompareTo(r.At.position.x));
@@ -201,10 +201,12 @@ namespace DiceVoders.Module.Screens
             return model != null && model.ArtifactName != ArtifactName.None ? model : null;
         }
 
-        private static NodeVtable ArtifactNode(ArtifactView view, AViewItem click)
+        // An unlocked unique's tooltip carries the game's unlock text ("You now have a chance to find
+        // this perk during a run with this commander!"), as the game sets it (SetModel(model, true)).
+        private static NodeVtable ArtifactNode(ArtifactView view, bool withUnlockText)
         {
             Func<string> label = () => EncounterScreen.ArtifactLabel(Model(view));
-            Func<IEnumerable<string>> details = () => EncounterScreen.ArtifactDetails(Model(view), view);
+            Func<IEnumerable<string>> details = () => EncounterScreen.ArtifactDetails(Model(view), view, withUnlockText);
             return new NodeVtable
             {
                 ControlType = ControlTypes.Text,

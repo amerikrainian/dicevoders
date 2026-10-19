@@ -297,7 +297,7 @@ namespace DiceVoders.Module.Encounter
         /// it has none), the lines after it, and the keyword explanations the game shows beside it
         /// ("Mini-Dice: Rolled and scored automatically each turn."). On its board view's tooltip
         /// unless a view is given (a compendium's).</summary>
-        public static (string Title, List<string> Lines, List<string> Keywords) ArtifactTooltip(ArtifactModel artifact, ArtifactView view = null)
+        public static (string Title, List<string> Lines, List<string> Keywords) ArtifactTooltip(ArtifactModel artifact, ArtifactView view = null, bool withUnlockText = false)
         {
             var lines = new List<string>();
             var keywords = new List<string>();
@@ -308,7 +308,7 @@ namespace DiceVoders.Module.Encounter
             {
                 if (tooltip != null)
                 {
-                    tooltip.SetArtifactText(artifact, false, Model);
+                    tooltip.SetArtifactText(artifact, withUnlockText, Model);
                     if (tooltip.TitleText != null && tooltip.TitleText.gameObject.activeSelf) title = WithPilot(artifact, GameText.Of(tooltip.TitleText));
                     // A pilot's rarity is None, which the game has no text for: its line reads Unity's
                     // "No translation found for 'None_Misc'".
@@ -316,8 +316,9 @@ namespace DiceVoders.Module.Encounter
                     foreach (var tmp in new TMPro.TMP_Text[] { tooltip.DescriptionText, rarity, tooltip.ScalingText })
                     {
                         if (tmp == null || !tmp.gameObject.activeSelf) continue;
-                        string text = GameText.Of(tmp);
-                        if (text != null) lines.Add(text);
+                        // The unlock text follows a rule of dashes: a drawn divider, not read.
+                        string text = GameText.Clean(Divider.Replace(tmp.text ?? "", "\n"));
+                        if (!string.IsNullOrWhiteSpace(text) && !GameText.IsMissing(text)) lines.Add(text);
                     }
                     keywords = Keywords.Of(tooltip);
                 }
@@ -330,6 +331,9 @@ namespace DiceVoders.Module.Encounter
             }
             return (title, lines, keywords);
         }
+
+        private static readonly System.Text.RegularExpressions.Regex Divider =
+            new System.Text.RegularExpressions.Regex(@"(^|\n)[ \-]{5,}(?=\n|$)");
 
         /// <summary>The artifact's level, XP and the XP its next level takes
         /// (<see cref="ArtifactModel.GetLevelXPRequirement"/>); null for one that gains none (the
