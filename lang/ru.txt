@@ -21,6 +21,7 @@ state.disabled=недоступно
 state.locked=заблокировано
 state.completed=пройдено
 cs.random=Случайный командир
+cs.challenges=Испытания
 state.selected=выбрано
 state.on=включено
 state.off=выключено

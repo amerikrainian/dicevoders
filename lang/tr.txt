@@ -21,6 +21,7 @@ state.disabled=devre dışı
 state.locked=kilitli
 state.completed=tamamlandı
 cs.random=Rastgele komutan
+cs.challenges=Meydan okumalar
 state.selected=seçili
 state.on=açık
 state.off=kapalı

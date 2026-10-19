@@ -164,6 +164,7 @@ namespace DiceVoders.Module.Screens
             challengeNodes.Sort((l, r) => l._index.CompareTo(r._index));
             if (challengeNodes.Count > 0)
             {
+                b.PushContext(Strings.Get("cs.challenges"));
                 b.StartRow("comp:challengerow");
                 foreach (var n in challengeNodes)
                 {
@@ -174,6 +175,7 @@ namespace DiceVoders.Module.Screens
                     b.AddItem(ControlId.Structural("comp:challenge:" + key), Text(label, details, node));
                 }
                 b.EndRow();
+                b.PopContext();
             }
 
             var commanders = page.Find("Commanders");

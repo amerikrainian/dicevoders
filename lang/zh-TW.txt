@@ -21,6 +21,7 @@ state.disabled=無法使用
 state.locked=已鎖定
 state.completed=已完成
 cs.random=隨機指揮官
+cs.challenges=挑戰
 state.selected=已選取
 state.on=開
 state.off=關

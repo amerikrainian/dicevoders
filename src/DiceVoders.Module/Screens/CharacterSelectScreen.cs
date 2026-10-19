@@ -93,9 +93,11 @@ namespace DiceVoders.Module.Screens
             challenges.Sort((l, r) => l._index.CompareTo(r._index));
             if (challenges.Count > 0)
             {
+                b.PushContext(Strings.Get("cs.challenges"));
                 b.StartRow("cs:challenges", entry: () => Math.Max(0, challenges.FindIndex(n => n.IsSelected)));
                 foreach (var node in challenges) b.AddItem(ControlId.Structural("cs:challenge:" + node.ChallengeName), Challenge(node));
                 b.EndRow();
+                b.PopContext();
             }
 
             // The mission panel (the tutorial's "Mission Complete!", later the chapter's): its lines,
