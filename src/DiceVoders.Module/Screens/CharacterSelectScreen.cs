@@ -144,9 +144,9 @@ namespace DiceVoders.Module.Screens
         // The commander panel (Frame, shown once a commander is chosen): "The Captain, LV. 2"; the
         // starting perk as the board reads it, Backspace its tooltip; the unique artifacts as drawn,
         // three rows top to bottom of left and right: an unlocked one by name (Backspace its tooltip),
-        // a locked one by its tooltip's title ("Locked LV.3 Unique"), Backspace its condition
-        // ("Defeat 4 pilots with this commander to level up and unlock this! (2/4)"); Enter is the
-        // game's click (an unlockable one's reveal).
+        // a locked one by its tooltip's condition ("Defeat 4 pilots with this commander to level up
+        // and unlock this! (2/4)"), Backspace its title ("Locked LV.3 Unique"); Enter is the game's
+        // click (an unlockable one's reveal).
         private static void BuildCommander(GraphBuilder b, CharacterSelectionController c, HashSet<IntPtr> taken)
         {
             if (c.Frame == null || !c.Frame.gameObject.activeInHierarchy) return;
@@ -218,8 +218,10 @@ namespace DiceVoders.Module.Screens
 
         private static NodeVtable LockedNode(LockedArtifactItemView item)
         {
-            Func<string> label = () => LockedText(item, true) ?? ViewNodes.Label(item);
-            Func<IEnumerable<string>> details = () => GameNodes.Lines(LockedText(item, false));
+            // By its condition (the slot draws a bare lock, its title only "Locked LV.6 Unique"):
+            // the title for Backspace.
+            Func<string> label = () => LockedText(item, false) ?? LockedText(item, true) ?? ViewNodes.Label(item);
+            Func<IEnumerable<string>> details = () => GameNodes.Lines(LockedText(item, true));
             var vt = ViewNodes.Button(item, label);
             vt.Details = details;
             vt.OnSecondary = () => SayDetails(details());

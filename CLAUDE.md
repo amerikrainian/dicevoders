@@ -138,8 +138,8 @@ sends `keybd_event`.
     (`CommanderText`, `LevelTextObject` or `LevelTextObjectChinese`), the starting perk
     (`CommanderArtifactView`, as on the board, Backspace with keywords), the unique artifacts as
     drawn, rows by height top first, left to right (index i: `LockedArtifactItems[i]` shown = locked,
-    by its `Tooltip` title "Locked LV.3 Unique", Backspace "Defeat 4 pilots with this commander to
-    level up and unlock this! (2/4)", Enter its click; else `UnlockedArtifactViews[i]` by name,
+    by its `Tooltip` condition "Defeat 4 pilots with this commander to level up and unlock this!
+    (2/4)" (the slot draws a bare lock), Backspace its title "Locked LV.3 Unique", Enter its click; else `UnlockedArtifactViews[i]` by name,
     "Monocle"); every other shown clickable in hierarchy order (Launch!, `StartButton`); Back
     (`OnExitPressed`) last, Escape too. Seen live: after the tutorial, after New Chapter Unlocked
     (CH1 open, three commanders unlocked), The Captain chosen. Not seen: a unique ready to unlock
