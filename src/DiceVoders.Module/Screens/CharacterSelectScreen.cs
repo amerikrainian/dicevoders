@@ -309,7 +309,7 @@ namespace DiceVoders.Module.Screens
 
         // "The Captain, New!": the commander's name (<c>_Misc</c>; <c>_Arti_Title</c> is its perk's),
         // and the game's New! while it shows.
-        private static string CommanderLabel(CommanderIconView icon)
+        internal static string CommanderLabel(CommanderIconView icon)
         {
             if (icon.IsLocked)
             {
@@ -330,7 +330,7 @@ namespace DiceVoders.Module.Screens
             return name;
         }
 
-        private static IEnumerable<string> CommanderDetails(CommanderIconView icon)
+        internal static IEnumerable<string> CommanderDetails(CommanderIconView icon)
         {
             var lines = new List<string>();
             if (icon.IsLocked)

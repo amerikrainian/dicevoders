@@ -184,8 +184,21 @@ namespace DiceVoders.Module.Screens
             if (icons.Count > 0)
             {
                 b.StartRow("comp:commanderrow");
+                // A display (the icons' click acts only on the commander select): each by name, or its
+                // lock, "completed" while its star (won with it) shows.
                 foreach (var icon in icons)
-                    b.AddItem(ControlId.Structural("comp:commander:" + icon.CommanderName), CharacterSelectScreen.Commander(icon));
+                {
+                    var ic = icon;
+                    Func<string> label = () =>
+                    {
+                        string name = CharacterSelectScreen.CommanderLabel(ic);
+                        bool won = false;
+                        try { won = ic.Star != null && ic.Star.activeInHierarchy; }
+                        catch (Exception e) { CoreLog.Warning("CompendiumScreen: reading a commander's star failed: " + e.Message); }
+                        return won ? name + ", " + Strings.StateCompleted : name;
+                    };
+                    b.AddItem(ControlId.Structural("comp:commander:" + icon.CommanderName), Text(label, () => CharacterSelectScreen.CommanderDetails(ic), ic));
+                }
                 b.EndRow();
             }
         }

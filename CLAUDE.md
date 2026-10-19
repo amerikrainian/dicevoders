@@ -157,7 +157,8 @@ sends `keybd_event`.
     figures ("Runs played: 1"), "0 / 19 Challenges Completed", the chapters (`DifficultyNodes`,
     `Chapter<n>_Title`, locked, completed) and the challenges (`ChallengeNodes`, `<ChallengeName>_Title`,
     Backspace `_Desc` and the `<Name>Mod_Title`/`_Desc` rules) as rows, "Won with 0 / 10
-    Commanders", the commanders as a row (the hub's nodes). Other pages: each `GridLayoutGroup`'s
+    Commanders", the commanders as a row of text (their click acts only on the hub): name or lock,
+    "completed" while their `Star` shows. Other pages: each `GridLayoutGroup`'s
     children in hierarchy order, rows of its `constraintCount` (8 on the perks pages; world
     positions are 1.5 apart and useless for rows): an `ArtifactView` by name (Backspace its tooltip
     and keywords), an `InvaderCompendiumEntry` by name (Backspace its `EntityTooltip`), a
