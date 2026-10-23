@@ -101,10 +101,11 @@ namespace DiceVoders.Core.Encounter
         /// ("column 3: 20", a mini-die's "Mini-Dice, column 6: 30", several "3 Mini-Dice, column 1: 0"), any other column's gain in the same
         /// step, then everything else that changed in it, as <see cref="Lines"/> says it. A base die's
         /// column that changed nothing is not said (the player chose it); a mini-die's always is, as
-        /// its roll. <paramref name="dice"/> is how many dice the column scored with; <paramref name="gains"/> holds each column's gain as printed, left to right, null
+        /// its roll. <paramref name="combo"/> is the label the game draws over a column scored with several
+        /// dice ("column 4: 80, Pair"). <paramref name="dice"/> is how many dice the column scored with; <paramref name="gains"/> holds each column's gain as printed, left to right, null
         /// for none.
         /// </summary>
-        public static List<string> Step(EncounterSnapshot prev, EncounterSnapshot now, int column, int dice, IList<string> gains, string miniLabel)
+        public static List<string> Step(EncounterSnapshot prev, EncounterSnapshot now, int column, int dice, IList<string> gains, string miniLabel, string combo = null)
         {
             var rest = Lines(prev, now);
             bool any = !string.IsNullOrEmpty(miniLabel);
@@ -113,6 +114,7 @@ namespace DiceVoders.Core.Encounter
             string own = column >= 1 && column <= gains.Count ? gains[column - 1] : null;
             any |= own != null;
             parts.Add(S.EncColumnAttack(column, own ?? "0"));
+            if (!string.IsNullOrEmpty(combo)) parts.Add(combo);
             for (int i = 0; i < gains.Count; i++)
                 if (i != column - 1 && gains[i] != null) { parts.Add(S.EncColumnAttack(i + 1, gains[i])); any = true; }
             if (!any && rest.Count == 0) return rest;

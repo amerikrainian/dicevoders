@@ -116,6 +116,12 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void Several_dice_add_the_game_s_combo_label()
+        {
+            Assert.Equal(new[] { "column 4: 80, Pair" }, EncounterDiff.Step(Snap("Scoring"), Snap("Scoring"), 4, 2, Gains((4, "80")), null, "Pair"));
+        }
+
+        [Fact]
         public void Steps_then_the_shop_say_the_total_once()
         {
             Assert.Equal(new[] { "60/100 attack", "Shop" },

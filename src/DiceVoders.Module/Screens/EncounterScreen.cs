@@ -374,6 +374,7 @@ namespace DiceVoders.Module.Screens
             parts.AddRange(UnitStates(unit));
             try { if (unit.MaxCharge > 0) parts.Add(Strings.EncCharge(unit.Charge, unit.MaxCharge)); }
             catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's charge failed: " + e.Message); }
+            parts.Add(Facing(unit));
             parts.RemoveAll(string.IsNullOrEmpty);
             return string.Join(", ", parts);
         }
@@ -391,6 +392,37 @@ namespace DiceVoders.Module.Screens
             catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's state failed: " + e.Message); }
             states.RemoveAll(string.IsNullOrEmpty);
             return states;
+        }
+
+        /// <summary>"looking right": the direction a unit scores in (the Oculus's "Score all units in the
+        /// direction its looking at", <see cref="EntityModel.OculusDirection"/>, drawn only as the
+        /// sprite's facing), for a unit whose scoring uses it; null for the rest (every unit has one).
+        /// N is a row up (<see cref="GridModel.GetCoordsInDirection"/>), E a column right.</summary>
+        internal static string Facing(EntityModel unit)
+        {
+            try
+            {
+                bool looks = false;
+                if (unit.OnScoreTaskList != null)
+                    foreach (var task in unit.OnScoreTaskList)
+                        if (task != null && (task.TryCast<OculusTask>() != null || task.TryCast<WarpedOculusTask>() != null)) { looks = true; break; }
+                if (!looks) return null;
+                string dir;
+                switch (unit.OculusDirection)
+                {
+                    case Direction.N: dir = Strings.EncDirUp; break;
+                    case Direction.S: dir = Strings.EncDirDown; break;
+                    case Direction.W: dir = Strings.EncDirLeft; break;
+                    case Direction.E: dir = Strings.EncDirRight; break;
+                    case Direction.NW: dir = Strings.EncDirUpLeft; break;
+                    case Direction.NE: dir = Strings.EncDirUpRight; break;
+                    case Direction.SW: dir = Strings.EncDirDownLeft; break;
+                    case Direction.SE: dir = Strings.EncDirDownRight; break;
+                    default: return null;
+                }
+                return Strings.EncLooking(dir);
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's facing failed: " + e.Message); return null; }
         }
 
         private static IEnumerable<string> CellDetails(int x, int y)

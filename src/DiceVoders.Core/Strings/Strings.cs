@@ -171,6 +171,16 @@ namespace DiceVoders.Core.Strings
             // What the game lights on the board for the hovered item; {0} = the units, tiles and
             // artifacts, comma-separated.
             D("enc.affects", "affects: {0}"),
+            // The direction a unit scores in (the Oculus); {0} = one of the enc.dir_* words below.
+            D("enc.looking", "looking {0}"),
+            D("enc.dir_up", "up"),
+            D("enc.dir_down", "down"),
+            D("enc.dir_left", "left"),
+            D("enc.dir_right", "right"),
+            D("enc.dir_up_left", "up-left"),
+            D("enc.dir_up_right", "up-right"),
+            D("enc.dir_down_left", "down-left"),
+            D("enc.dir_down_right", "down-right"),
             // The shop phase opening after a turn.
             D("enc.shop", "Shop"),
             // A tile the grid does not have yet (the shop's Build Tile adds them).
@@ -459,6 +469,15 @@ namespace DiceVoders.Core.Strings
         public static string EncDiceCount(int count, string dice) => F("enc.dice_count", count, dice);
         public static string EncTurnScore(string attack, string mult, string total) => F("enc.turn_score", attack, mult, total);
         public static string EncAffects(string what) => F("enc.affects", what);
+        public static string EncLooking(string direction) => F("enc.looking", direction);
+        public static string EncDirUp => Get("enc.dir_up");
+        public static string EncDirDown => Get("enc.dir_down");
+        public static string EncDirLeft => Get("enc.dir_left");
+        public static string EncDirRight => Get("enc.dir_right");
+        public static string EncDirUpLeft => Get("enc.dir_up_left");
+        public static string EncDirUpRight => Get("enc.dir_up_right");
+        public static string EncDirDownLeft => Get("enc.dir_down_left");
+        public static string EncDirDownRight => Get("enc.dir_down_right");
         public static string EncShop => Get("enc.shop");
         public static string EncNoTile => Get("enc.no_tile");
         public static string EncTarget => Get("enc.target");

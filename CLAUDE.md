@@ -280,7 +280,9 @@ sends `keybd_event`.
     is the start, `false` the end; `_i_5__2` the 1-based column, `_isMini_5__3`), live engine only,
     snapshot as each column starts (what came before is said) and ends (`EncounterDiff.Step`: "column
     4: 80", then what it set off: "4D Printer level 2", "new tile at 5, 1", "Mult 2"; the gain is
-    the column units' `AttackGainedThisTurn` summed, end less start; a base die's column that changed
+    the column units' `AttackGainedThisTurn` summed, end less start; with several dice the label
+    the game draws over the column joins it, "column 2: 140, Pair" (`GridColumn.PairTextObjects[dice -
+    2]`, its `LocalizeStringEvent`'s string: hidden, the text is the prefab's); a base die's column that changed
     nothing is silent, a mini-die's always said, "Mini-Dice, column 5: 0", "3 Mini-Dice, column 1:
     0"; the Mini-Dice count spent in the scoring unsaid). Then the scoring board under the grid
     (`EncounterView.CurrentScoreBoard`, `StellarVisScoreBoard`: the turn's attack counting up, "X 2.0"
@@ -342,6 +344,12 @@ sends `keybd_event`.
     Common/Uncommon/Rare/Legendary) reads with its name, bars as commas ("Current chances: Common 84%,
     Uncommon 13%, Rare 6%, Legendary 0%"). Seen live in the shop, with the choices' keywords (Comet:
     Base Dice, Mult; Shooter: Repeat; the spells carry none).
+  - The Oculus (and Warped Oculus) score "in the direction its looking at", drawn only as the
+    sprite's facing: a unit with an `OculusTask`/`WarpedOculusTask` in `OnScoreTaskList` reads its
+    `OculusDirection` last, "looking right" (`EncounterScreen.Facing`; N is a row up, E a column
+    right, per `GridModel.GetCoordsInDirection`). Selection previews (`PreviewController.RunPreview`)
+    draw nothing in this game: the whole scene diffed with a target hovered for Give Shield,
+    Sacrifice Unit, Swap or Move (both picks), placing a unit; no unit has a `PreviewTaskList`.
   - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
     slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
     Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details

@@ -142,11 +142,30 @@ namespace DiceVoders.Module.Encounter
                     }
                     string mini = _columnMini ? GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice" : null;
                     CoreLog.Info("EncounterEvents: column " + column + " scored with " + _columnDice + (_columnMini ? " mini" : "") + " dice, gains [" + string.Join(" ", gains.ConvertAll(g => g ?? "-")) + "]");
-                    Say(EncounterDiff.Step(_last, now, column, _columnDice, gains, mini));
+                    Say(EncounterDiff.Step(_last, now, column, _columnDice, gains, mini, Combo(column - 1, _columnDice)));
                     _last = now;
                 }
                 catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's end failed: " + e.Message); }
             }
+        }
+
+        // The label the game draws over a column scored with several dice (GridColumn.PairTextObjects:
+        // "Pair", "Triple!", ... for 2, 3, ... dice), its localized string: the texts are filled by
+        // LocalizeStringEvents only while drawn, so a hidden one holds the prefab's.
+        private static string Combo(int x, int dice)
+        {
+            if (dice < 2) return null;
+            try
+            {
+                var labels = Encounter.Column(x)?.PairTextObjects;
+                if (labels == null || dice - 2 >= labels.Count) return null;
+                var tmp = labels[dice - 2]?.GetComponentInChildren<TMPro.TMP_Text>(true);
+                if (tmp == null) return null;
+                var ev = tmp.GetComponent<UnityEngine.Localization.Components.LocalizeStringEvent>();
+                string text = ev != null && ev.StringReference != null && !ev.StringReference.IsEmpty ? ev.StringReference.GetLocalizedString() : tmp.text;
+                return GameText.Clean(text);
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterEvents: reading column " + (x + 1) + "'s combo label failed: " + e.Message); return null; }
         }
 
         private static int DiceCount(ScoreColumnTask task)
