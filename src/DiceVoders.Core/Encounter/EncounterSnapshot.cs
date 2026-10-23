@@ -26,10 +26,6 @@ namespace DiceVoders.Core.Encounter
         public string MultText, MultLabel;
         /// <summary>The tokens in a fixed order (Budge, Chrono, Swap, Mini-Dice, Cash), each its label and count.</summary>
         public List<Figure> Tokens = new List<Figure>();
-        /// <summary>The mini-dice faces launched since the last snapshot, in launch order, and their
-        /// name ("Mini-Dice"), the game's.</summary>
-        public List<int> MiniDice = new List<int>();
-        public string MiniDiceLabel;
         /// <summary>The base dice faces in the tray's order; 0 for one still rolling.</summary>
         public List<int> Dice = new List<int>();
         /// <summary>The attack each column gained this turn, as printed ("0" for none), left to right.</summary>

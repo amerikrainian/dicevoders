@@ -102,6 +102,7 @@ enc.cant_freeze=无法冻结
 enc.cant_reroll=无法重掷
 enc.rolled=掷出 {0}
 enc.column_attack=第{0}列: {1}
+enc.dice_count={0} {1}
 enc.shop=商店
 enc.no_tile=无格子
 enc.target=目标

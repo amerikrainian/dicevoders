@@ -10,9 +10,9 @@ namespace DiceVoders.Core.Encounter
     /// <list type="number">
     /// <item>a new target ("Defeat the N.B.S. (Neptune Base Security), Act 1-2"), after which the
     /// round's resets (attack, turns, cash) go unsaid;</item>
-    /// <item>the turn's scoring once the player phase is left with more attack, one line, the mini-dice
-    /// launched first ("Mini-Dice 6, 2, column 3: 20, column 5: 10, 30/100 attack"); mini-dice and
-    /// attack changing otherwise ("40/100 attack");</item>
+    /// <item>the turn's scoring once the player phase is left with more attack, one line ("column 3:
+    /// 20, column 5: 10, 30/100 attack"), when no <see cref="Step"/> said it column by column; attack
+    /// changing otherwise ("40/100 attack");</item>
     /// <item>the target reached, a heart lost;</item>
     /// <item>units: destroyed ("Time Angel at 6, 1 destroyed"), added ("Migo added at 4, 1"), moved
     /// ("Migo moved to 3, 2"), strength ("all units +5 strength" when every one that stayed changed
@@ -27,7 +27,7 @@ namespace DiceVoders.Core.Encounter
     /// </summary>
     public static class EncounterDiff
     {
-        public const string PlayerPhase = "Player", DraftPhase = "Draft";
+        public const string PlayerPhase = "Player", DraftPhase = "Draft", ScoringPhase = "Scoring";
 
         public static List<string> Lines(EncounterSnapshot prev, EncounterSnapshot now)
         {
@@ -40,12 +40,9 @@ namespace DiceVoders.Core.Encounter
                 lines.Add(string.IsNullOrEmpty(now.Act) ? now.TargetName : now.TargetName + ", " + now.Act);
 
             bool scored = wasPlayer && !isPlayer && now.Total > prev.Total;
-            string mini = now.MiniDice.Count > 0 && !string.IsNullOrEmpty(now.MiniDiceLabel)
-                ? S.EncFigure(now.MiniDiceLabel, string.Join(", ", now.MiniDice)) : null;
             if (scored)
             {
                 var parts = new List<string>();
-                if (mini != null) parts.Add(mini);
                 for (int i = 0; i < now.ColumnAttack.Count; i++)
                 {
                     string attack = now.ColumnAttack[i];
@@ -54,11 +51,8 @@ namespace DiceVoders.Core.Encounter
                 parts.Add(S.EncAttack(now.TotalText, now.TargetText));
                 lines.Add(string.Join(", ", parts));
             }
-            else
-            {
-                if (mini != null) lines.Add(mini);
-                if (!newTarget && now.Total != prev.Total) lines.Add(S.EncAttack(now.TotalText, now.TargetText));
-            }
+            else if (!newTarget && now.Total != prev.Total)
+                lines.Add(S.EncAttack(now.TotalText, now.TargetText));
             if (!newTarget && prev.Total < prev.Target && now.Total >= now.Target && now.Target > 0 && !string.IsNullOrEmpty(now.TargetReachedText))
                 lines.Add(now.TargetReachedText);
             if (now.Hearts < prev.Hearts)
@@ -72,10 +66,10 @@ namespace DiceVoders.Core.Encounter
             {
                 var before = prev.Tokens.Find(t => t.Key == token.Key);
                 if (before == null || before.Value == token.Value) continue;
-                // A new round's fresh Cash is no news; nor the Mini-Dice count where their faces are said
-                // ("Mini-Dice 0" after "Mini-Dice 6" would read as the same thing).
+                // A new round's fresh Cash is no news; nor the Mini-Dice spent as they are rolled in the
+                // scoring, where each one's column is said (Step).
                 if (newTarget && token.Key == "cash") continue;
-                if (mini != null && token.Key == "minidice") continue;
+                if (token.Key == "minidice" && token.Value < before.Value && now.Phase == ScoringPhase) continue;
                 lines.Add(S.EncFigure(token.Label, token.Value.ToString()));
             }
             if (now.Mult > prev.Mult && now.Mult > 1 && !string.IsNullOrEmpty(now.MultLabel))
@@ -100,6 +94,30 @@ namespace DiceVoders.Core.Encounter
             if (!newTarget && now.TurnsLeft != prev.TurnsLeft && now.Phase == prev.Phase && !string.IsNullOrEmpty(now.TurnsText))
                 lines.Add(now.TurnsText);
             return lines;
+        }
+
+        /// <summary>
+        /// One column's scoring, said as it ends: the column (1-based) with the attack it gained
+        /// ("column 3: 20", a mini-die's "Mini-Dice, column 6: 30", several "3 Mini-Dice, column 1: 0"), any other column's gain in the same
+        /// step, then everything else that changed in it, as <see cref="Lines"/> says it. A base die's
+        /// column that changed nothing is not said (the player chose it); a mini-die's always is, as
+        /// its roll. <paramref name="dice"/> is how many dice the column scored with; <paramref name="gains"/> holds each column's gain as printed, left to right, null
+        /// for none.
+        /// </summary>
+        public static List<string> Step(EncounterSnapshot prev, EncounterSnapshot now, int column, int dice, IList<string> gains, string miniLabel)
+        {
+            var rest = Lines(prev, now);
+            bool any = !string.IsNullOrEmpty(miniLabel);
+            var parts = new List<string>();
+            if (!string.IsNullOrEmpty(miniLabel)) parts.Add(dice > 1 ? S.EncDiceCount(dice, miniLabel) : miniLabel);
+            string own = column >= 1 && column <= gains.Count ? gains[column - 1] : null;
+            any |= own != null;
+            parts.Add(S.EncColumnAttack(column, own ?? "0"));
+            for (int i = 0; i < gains.Count; i++)
+                if (i != column - 1 && gains[i] != null) { parts.Add(S.EncColumnAttack(i + 1, gains[i])); any = true; }
+            if (!any && rest.Count == 0) return rest;
+            rest.Insert(0, string.Join(", ", parts));
+            return rest;
         }
 
         private static string Place(int x, int y) => S.EncCoord(x + 1, y + 1);

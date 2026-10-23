@@ -82,16 +82,44 @@ namespace DiceVoders.Tests
             Id = id, Name = name, X = x, Y = y, Strength = strength, StrengthText = strength.ToString(), States = new List<string>(states),
         };
 
-        [Fact]
-        public void The_mini_dice_lead_the_scoring()
+        private static List<string> Gains(params (int Column, string Gain)[] gains)
         {
-            var now = Snap("Draft", total: 30, turns: 3);
-            now.ColumnAttack[5] = "30";
-            now.MiniDice.Add(6);
-            now.MiniDiceLabel = "Mini-Dice";
-            now.Tokens.Add(new Figure { Key = "minidice", Label = "Mini-Dice", Value = 0 });
-            Assert.Equal(new[] { "Mini-Dice 6, column 6: 30, 30/100 attack", "Shop" },
-                EncounterDiff.Lines(WithMiniDice(Snap("Player", dice: new[] { 6, 1, 6 }), 1), now));
+            var list = new List<string> { null, null, null, null, null, null };
+            foreach (var (column, gain) in gains) list[column - 1] = gain;
+            return list;
+        }
+
+        [Fact]
+        public void A_column_step_says_its_gain_then_what_it_set_off()
+        {
+            var prev = Snap("Scoring");
+            prev.Units.Add(Unit("Migo#1", "Migo", 2, 0, 10));
+            var now = Snap("Scoring");
+            now.Units.Add(Unit("Migo#1", "Migo", 2, 0, 15));
+            Assert.Equal(new[] { "column 3: 40, column 5: 10", "Migo at 3, 1: 15 strength" },
+                EncounterDiff.Step(prev, now, 3, 1, Gains((3, "40"), (5, "10")), null));
+        }
+
+        [Fact]
+        public void A_base_die_column_that_changed_nothing_is_not_said()
+        {
+            Assert.Empty(EncounterDiff.Step(Snap("Scoring"), Snap("Scoring"), 4, 2, Gains(), null));
+        }
+
+        [Fact]
+        public void A_mini_die_is_always_said_and_its_spending_is_not()
+        {
+            var prev = WithMiniDice(Snap("Scoring"), 1);
+            var now = WithMiniDice(Snap("Scoring"), 0);
+            Assert.Equal(new[] { "Mini-Dice, column 1: 0" }, EncounterDiff.Step(prev, now, 1, 1, Gains(), "Mini-Dice"));
+            Assert.Equal(new[] { "3 Mini-Dice, column 1: 0" }, EncounterDiff.Step(prev, now, 1, 3, Gains(), "Mini-Dice"));
+        }
+
+        [Fact]
+        public void Steps_then_the_shop_say_the_total_once()
+        {
+            Assert.Equal(new[] { "60/100 attack", "Shop" },
+                EncounterDiff.Lines(Snap("Scoring", total: 0), Snap("Draft", total: 60, turns: 3)));
         }
 
         private static EncounterSnapshot WithMiniDice(EncounterSnapshot s, int count)

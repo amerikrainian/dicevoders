@@ -11,10 +11,11 @@ using HarmonyLib;
 namespace DiceVoders.Module.Encounter
 {
     /// <summary>
-    /// The encounter's narration, as starvaders' fight's: no patches, a plain snapshot of the model
-    /// on each settled frame, compared with the last (<see cref="EncounterDiff"/>), each line queued
-    /// (never interrupting). Settled: the game waits on the player (a tip that waits for a click), or
-    /// the task engine has been idle with no die rolling for <see cref="SettleFrames"/> frames.
+    /// The encounter's narration, as starvaders' fight's: a plain snapshot of the model on each
+    /// settled frame, compared with the last (<see cref="EncounterDiff"/>), each line queued (never
+    /// interrupting). Settled: the game waits on the player (a tip that waits for a click), or the
+    /// task engine has been idle with no die rolling for <see cref="SettleFrames"/> frames. The
+    /// scoring, which never settles, adds a snapshot as each column starts and ends (<see cref="ColumnSteps"/>).
     /// Ticked by the module before the screens, so an event is heard before the focus landing it
     /// causes. A new controller (a new encounter) is a fresh baseline, said nothing of.
     /// </summary>
@@ -34,7 +35,7 @@ namespace DiceVoders.Module.Encounter
             Settled = false;
             var c = Encounter.Controller;
             if (c == null) { _controller = IntPtr.Zero; _last = null; _idle = 0; return; }
-            if (c.Pointer != _controller) { _controller = c.Pointer; _last = null; _idle = 0; }
+            if (c.Pointer != _controller) { _controller = c.Pointer; _last = null; _idle = 0; _column = -1; }
 
             var tip = Tips.Current;
             bool waiting = tip != null && Tips.WaitsForClick(tip);
@@ -44,41 +45,96 @@ namespace DiceVoders.Module.Encounter
 
             var now = Take();
             if (now == null) return;
-            _miniDice.Clear();
-            if (_last != null)
-            {
-                var lines = EncounterDiff.Lines(_last, now);
-                if (lines.Count > 0) LogRaw();
-                foreach (var line in lines) Speech.Say(line);
-            }
+            if (_last != null) Say(EncounterDiff.Lines(_last, now));
             _last = now;
         }
 
-        // The mini-dice launched since the last snapshot: their faces are the columns they go to,
-        // caught as the game sends each (they roll and land mid-scoring, never on a settled frame).
-        // Each goes through MiniDicePart.LaunchDiceToColumn, from ProcessMiniDiceTask (and from
-        // MiniDiceSpawner.LaunchDiceToColumn, which nothing calls in this build: patched there, none
-        // were ever caught).
-        private static readonly List<int> _miniDice = new List<int>();
-
-        [HarmonyPatch(typeof(MiniDicePart), nameof(MiniDicePart.LaunchDiceToColumn))]
-        internal static class MiniDiceLaunch
+        private static void Say(List<string> lines)
         {
+            if (lines.Count > 0) LogRaw();
+            foreach (var line in lines) Speech.Say(line);
+        }
+
+        // The turn's scoring is one busy stretch (the dice launched, each column scored in turn, the
+        // end of the turn) that settles only as the shop opens. It is said column by column instead:
+        // ScoreDiceTask scores the columns holding dice in ascending order, each a ScoreColumnTask
+        // (the mini-dice through a second ScoreDiceTask), whose coroutine is hooked. As a column
+        // starts, what came before it is said; as it ends, the column with the attack it gained and
+        // what its units set off. The end of the turn is then the shop's settled snapshot.
+        private static int _column = -1, _columnDice;
+        private static bool _columnMini;
+        private static BigDouble[] _stepStart;
+
+        [HarmonyPatch(typeof(ScoreColumnTask._Execute_d__1), nameof(ScoreColumnTask._Execute_d__1.MoveNext))]
+        internal static class ColumnSteps
+        {
+            [HarmonyPrefix]
+            private static void Prefix(ScoreColumnTask._Execute_d__1 __instance, out bool __state)
+            {
+                __state = false;
+                try
+                {
+                    if (__instance.__1__state != 0 || _last == null || !Live(__instance.__4__this)) return;
+                    __state = true;
+                    var now = Take();
+                    if (now == null) return;
+                    Say(EncounterDiff.Lines(_last, now));
+                    _last = now;
+                    _stepStart = ColumnSums(Encounter.Model, true);
+                }
+                catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's start failed: " + e.Message); }
+            }
+
             [HarmonyPostfix]
-            private static void Postfix(GridColumn gridColumn)
+            private static void Postfix(ScoreColumnTask._Execute_d__1 __instance, bool __result, bool __state)
             {
                 try
                 {
-                    if (gridColumn == null) return;
-                    for (int x = 0; x < Encounter.Columns; x++)
+                    // The column and whether it is a mini-die's are read from the args on the first step;
+                    // how many dice it scores with stays in the args (Amount).
+                    if (__state)
                     {
-                        var column = Encounter.Column(x);
-                        if (column != null && column.Pointer == gridColumn.Pointer) { _miniDice.Add(x + 1); return; }
+                        _column = __instance._i_5__2;
+                        _columnMini = __instance._isMini_5__3;
+                        _columnDice = DiceCount(__instance.__4__this);
                     }
-                    CoreLog.Warning("EncounterEvents: a mini-die went to a column not on the grid");
+                    if (__result || _column < 0 || _last == null || _stepStart == null) return;
+                    int column = _column;
+                    _column = -1;
+                    var now = Take();
+                    var end = ColumnSums(Encounter.Model, true);
+                    if (now == null || end == null) return;
+                    var gains = new List<string>();
+                    for (int x = 0; x < end.Length; x++)
+                    {
+                        var gain = x < _stepStart.Length ? end[x] - _stepStart[x] : end[x];
+                        gains.Add(gain.ToDouble() > 0 ? gain.ToString() : null);
+                    }
+                    string mini = _columnMini ? GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice" : null;
+                    CoreLog.Info("EncounterEvents: column " + column + " scored with " + _columnDice + (_columnMini ? " mini" : "") + " dice, gains [" + string.Join(" ", gains.ConvertAll(g => g ?? "-")) + "]");
+                    Say(EncounterDiff.Step(_last, now, column, _columnDice, gains, mini));
+                    _last = now;
                 }
-                catch (Exception e) { CoreLog.Warning("EncounterEvents: reading a mini-die failed: " + e.Message); }
+                catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's end failed: " + e.Message); }
             }
+        }
+
+        private static int DiceCount(ScoreColumnTask task)
+        {
+            try
+            {
+                if (task?.Args != null && task.Args.TryGetValue(ArgKey.Amount, out var amount) && amount != null) return amount.Unbox<int>();
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterEvents: reading a column's dice count failed: " + e.Message); }
+            return 1;
+        }
+
+        // The encounter's own task engine, not a preview's.
+        private static bool Live(ATask task)
+        {
+            var engine = task?.TaskEngine;
+            var live = Encounter.Controller?.TaskEngine;
+            return engine != null && live != null && engine.Pointer == live.Pointer && !engine.IsPreviewMode;
         }
 
         /// <summary>Take the encounter as it is now as the baseline, so what a key has just said
@@ -121,8 +177,6 @@ namespace DiceVoders.Module.Encounter
                     CloudLabel = GameLoc.Get("Cloudy_TooltipTitle") ?? "Cloudy",
                 };
                 foreach (var die in Encounter.Dice()) s.Dice.Add(die.isRolling ? 0 : die.Value);
-                s.MiniDice.AddRange(_miniDice);
-                s.MiniDiceLabel = GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice";
                 ColumnAttack(model, s.ColumnAttack);
                 Tokens(s.Tokens);
                 Units(model, s.Units);
@@ -205,22 +259,30 @@ namespace DiceVoders.Module.Encounter
         // the model's AtkPerCol reads all 0 by then).
         private static void ColumnAttack(EncounterModel model, List<string> into)
         {
+            var sums = ColumnSums(model, Encounter.Phase == Phase.Scoring);
+            if (sums == null) return;
+            foreach (var sum in sums) into.Add(sum.ToDouble() > 0 ? sum.ToString() : "0");
+        }
+
+        private static BigDouble[] ColumnSums(EncounterModel model, bool thisTurn)
+        {
+            if (model == null) return null;
             int columns = Encounter.Columns;
             var sums = new BigDouble[columns];
             var any = new bool[columns];
-            bool scoring = Encounter.Phase == Phase.Scoring;
             foreach (var kv in model.ModelItemDict)
             {
                 var unit = kv.Value?.TryCast<EntityModel>();
                 if (unit == null || !model.GridModel.IsEntityOnGrid(unit.EntityID)) continue;
                 int x = model.GridModel.GetEntityCoord(unit.EntityID, false).x;
                 if (x < 0 || x >= columns) continue;
-                var gained = scoring ? unit.GetAttackGainedThisTurn() : unit.GetAttackGainedLastTurn();
+                var gained = thisTurn ? unit.GetAttackGainedThisTurn() : unit.GetAttackGainedLastTurn();
                 if (gained.ToDouble() <= 0) continue;
                 sums[x] = any[x] ? sums[x] + gained : gained;
                 any[x] = true;
             }
-            for (int x = 0; x < columns; x++) into.Add(any[x] ? sums[x].ToString() : "0");
+            for (int x = 0; x < columns; x++) if (!any[x]) sums[x] = new BigDouble(0);
+            return sums;
         }
 
         // The model's turn figures beside what was said, while the scoring summary's sources are

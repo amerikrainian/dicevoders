@@ -263,23 +263,31 @@ sends `keybd_event`.
     Pass `new InputAction.CallbackContext()`: the interop type is a reference wrapper, `default` is
     null and the call throws. A budge or freeze says the die after ("4, Budge 2"); a refusal
     says "can't budge/freeze/reroll"; off a die they do nothing. Narration (`EncounterEvents`,
-    starvaders' FightEvents: settled snapshots, Core `EncounterDiff`, tested): the turn's scoring on
-    leaving the player phase, one line ("column 3: 20, column 5: 10, 30/100 attack": the column's
-    units' `AttackGainedLastTurn` summed, `...ThisTurn` while still scoring; `AtkPerCol` reads all 0
-    once the shop opens; the raw figures are logged beside it), target reached, a heart lost,
-    "shop", a new turn ("3 Turns, rolled 2, 4, 6"), a reroll; and every other settled change: a new
-    target (its round's resets unsaid), attack, units destroyed/added/moved (keyed
-    `EntityName#Number`), strength ("all units +5 strength" when alike), states and charge,
+    starvaders' FightEvents: settled snapshots, Core `EncounterDiff`, tested). The scoring never
+    settles (Launch to the shop is one busy stretch, and Mult raised in it is back to 1 by the shop),
+    so it is said column by column, as starvaders snapshots each invader's action: `ScoreDiceTask`
+    scores the columns holding dice in ascending order, each a `ScoreColumnTask` with all that
+    column's dice (`ArgKey.Amount`), the mini-dice through a second `ScoreDiceTask` (`isMini`). A
+    Harmony prefix and postfix on its coroutine (`ScoreColumnTask._Execute_d__1.MoveNext`: state 0
+    is the start, `false` the end; `_i_5__2` the 1-based column, `_isMini_5__3`), live engine only,
+    snapshot as each column starts (what came before is said) and ends (`EncounterDiff.Step`: "column
+    4: 80", then what it set off: "4D Printer level 2", "new tile at 5, 1", "Mult 2"; the gain is
+    the column units' `AttackGainedThisTurn` summed, end less start; a base die's column that changed
+    nothing is silent, a mini-die's always said, "Mini-Dice, column 5: 0", "3 Mini-Dice, column 1:
+    0"; the Mini-Dice count spent in the scoring unsaid). The shop's settled snapshot then says the
+    end of the turn, "300/500 attack", "Shop". The old one-line summary ("column 3: 20, column 5:
+    10, 30/100 attack", `AttackGainedLastTurn` once the shop opens) stays for a turn no step said.
+    The result screen settles too: the last turn's total is said before it. Also said: target
+    reached, a heart lost, "shop", a new turn ("3 Turns, rolled 2, 4, 6"), a reroll; and every other
+    settled change: a new target (its round's resets unsaid), attack, units destroyed/added/moved
+    (keyed `EntityName#Number`), strength ("all units +5 strength" when alike), states and charge,
     artifacts added/removed/moved/levelled/XP (keyed `ArtifactID.Number`; a pilot's artifact left
     out: its arrival is the new target's line, "Noel, Hyperfreeze, Act 2-3"), new tiles, clouds, honey,
     tokens ("Chrono 4"), Mult rising, the shop's offer rerolled (a purchase only removes), turns
-    left changing within a phase. Mini-dice faces lead the scoring line ("Mini-Dice 6, column 6:
-    30, ..."): caught by a Harmony postfix on `MiniDicePart.LaunchDiceToColumn`, called per die by
-    `ProcessMiniDiceTask` (`MiniDiceSpawner.LaunchDiceToColumn` has no callers: patched there first,
-    nothing was caught; the game logs "Scoring Mini Dice: [1, 5, 5]" to check against) (a face is the
-    column it goes to; they land mid-scoring, never on a settled frame); the Mini-Dice count is left
-    out of that diff. Verified live: the refusals with a tip
-    up, a launch (20 + 10 = 30 in the tutorial). Not exercised: a real budge, freeze, reroll, cancel.
+    left changing within a phase. The raw turn figures are logged beside what is said. Verified
+    live: the refusals with a tip up, launches (Shooter's Repeat, a levelled artifact building a
+    tile, mini-dice, the last turn into the result), a budge ("6, cracked, Budge 5"). Not exercised:
+    a real freeze, reroll, cancel.
     Tiles: only `GridModel.BuiltCoords` exist (the tutorial starts with the bottom row less column
     4, plus 2,2); others read "no tile"; `GetBuildableCoords` is where Build Tile can add one. The
     shop (`Phase.Draft`) strip: `DraftPanel.DraftChoices` still `IsActive` ("Meteor, Artifact, 2

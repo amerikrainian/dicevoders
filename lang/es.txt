@@ -102,6 +102,7 @@ enc.cant_freeze=no se puede congelar
 enc.cant_reroll=no se puede volver a tirar
 enc.rolled=salió {0}
 enc.column_attack=columna {0}: {1}
+enc.dice_count={0} {1}
 enc.shop=tienda
 enc.no_tile=sin casilla
 enc.target=objetivo

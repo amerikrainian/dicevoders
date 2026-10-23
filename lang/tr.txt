@@ -102,6 +102,7 @@ enc.cant_freeze=dondurulamaz
 enc.cant_reroll=yeniden atılamaz
 enc.rolled=atıldı {0}
 enc.column_attack=sütun {0}: {1}
+enc.dice_count={0} {1}
 enc.shop=dükkan
 enc.no_tile=kare yok
 enc.target=hedef
