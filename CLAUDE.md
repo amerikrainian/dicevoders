@@ -302,7 +302,8 @@ sends `keybd_event`.
     (keyed `EntityName#Number`), strength ("all units +5 strength" when alike), states and charge,
     artifacts added/removed/moved/levelled/XP (keyed `ArtifactID.Number`; a pilot's artifact left
     out: its arrival is the new target's line, "Noel, Hyperfreeze, Act 2-3"), new tiles, clouds, honey,
-    tokens ("Chrono 4"), Mult rising, the shop's offer rerolled (a purchase only removes), turns
+    tokens ("Chrono 4"), the shop's rarity ("Shop rarity, +5 %": `EncounterValue.ShopRarity`, titled
+    by its hover, whose key reads "% Shop Rarity"), Mult rising, the shop's offer rerolled (a purchase only removes), turns
     left changing within a phase. The raw turn figures are logged beside what is said. Verified
     live: the refusals with a tip up, launches (Shooter's Repeat, a levelled artifact building a
     tile, mini-dice, the last turn into the result), a budge ("6, cracked, Budge 5"). Not exercised:
@@ -312,7 +313,8 @@ sends `keybd_event`.
     shop (`Phase.Draft`) strip: `DraftPanel.DraftChoices` still `IsActive` ("Meteor, Artifact, 2
     cash[, Uncommon][, cursed][, frozen][, can't afford]": `tempRarity`, `isCursed`, `IsLocked`,
     `CantBuyCostIcon`), then Proceed (`BG/ProceedButton`) and Skip remaining turns
-    (`SkipTurns/ProceedLine/SkipButton`, when shown). A choice's text is in `EntityTooltip` for a unit
+    (`SkipTurns/ProceedLine/SkipButton`, when shown; after a target taken in the first turn it adds the
+    drawn "One-Turn KO!, +50% SHOP RARITY", `ProceedLine/OTKO`; no skip cash is drawn). A choice's text is in `EntityTooltip` for a unit
     (title in `TitleLongerText`), `Tooltip` otherwise (the other holds prefab placeholders); hidden
     tooltips, so a text counts only by its own `activeSelf` (spells have no scaling line). Enter
     buys (the game's click); F freezes. Selections (`SelectionController.IsSelecting`): cells whose

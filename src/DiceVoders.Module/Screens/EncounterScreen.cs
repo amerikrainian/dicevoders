@@ -278,7 +278,7 @@ namespace DiceVoders.Module.Screens
             if (proceed != null)
                 b.AddItem(ControlId.Structural("enc:proceed"), StripButton(proceed, () => GameLoc.Get("Proceed_Misc") ?? "Proceed"));
             if (skip != null)
-                b.AddItem(ControlId.Structural("enc:skip"), StripButton(skip, () => (GameLoc.Get("SkipTurns_Misc") ?? "Skip remaining turns").TrimEnd(':', ' ')));
+                b.AddItem(ControlId.Structural("enc:skip"), StripButton(skip, () => SkipLabel(skip)));
             b.EndRow();
             b.PopContext();
         }
@@ -584,14 +584,40 @@ namespace DiceVoders.Module.Screens
         // "Shop rarity, +0 %": the hover's title and the figure drawn under it.
         private static string ShopRarity(UnityEngine.Transform rarity)
         {
-            var parts = new List<string>();
-            var view = rarity.GetComponent<TooltipTriggerView>();
-            var tip = view != null && view.Tooltip != null ? view.Tooltip.GetComponentInChildren<Tooltip>(true) : null;
-            parts.Add((tip != null ? GameText.Of(tip.TitleText) : null) ?? GameLoc.Get("ShopRarity_TooltipTitle"));
+            var parts = new List<string> { ShopRarityTitle(rarity) };
             var number = rarity.Find("RarityNumber");
             if (number != null && number.gameObject.activeInHierarchy) parts.Add(GameText.Of(number.GetComponent<TMPro.TMP_Text>()));
             parts.RemoveAll(string.IsNullOrEmpty);
             return string.Join(", ", parts);
+        }
+
+        // "Skip remaining turns", then what the game draws beside it after a target taken in the first
+        // turn: "One-Turn KO!, +50% SHOP RARITY" (ProceedLine/OTKO).
+        private static string SkipLabel(AViewItem skip)
+        {
+            var parts = new List<string> { (GameLoc.Get("SkipTurns_Misc") ?? "Skip remaining turns").TrimEnd(':', ' ') };
+            try
+            {
+                var otko = skip.transform.parent != null ? skip.transform.parent.Find("OTKO") : null;
+                if (otko != null && otko.gameObject.activeInHierarchy)
+                    foreach (var tmp in otko.GetComponentsInChildren<TMPro.TMP_Text>(false))
+                    {
+                        string text = GameText.Of(tmp);
+                        if (text != null) parts.Add(text);
+                    }
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading the skip's one-turn KO failed: " + e.Message); }
+            return string.Join(", ", parts);
+        }
+
+        /// <summary>"Shop rarity": the title of the rarity figure's hover (its key's own string reads
+        /// "% Shop Rarity").</summary>
+        internal static string ShopRarityTitle(UnityEngine.Transform rarity = null)
+        {
+            rarity = rarity ?? EncounterState.RarityTrigger();
+            var view = rarity != null ? rarity.GetComponent<TooltipTriggerView>() : null;
+            var tip = view != null && view.Tooltip != null ? view.Tooltip.GetComponentInChildren<Tooltip>(true) : null;
+            return (tip != null ? GameText.Of(tip.TitleText) : null) ?? GameLoc.Get("ShopRarity_TooltipTitle");
         }
 
         internal static string ChoiceName(DraftChoice choice)

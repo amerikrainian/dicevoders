@@ -141,6 +141,14 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void Shop_rarity_changing_is_said_as_drawn()
+        {
+            var prev = Snap("Draft"); prev.ShopRarityLabel = "Shop rarity";
+            var now = Snap("Draft"); now.ShopRarityLabel = "Shop rarity"; now.ShopRarity = 5;
+            Assert.Equal(new[] { "Shop rarity, +5 %" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
         public void Tippy_moving_is_said()
         {
             var prev = Snap("Draft"); prev.Tippy = "Tippy: right tiles";

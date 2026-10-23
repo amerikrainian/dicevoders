@@ -20,7 +20,7 @@ namespace DiceVoders.Core.Encounter
     /// <item>artifacts: added ("Meteor added, column 5"), removed, moved, levelled, XP ("Meteor: 9/10 XP"),
     /// blocked and freed ("Meteor: blocked", "Meteor: blocked lost");</item>
     /// <item>tiles: new ones, clouds coming and going, honey;</item>
-    /// <item>the tokens that changed ("Chrono 4"), Mult rising;</item>
+    /// <item>the tokens that changed ("Chrono 4"), the shop's rarity ("Shop rarity, +5 %"), Mult rising;</item>
     /// <item>the shop opening, its offer changing other than by a purchase ("shop: Comet, Migo");</item>
     /// <item>a new turn with its roll ("3 Turns, rolled 2, 4, 6"), turns left changing within a phase, and
     /// dice rerolled within the turn ("rolled 1, 5, 6").</item>
@@ -75,6 +75,9 @@ namespace DiceVoders.Core.Encounter
                 if (token.Key == "minidice" && token.Value < before.Value && now.Phase == ScoringPhase) continue;
                 lines.Add(S.EncFigure(token.Label, token.Value.ToString()));
             }
+            // "Shop rarity, +5 %", as the shop draws it; a new round's reset unsaid.
+            if (!newTarget && now.ShopRarity != prev.ShopRarity && !string.IsNullOrEmpty(now.ShopRarityLabel))
+                lines.Add(now.ShopRarityLabel + ", " + (now.ShopRarity >= 0 ? "+" : "") + now.ShopRarity.ToString(CultureInfo.InvariantCulture) + " %");
             if (now.Mult > prev.Mult && now.Mult > 1 && !string.IsNullOrEmpty(now.MultLabel))
                 lines.Add(S.EncFigure(now.MultLabel, now.MultText));
 

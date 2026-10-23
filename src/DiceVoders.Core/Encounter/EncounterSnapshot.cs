@@ -32,6 +32,9 @@ namespace DiceVoders.Core.Encounter
         public int PilotDie;
         /// <summary>What Tippy covers, as said ("Tippy: right tiles"); null outside Tippy's fight.</summary>
         public string Tippy;
+        /// <summary>The shop's rarity bonus (percent) and its name ("Shop rarity"), the game's.</summary>
+        public int ShopRarity;
+        public string ShopRarityLabel;
         /// <summary>The attack each column gained this turn, as printed ("0" for none), left to right.</summary>
         public List<string> ColumnAttack = new List<string>();
         public List<UnitSnap> Units = new List<UnitSnap>();
