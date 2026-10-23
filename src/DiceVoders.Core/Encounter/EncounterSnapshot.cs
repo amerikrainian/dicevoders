@@ -18,6 +18,9 @@ namespace DiceVoders.Core.Encounter
         /// <summary>"4 Turns", the game's words.</summary>
         public string TurnsText;
         public int Hearts;
+        /// <summary>Blood Beast's Rage (-1 for any other commander), and the turns left in Beast Mode (0
+        /// outside it).</summary>
+        public int Rage = -1, BeastTurns;
         public double Total, Target;
         public string TotalText, TargetText;
         /// <summary>"TARGET REACHED!", the game's words.</summary>

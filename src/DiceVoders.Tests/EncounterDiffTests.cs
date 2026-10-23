@@ -141,6 +141,17 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void Rage_and_beast_mode_are_said()
+        {
+            var prev = Snap("Player"); prev.Rage = 4;
+            var now = Snap("Player"); now.Rage = 5; now.BeastTurns = 3;
+            Assert.Equal(new[] { "Rage 5", "Beast Mode" }, EncounterDiff.Lines(prev, now));
+            var after = Snap("Player"); after.Rage = 0;
+            Assert.Equal(new[] { "Rage 0", "Beast Mode lost" }, EncounterDiff.Lines(now, after));
+            Assert.Empty(EncounterDiff.Lines(Snap("Player"), Snap("Player")));
+        }
+
+        [Fact]
         public void Shop_rarity_changing_is_said_as_drawn()
         {
             var prev = Snap("Draft"); prev.ShopRarityLabel = "Shop rarity";

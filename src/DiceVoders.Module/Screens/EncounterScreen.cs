@@ -829,7 +829,31 @@ namespace DiceVoders.Module.Screens
             return text != null ? text.Replace("[#]", left.Value.ToString()) : left.Value.ToString();
         }
 
-        public static string Hearts() => Figure(Strings.EncHearts, EncounterValue.Hearts);
+        /// <summary>"Hearts 5"; with Blood Beast also its Rage, drawn as a second bar on the hearts
+        /// ("Hearts 5, Rage 2"), and Beast Mode's turns left while in it ("..., Beast Mode, 3 Turns":
+        /// <see cref="EncounterValue.BeastTurn"/>, counted down as each turn starts).</summary>
+        public static string Hearts()
+        {
+            string hearts = Figure(Strings.EncHearts, EncounterValue.Hearts);
+            if (!HasRage()) return hearts;
+            var parts = new List<string> { hearts, Figure(Strings.EncRage, EncounterValue.Rage) };
+            int beast = EncounterState.Int(EncounterValue.BeastTurn) ?? 0;
+            if (beast > 0)
+            {
+                string turns = GameLoc.Get("TurnsLeft_Misc");
+                parts.Add(Strings.EncBeastMode);
+                parts.Add(turns != null ? turns.Replace("[#]", beast.ToString()) : beast.ToString());
+            }
+            parts.RemoveAll(string.IsNullOrEmpty);
+            return string.Join(", ", parts);
+        }
+
+        /// <summary>Whether the commander has Rage (Blood Beast, its starter perk <c>Hemophage</c>).</summary>
+        public static bool HasRage()
+        {
+            try { return EncounterState.Model?.HasArtifact(ArtifactName.Hemophage) == true; }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading the commander's perk failed: " + e.Message); return false; }
+        }
 
         public static string Mult() => Strings.EncFigure(GameLoc.Get("GlobalMult_Keyword") ?? "Mult", EncounterState.Mult());
 

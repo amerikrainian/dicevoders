@@ -229,6 +229,11 @@ namespace DiceVoders.Module.Encounter
                 var pilotDie = Encounter.PilotDie();
                 if (pilotDie != null && !pilotDie.isRolling) s.PilotDie = pilotDie.Value;
                 s.Tippy = Screens.EncounterScreen.TippyLine();
+                if (Screens.EncounterScreen.HasRage())
+                {
+                    s.Rage = Encounter.Int(EncounterValue.Rage) ?? 0;
+                    s.BeastTurns = Encounter.Int(EncounterValue.BeastTurn) ?? 0;
+                }
                 s.ShopRarity = Encounter.Int(EncounterValue.ShopRarity) ?? 0;
                 s.ShopRarityLabel = Screens.EncounterScreen.ShopRarityTitle();
                 ColumnAttack(model, s.ColumnAttack);

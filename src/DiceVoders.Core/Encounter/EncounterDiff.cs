@@ -13,7 +13,7 @@ namespace DiceVoders.Core.Encounter
     /// <item>the turn's scoring once the player phase is left with more attack, one line ("column 3:
     /// 20, column 5: 10, 30/100 attack"), when no <see cref="Step"/> said it column by column; attack
     /// changing otherwise ("40/100 attack");</item>
-    /// <item>the target reached, a heart lost;</item>
+    /// <item>the target reached, a heart lost, Blood Beast's Rage changing and Beast Mode coming and going;</item>
     /// <item>units: destroyed ("Time Angel at 6, 1 destroyed"), added ("Migo added at 4, 1"), moved
     /// ("Migo moved to 3, 2"), strength ("all units +5 strength" when every one that stayed changed
     /// alike, else "Migo at 2, 1: 20 strength"), states gained and lost, charge;</item>
@@ -58,6 +58,11 @@ namespace DiceVoders.Core.Encounter
                 lines.Add(now.TargetReachedText);
             if (now.Hearts < prev.Hearts)
                 lines.Add(S.EncFigure(S.EncHearts, now.Hearts.ToString()));
+            // Blood Beast: Rage, and Beast Mode coming and going.
+            if (now.Rage >= 0 && prev.Rage >= 0 && now.Rage != prev.Rage)
+                lines.Add(S.EncFigure(S.EncRage, now.Rage.ToString()));
+            if (now.BeastTurns > 0 && prev.BeastTurns == 0) lines.Add(S.EncBeastMode);
+            else if (now.BeastTurns == 0 && prev.BeastTurns > 0) lines.Add(S.EncLost(S.EncBeastMode));
 
             // Tippy moving to cover another part of the screen (its blocked units and artifacts follow).
             if (!string.IsNullOrEmpty(now.Tippy) && now.Tippy != prev.Tippy) lines.Add(now.Tippy);

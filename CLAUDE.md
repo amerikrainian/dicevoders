@@ -375,6 +375,12 @@ sends `keybd_event`.
     are the game's blocked ones. Every pilot panel holds a `DangerDice`; only a pilot that rolls it
     has it `IsActive` (Tippy's is face 0). Seen live, the areas forced through `TippyArea` and
     `SetTippyAreaVisual`.
+  - Blood Beast (starter perk `Hemophage`): Rage (`EncounterValue.Rage`, drawn only as a second bar
+    on the hearts, `HeartsPanel/RageBar`; its hover is "Hearts / Rage") joins the status's hearts,
+    "Hearts 5, Rage 2", and Beast Mode its turns left (`BeastTurn`, counted down as turns start):
+    "..., Beast Mode, 3 Turns" (the game's `TurnsLeft_Misc`); said as they change ("Rage 5", "Beast
+    Mode", "Beast Mode lost"). "Rage" and "Beast Mode" are the mod's (no key of their own). Seen live:
+    Rage set to 4, a Sacrifice entering the game's Beast Mode.
   - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
     slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
     Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details
