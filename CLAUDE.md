@@ -57,7 +57,15 @@ guildrun's, retargeted in `gamelib.py` (app id, folder, `GAME_ASSEMBLY_PREFIXES`
 `disasm.py Type.Method --calls` (with `uv run --with capstone`), `dump_game.py`, `dump_diff.py`,
 `check_members.py`, and `dev.py` (`launch`, `kill`, `reload`, `nav`, `input ui.down`,
 `speech --tail N`, `log --grep X`, `gui`, `eval file.cs`, `typeinfo`, `actions`, `module`,
-`screenshot`). `dev.py screenshot` timed out with the game in the background.
+`screenshot`). `dev.py screenshot` timed out with the game in the background. `stage.py` stages
+encounter scenarios through the game's hidden `DebugController` (in the encounter scene, inactive;
+`SetupDebug` then `CloseDebug` fills it without its canvas): `state`, `skip` (Skip Round: the next
+target, a pilot's rewards included), `pilot NAME [--index I]` (`EncounterModel.PilotOrder`, then
+`MapPanel.UpdateMap`), `offer NAME [--slot S]` (a shop choice becomes any unit, `DebugInitializeUnit`,
+at 0 cash, or artifact, `Initialize(..., DraftType.Artifact, name, ...)`), `find TEXT`, `gain
+money|budge|chrono|heart [N]`, `set VALUE N` (`IntValues` or `BigDoubleValues`). Achievements cannot be
+blocked reliably: an earned one is recorded in the save (`LoggerDataSO.GetAchievement`) and pushed to
+Steam again at boot (`SyncSteamAchievements`) and on load.
 
 ## Build & deploy
 `dotnet build DiceVoders.slnx` (or `.\build.ps1`) builds all five projects and deploys host +
