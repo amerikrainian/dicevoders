@@ -187,6 +187,13 @@ namespace DiceVoders.Core.Strings
             D("enc.trapped", "trapped"),
             // A tile under a pilot's danger zone (Garu's Turret strikes it as the turn ends).
             D("enc.danger", "danger"),
+            // What Tippy covers this turn, after its name ("Tippy: right tiles"): the two halves' artifact
+            // slots, the two halves' tiles, the dice buttons.
+            D("enc.area_left_artifacts", "left artifacts"),
+            D("enc.area_right_artifacts", "right artifacts"),
+            D("enc.area_left_tiles", "left tiles"),
+            D("enc.area_right_tiles", "right tiles"),
+            D("enc.area_buttons", "buttons"),
             // The shop phase opening after a turn.
             D("enc.shop", "Shop"),
             // A tile the grid does not have yet (the shop's Build Tile adds them).
@@ -487,6 +494,11 @@ namespace DiceVoders.Core.Strings
         public static string EncBlocked => Get("enc.blocked");
         public static string EncTrapped => Get("enc.trapped");
         public static string EncDanger => Get("enc.danger");
+        public static string EncAreaLeftArtifacts => Get("enc.area_left_artifacts");
+        public static string EncAreaRightArtifacts => Get("enc.area_right_artifacts");
+        public static string EncAreaLeftTiles => Get("enc.area_left_tiles");
+        public static string EncAreaRightTiles => Get("enc.area_right_tiles");
+        public static string EncAreaButtons => Get("enc.area_buttons");
         public static string EncShop => Get("enc.shop");
         public static string EncNoTile => Get("enc.no_tile");
         public static string EncTarget => Get("enc.target");

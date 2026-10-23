@@ -358,7 +358,8 @@ namespace DiceVoders.Module.Screens
         {
             string text = Strings.EncCoord(x + 1, y + 1) + ", " + CellContents(x, y);
             var unit = EncounterState.At(x, y);
-            if (unit != null && unit.IsBlocked) text = Strings.EncBlocked + ", " + text;
+            // A unit the game blocks, or any tile under Tippy (nothing placed there will score).
+            if (unit != null && unit.IsBlocked || EncounterState.Built(x, y) && EncounterState.TippyCovers(x)) text = Strings.EncBlocked + ", " + text;
             if (EncounterState.Danger(x, y)) text = Strings.EncDanger + ", " + text;
             return EncounterState.TargetAt(x, y) != null ? Strings.EncTarget + ", " + text : text;
         }
@@ -668,6 +669,7 @@ namespace DiceVoders.Module.Screens
             if (ActionTip() != null)
                 b.AddItem(ControlId.Structural("enc:tip"), Stat(() => { var tip = ActionTip(); return tip != null ? Tips.Text(tip) : null; }));
             b.AddItem(ControlId.Structural("enc:target"), Stat(TargetLine, () => Keywords.Trigger(EncounterState.TargetTrigger())));
+            if (TippyLine() != null) b.AddItem(ControlId.Structural("enc:tippy"), Stat(TippyLine));
             b.AddItem(ControlId.Structural("enc:attack"), Stat(Attack, () => Keywords.Trigger(EncounterState.ScoreTrigger())));
             b.AddItem(ControlId.Structural("enc:turns"), Stat(Turns));
             b.AddItem(ControlId.Structural("enc:hearts"), Stat(Hearts, () => Keywords.Trigger(EncounterState.HeartsTrigger())));
@@ -770,6 +772,22 @@ namespace DiceVoders.Module.Screens
             string target = Target();
             string act = GameText.Of(EncounterState.View?.MapPanel?.actText);
             return target != null && act != null ? target + ", " + act : target ?? act;
+        }
+
+        /// <summary>"Tippy: right tiles": what Tippy covers this turn; null when Tippy is not up.</summary>
+        public static string TippyLine()
+        {
+            string area;
+            switch (EncounterState.TippyArea())
+            {
+                case 0: area = Strings.EncAreaLeftArtifacts; break;
+                case 1: area = Strings.EncAreaRightArtifacts; break;
+                case 2: area = Strings.EncAreaLeftTiles; break;
+                case 3: area = Strings.EncAreaRightTiles; break;
+                case 4: area = Strings.EncAreaButtons; break;
+                default: return null;
+            }
+            return Strings.EncAt(PilotName.Tippy.ToString(), area);
         }
 
         /// <summary>"30/100 attack": Total Attack against Target Defense, the score panel's two.</summary>

@@ -228,6 +228,7 @@ namespace DiceVoders.Module.Encounter
                 foreach (var die in Encounter.Dice()) s.Dice.Add(die.isRolling ? 0 : die.Value);
                 var pilotDie = Encounter.PilotDie();
                 if (pilotDie != null && !pilotDie.isRolling) s.PilotDie = pilotDie.Value;
+                s.Tippy = Screens.EncounterScreen.TippyLine();
                 ColumnAttack(model, s.ColumnAttack);
                 Tokens(s.Tokens);
                 Units(model, s.Units);

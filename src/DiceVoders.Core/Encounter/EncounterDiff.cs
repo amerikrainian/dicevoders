@@ -59,6 +59,8 @@ namespace DiceVoders.Core.Encounter
             if (now.Hearts < prev.Hearts)
                 lines.Add(S.EncFigure(S.EncHearts, now.Hearts.ToString()));
 
+            // Tippy moving to cover another part of the screen (its blocked units and artifacts follow).
+            if (!string.IsNullOrEmpty(now.Tippy) && now.Tippy != prev.Tippy) lines.Add(now.Tippy);
             Units(prev, now, lines);
             Artifacts(prev, now, lines);
             Tiles(prev, now, lines);

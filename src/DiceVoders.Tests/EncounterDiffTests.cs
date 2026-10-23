@@ -141,6 +141,15 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void Tippy_moving_is_said()
+        {
+            var prev = Snap("Draft"); prev.Tippy = "Tippy: right tiles";
+            var now = Snap("Draft"); now.Tippy = "Tippy: left artifacts";
+            Assert.Equal(new[] { "Tippy: left artifacts" }, EncounterDiff.Lines(prev, now));
+            Assert.Empty(EncounterDiff.Lines(now, now));
+        }
+
+        [Fact]
         public void An_artifact_blocked_and_freed_is_said()
         {
             var prev = Snap("Draft");

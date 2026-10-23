@@ -365,6 +365,14 @@ sends `keybd_event`.
     the turn ends; the tile shows a danger zone (`TileView._dangerZoneView._isActive`, its
     `DangerZoneMask` faded in): the cell leads with "danger" (`Encounter.Danger`). Seen live, the zone
     following a budged die.
+  - Tippy ("Call Tippy!": artifacts there cannot trigger, units cannot score) covers one of five
+    areas, moved as each turn ends (`EncounterModel.TippyArea`, the `TippyController`'s shown
+    `TippyArea`: 0 left artifact slots, 1 right, 2 left tiles, 3 right, 4 the dice buttons, where the
+    game itself refuses Budge): the status stop's "Tippy: left artifacts" after the target, said as
+    it moves; tiles in a covered half lead with "blocked", empty ones too; its units and artifacts
+    are the game's blocked ones. Every pilot panel holds a `DangerDice`; only a pilot that rolls it
+    has it `IsActive` (Tippy's is face 0). Seen live, the areas forced through `TippyArea` and
+    `SetTippyAreaVisual`.
   - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
     slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
     Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details

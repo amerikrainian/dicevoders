@@ -386,8 +386,10 @@ namespace DiceVoders.Module.Encounter
             if (panel == null || !panel.gameObject.activeInHierarchy) return null;
             try
             {
+                // Every pilot panel holds one; only a pilot that rolls it has it active (Tippy's is
+                // drawn, face 0, inactive).
                 foreach (var die in panel.GetComponentsInChildren<Dice>(false))
-                    if (die.IsDangerDice) return die;
+                    if (die.IsDangerDice && die.IsActive) return die;
             }
             catch (Exception e) { CoreLog.Warning("Encounter: reading the pilot's die failed: " + e.Message); }
             return null;
@@ -399,6 +401,32 @@ namespace DiceVoders.Module.Encounter
         {
             try { var zone = Tile(x, y)?._dangerZoneView; return zone != null && zone._isActive; }
             catch (Exception e) { CoreLog.Warning("Encounter: reading tile " + (x + 1) + ", " + (y + 1) + "'s danger zone failed: " + e.Message); return false; }
+        }
+
+        /// <summary>What Tippy covers ("Call Tippy!": artifacts there cannot trigger, units cannot score),
+        /// one of five parts of the screen, moved as each turn ends: 0 the left half's artifact slots,
+        /// 1 the right half's, 2 the left half's tiles, 3 the right half's, 4 the dice buttons (Budge
+        /// and the rest refuse); -1 when Tippy is not up. The <see cref="TippyController"/>'s shown
+        /// area, its fields in that order (the model's <c>TippyArea</c> is the same index).</summary>
+        public static int TippyArea()
+        {
+            try
+            {
+                var tippy = UnityEngine.Object.FindObjectOfType<TippyController>();
+                if (tippy == null || !tippy.isActiveAndEnabled || (tippy.canvasGroup != null && tippy.canvasGroup.alpha <= 0.01f)) return -1;
+                var areas = new[] { tippy.TippyAreaLeftArtifact, tippy.TippyAreaRightArtifact, tippy.TippyAreaLeftGrid, tippy.TippyAreaRightGrid, tippy.TippyAreaButtons };
+                for (int i = 0; i < areas.Length; i++)
+                    if (areas[i] != null && areas[i].gameObject.activeInHierarchy) return i;
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading Tippy's area failed: " + e.Message); }
+            return -1;
+        }
+
+        /// <summary>Whether Tippy covers the column's tiles (the half the column is in).</summary>
+        public static bool TippyCovers(int x)
+        {
+            int area = TippyArea();
+            return area == 2 && x < Columns / 2 || area == 3 && x >= Columns / 2;
         }
 
         /// <summary>Whether the column shows a trap (Kaia's Booby Trap, <see cref="GridColumn.TrapObject"/>).</summary>
