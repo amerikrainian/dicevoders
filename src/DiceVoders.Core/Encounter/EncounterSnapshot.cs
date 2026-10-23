@@ -73,5 +73,7 @@ namespace DiceVoders.Core.Encounter
         public int Level;
         /// <summary>Its XP and what its next level takes; -1 for one that gains none.</summary>
         public int Xp, XpNeeded;
+        /// <summary>Blocked from triggering (a pilot's: Xenn's Sol and Luna, Tippy).</summary>
+        public bool Blocked;
     }
 }

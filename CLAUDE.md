@@ -350,6 +350,11 @@ sends `keybd_event`.
     right, per `GridModel.GetCoordsInDirection`). Selection previews (`PreviewController.RunPreview`)
     draw nothing in this game: the whole scene diffed with a target hovered for Give Shield,
     Sacrifice Unit, Swap or Move (both picks), placing a unit; no unit has a `PreviewTaskList`.
+  - Blocked (Xenn's "Sol & Luna": each turn 2 random artifacts with an Arrow trigger, drawn as a sun
+    or moon, `BlockedBySol`/`BlockedByLuna`; Tippy's `BlockedByTippy`; `IsBlocked`, on units too):
+    leads the readout as "target" does, "blocked, column 4, Dice Power 1, 4D Printer, ..." (status
+    artifacts, cells alike), and is an event, "4D Printer: blocked", "Locked Slot: blocked lost"
+    (Xenn re-picks as the turn ends, before "Shop"). Seen live with Xenn staged as act 2's pilot.
   - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
     slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
     Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details

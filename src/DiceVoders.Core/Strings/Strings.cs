@@ -181,6 +181,8 @@ namespace DiceVoders.Core.Strings
             D("enc.dir_up_right", "up-right"),
             D("enc.dir_down_left", "down-left"),
             D("enc.dir_down_right", "down-right"),
+            // An artifact or unit a pilot keeps from triggering or scoring (Xenn, Tippy).
+            D("enc.blocked", "blocked"),
             // The shop phase opening after a turn.
             D("enc.shop", "Shop"),
             // A tile the grid does not have yet (the shop's Build Tile adds them).
@@ -478,6 +480,7 @@ namespace DiceVoders.Core.Strings
         public static string EncDirUpRight => Get("enc.dir_up_right");
         public static string EncDirDownLeft => Get("enc.dir_down_left");
         public static string EncDirDownRight => Get("enc.dir_down_right");
+        public static string EncBlocked => Get("enc.blocked");
         public static string EncShop => Get("enc.shop");
         public static string EncNoTile => Get("enc.no_tile");
         public static string EncTarget => Get("enc.target");

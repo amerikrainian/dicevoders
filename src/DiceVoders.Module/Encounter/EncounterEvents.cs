@@ -239,7 +239,7 @@ namespace DiceVoders.Module.Encounter
                     s.Artifacts.Add(new ArtifactSnap
                     {
                         Id = artifact.ArtifactID.Number, Name = Encounter.ArtifactName(artifact), Slot = slot, Level = artifact.Level,
-                        Xp = xp?.Xp ?? -1, XpNeeded = xp?.Needed ?? 0,
+                        Xp = xp?.Xp ?? -1, XpNeeded = xp?.Needed ?? 0, Blocked = Encounter.Blocked(artifact),
                     });
                 }
                 for (int x = 0; x < Encounter.Columns; x++)

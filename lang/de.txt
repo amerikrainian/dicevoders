@@ -114,6 +114,7 @@ enc.dir_up_left=oben links
 enc.dir_up_right=oben rechts
 enc.dir_down_left=unten links
 enc.dir_down_right=unten rechts
+enc.blocked=blockiert
 enc.shop=Laden
 enc.no_tile=kein Feld
 enc.target=Ziel

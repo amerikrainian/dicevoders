@@ -128,6 +128,17 @@ namespace DiceVoders.Tests
                 EncounterDiff.Lines(Snap("Scoring", total: 0), Snap("Draft", total: 60, turns: 3)));
         }
 
+        [Fact]
+        public void An_artifact_blocked_and_freed_is_said()
+        {
+            var prev = Snap("Draft");
+            prev.Artifacts.Add(new ArtifactSnap { Id = 1, Name = "Meteor", Slot = 2, Xp = -1 });
+            var now = Snap("Draft");
+            now.Artifacts.Add(new ArtifactSnap { Id = 1, Name = "Meteor", Slot = 2, Xp = -1, Blocked = true });
+            Assert.Equal(new[] { "Meteor: blocked" }, EncounterDiff.Lines(prev, now));
+            Assert.Equal(new[] { "Meteor: blocked lost" }, EncounterDiff.Lines(now, prev));
+        }
+
         private static EncounterSnapshot WithMiniDice(EncounterSnapshot s, int count)
         {
             s.Tokens.Add(new Figure { Key = "minidice", Label = "Mini-Dice", Value = count });

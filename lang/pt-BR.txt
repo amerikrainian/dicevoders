@@ -114,6 +114,7 @@ enc.dir_up_left=cima à esquerda
 enc.dir_up_right=cima à direita
 enc.dir_down_left=baixo à esquerda
 enc.dir_down_right=baixo à direita
+enc.blocked=bloqueado
 enc.shop=loja
 enc.no_tile=sem casa
 enc.target=alvo

@@ -114,6 +114,7 @@ enc.dir_up_left=왼쪽 위
 enc.dir_up_right=오른쪽 위
 enc.dir_down_left=왼쪽 아래
 enc.dir_down_right=오른쪽 아래
+enc.blocked=차단됨
 enc.shop=상점
 enc.no_tile=칸 없음
 enc.target=대상

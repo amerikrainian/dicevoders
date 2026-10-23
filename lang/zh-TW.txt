@@ -114,6 +114,7 @@ enc.dir_up_left=左上
 enc.dir_up_right=右上
 enc.dir_down_left=左下
 enc.dir_down_right=右下
+enc.blocked=被封鎖
 enc.shop=商店
 enc.no_tile=無格子
 enc.target=目標

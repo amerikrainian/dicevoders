@@ -114,6 +114,7 @@ enc.dir_up_left=sol üst
 enc.dir_up_right=sağ üst
 enc.dir_down_left=sol alt
 enc.dir_down_right=sağ alt
+enc.blocked=engellendi
 enc.shop=dükkan
 enc.no_tile=kare yok
 enc.target=hedef

@@ -252,6 +252,14 @@ namespace DiceVoders.Module.Encounter
             catch (Exception e) { CoreLog.Warning("Encounter: reading artifact slot " + slot + " failed: " + e.Message); return null; }
         }
 
+        /// <summary>Whether the artifact is blocked from triggering: Xenn's Sol and Luna (drawn as a sun or
+        /// a moon on it), Tippy's area.</summary>
+        public static bool Blocked(ArtifactModel artifact)
+        {
+            try { return artifact != null && (artifact.IsBlocked || artifact.BlockedBySol || artifact.BlockedByLuna || artifact.BlockedByTippy); }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading whether an artifact is blocked failed: " + e.Message); return false; }
+        }
+
         /// <summary>"Meteor"; a pilot's ability leads with the pilot ("Roxy, Trailblazer").</summary>
         public static string ArtifactName(ArtifactModel artifact)
         {

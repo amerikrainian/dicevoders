@@ -317,11 +317,13 @@ namespace DiceVoders.Module.Screens
             var parts = new List<string>();
             // A target: the game's mark for what placing does ("Replace", "Level Up!"), else "target".
             if (EncounterState.SlotTarget(x) != null) parts.Add(EncounterState.SlotMark(x) ?? Strings.EncTarget);
+            // Blocked leads, as "target" does: what the column's artifact will not do this turn.
+            if (EncounterState.Blocked(EncounterState.Artifact(x))) parts.Add(Strings.EncBlocked);
             parts.Add(Strings.EncColumn(x + 1));
             int power = EncounterState.DicePower(x);
             if (power > 0) parts.Add(Strings.EncFigure(GameLoc.Get("DicePower_Misc") ?? "Dice Power", power.ToString()));
             if (EncounterState.Honey(x)) parts.Add(Strings.EncHoney);
-            string artifact = ArtifactLabel(EncounterState.Artifact(x));
+            string artifact = ArtifactLabel(EncounterState.Artifact(x), blocked: false);
             if (artifact != null) parts.Add(artifact);
             return string.Join(", ", parts);
         }
@@ -350,6 +352,8 @@ namespace DiceVoders.Module.Screens
         internal static string CellText(int x, int y)
         {
             string text = Strings.EncCoord(x + 1, y + 1) + ", " + CellContents(x, y);
+            var unit = EncounterState.At(x, y);
+            if (unit != null && unit.IsBlocked) text = Strings.EncBlocked + ", " + text;
             return EncounterState.TargetAt(x, y) != null ? Strings.EncTarget + ", " + text : text;
         }
 
@@ -371,7 +375,8 @@ namespace DiceVoders.Module.Screens
             var parts = new List<string> { EncounterState.Name(unit) };
             string strength = EncounterState.Strength(unit);
             if (strength != null) parts.Add(Strings.EncStrength(strength));
-            parts.AddRange(UnitStates(unit));
+            // Blocked leads the cell instead (CellText); the events say it among the states.
+            parts.AddRange(UnitStates(unit).FindAll(s => s != Strings.EncBlocked));
             try { if (unit.MaxCharge > 0) parts.Add(Strings.EncCharge(unit.Charge, unit.MaxCharge)); }
             catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's charge failed: " + e.Message); }
             parts.Add(Facing(unit));
@@ -388,6 +393,7 @@ namespace DiceVoders.Module.Screens
                 if (unit.IsNegative) states.Add(Strings.EncNegative);
                 if (unit.IsShielded) states.Add(GameLoc.Get("Shielded_Keyword") ?? "Shielded");
                 if (unit.IsShocked) states.Add(GameLoc.Get("Shock_Keyword") ?? "Shock");
+                if (unit.IsBlocked) states.Add(Strings.EncBlocked);
             }
             catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's state failed: " + e.Message); }
             states.RemoveAll(string.IsNullOrEmpty);
@@ -473,11 +479,13 @@ namespace DiceVoders.Module.Screens
 
         /// <summary>"Meteor, LV. 2, 9/20 XP": the artifact's name, its level past the first, its XP;
         /// null for none.</summary>
-        internal static string ArtifactLabel(ArtifactModel artifact)
+        internal static string ArtifactLabel(ArtifactModel artifact, bool blocked = true)
         {
             string name = EncounterState.ArtifactName(artifact);
             if (name == null) return null;
-            var parts = new List<string> { name };
+            var parts = new List<string>();
+            if (blocked && EncounterState.Blocked(artifact)) parts.Add(Strings.EncBlocked);
+            parts.Add(name);
             var xp = EncounterState.ArtifactXp(artifact);
             if (xp.HasValue)
             {

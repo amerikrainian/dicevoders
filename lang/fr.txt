@@ -114,6 +114,7 @@ enc.dir_up_left=haut gauche
 enc.dir_up_right=haut droite
 enc.dir_down_left=bas gauche
 enc.dir_down_right=bas droite
+enc.blocked=bloqué
 enc.shop=boutique
 enc.no_tile=pas de case
 enc.target=cible
