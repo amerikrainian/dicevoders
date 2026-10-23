@@ -360,7 +360,7 @@ namespace DiceVoders.Module.Screens
 
         // The game's buttons under the dice and the shop (the abilities knob), a row below theirs: the
         // Reroll button ("Reroll Button, Chrono 2": R's reroll), the Budge button ("Budge Button,
-        // Budge 6, button, disabled"; "undo" while a budge can be undone, Enter then Q's undo;
+        // Budge 6, disabled"; "undo" while a budge can be undone, Enter then Q's undo;
         // budging is A and S), the
         // Mini-Dice ("Mini-Dice, 5"). Each with its tooltip on Backspace. Keys that act on a die or an
         // item (A, S, F) act on the one last focused.
@@ -391,8 +391,9 @@ namespace DiceVoders.Module.Screens
             catch (Exception e) { CoreLog.Warning("EncounterScreen: reading the budge's undo failed: " + e.Message); return false; }
         }
 
-        // A knob part: its tooltip's title and what it shows ("Reroll Button, Chrono 2"); a button when
-        // it does something.
+        // A knob part: its tooltip's title and what it shows ("Reroll Button, Chrono 2"), activatable
+        // when it does something. No role word: the game's title says "Button" already ("Budge
+        // Button, Budge 3, disabled").
         private static NodeVtable Ability(UnityEngine.GameObject view, UnityEngine.GameObject tooltip, Func<string> figure, Action activate,
             Func<bool> enabled = null)
         {
@@ -403,7 +404,7 @@ namespace DiceVoders.Module.Screens
                 return string.Join(", ", parts);
             };
             Func<IEnumerable<string>> details = () => Keywords.Tooltip(tooltip, localized: true);
-            var vt = activate != null ? GameNodes.Button(label, activate, enabled) : new NodeVtable
+            var vt = activate != null ? GameNodes.Button(label, activate, enabled, ControlTypes.Text) : new NodeVtable
             {
                 ControlType = ControlTypes.Text,
                 Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
