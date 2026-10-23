@@ -30,9 +30,17 @@ namespace DiceVoders.Module.Encounter
         /// <summary>Whether this frame is settled (see the class).</summary>
         public static bool Settled { get; private set; }
 
+        // Frames the narration waits out for a key that says its own result (Q's undo).
+        private static int _held;
+
+        /// <summary>Hold the narration for some frames: a key that says what it changed, then
+        /// <see cref="Rebase"/>s, is not said twice.</summary>
+        public static void Hold(int frames) => _held = Math.Max(_held, frames);
+
         public static void Tick()
         {
             Settled = false;
+            if (_held > 0) { _held--; return; }
             var c = Encounter.Controller;
             if (c == null) { _controller = IntPtr.Zero; _last = null; _idle = 0; return; }
             if (c.Pointer != _controller) { _controller = c.Pointer; _last = null; _idle = 0; _column = -1; }
@@ -267,6 +275,8 @@ namespace DiceVoders.Module.Encounter
                 }
                 if (Encounter.Phase == Phase.Draft)
                     foreach (var choice in Encounter.Choices()) s.Shop.Add(Screens.EncounterScreen.ChoiceName(choice));
+                if (s.Shop.Count > 0) s.LastOffer.AddRange(s.Shop);
+                else if (_last != null && _last.Phase == s.Phase) s.LastOffer.AddRange(_last.LastOffer);
                 return s;
             }
             catch (Exception e)

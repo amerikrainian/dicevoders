@@ -189,6 +189,16 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void A_reroll_emptying_then_refilling_the_shop_is_said()
+        {
+            var before = Snap("Draft"); before.Shop.AddRange(new[] { "Comet", "Migo" }); before.LastOffer.AddRange(before.Shop);
+            var empty = Snap("Draft"); empty.LastOffer.AddRange(before.Shop);
+            var after = Snap("Draft"); after.Shop.AddRange(new[] { "Meteor", "Shooter" });
+            Assert.Empty(EncounterDiff.Lines(before, empty));
+            Assert.Equal(new[] { "Shop: Meteor, Shooter" }, EncounterDiff.Lines(empty, after));
+        }
+
+        [Fact]
         public void Tippy_moving_is_said()
         {
             var prev = Snap("Draft"); prev.Tippy = "Tippy: right tiles";

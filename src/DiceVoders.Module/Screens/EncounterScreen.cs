@@ -82,6 +82,8 @@ namespace DiceVoders.Module.Screens
         public static DraftChoice FocusedChoice()
         {
             string id = FocusedKey();
+            // On the abilities row, the item last focused (F freezes it, as the game's hover would).
+            if (id != null && id.StartsWith("enc:ability:")) id = _lastChoice;
             if (id == null || !id.StartsWith("enc:choice:")) return null;
             int instance = int.Parse(id.Substring("enc:choice:".Length));
             foreach (var choice in EncounterState.Choices())
@@ -111,6 +113,8 @@ namespace DiceVoders.Module.Screens
         public static Dice FocusedDie()
         {
             string id = FocusedKey();
+            // On the abilities row, the die last focused (A, S and F act on it).
+            if (id != null && id.StartsWith("enc:ability:")) id = _lastDie;
             if (id == null || !id.StartsWith("enc:die:")) return null;
             int instance = int.Parse(id.Substring("enc:die:".Length));
             foreach (var die in EncounterState.Dice())
@@ -118,6 +122,9 @@ namespace DiceVoders.Module.Screens
             var pilotDie = EncounterState.PilotDie();
             return pilotDie != null && pilotDie.GetInstanceID() == instance ? pilotDie : null;
         }
+
+        // The die and the shop item last focused, for keys pressed on the abilities row.
+        private static string _lastDie, _lastChoice;
 
         private static string FocusedKey() =>
             (Navigation.Active as GraphNavigator)?.FocusedNode?.Id?.StructuralKey as string;
@@ -141,6 +148,9 @@ namespace DiceVoders.Module.Screens
         private IntPtr _reward;
         private bool _shopLanding, _starDraft;
         private string _targets;
+        private string _choiceFocus;
+        private bool _choiceGone;
+        private float _choiceGoneAt;
         private ControlId _pendingLanding;
         private bool _pendingSpeak;
 
@@ -188,6 +198,25 @@ namespace DiceVoders.Module.Screens
                 var choices = EncounterState.Choices();
                 if (choices.Count > 0) { _pendingLanding = ChoiceId(choices[0]); _pendingSpeak = true; _shopLanding = false; }
             }
+            // The die and the item last focused (set as they take the focus) hold only in their phase.
+            if (phase != Phase.Player) _lastDie = null;
+            if (phase != Phase.Draft) _lastChoice = null;
+            // A shop choice the focus fell off because the offer emptied (a reroll) takes the focus back
+            // as it returns; one left on purpose (still on offer as the focus left) does not.
+            string key = FocusedKey();
+            if (phase != Phase.Draft || selecting) { _choiceFocus = null; _choiceGone = false; }
+            else if (key != null && key.StartsWith("enc:choice:")) { _choiceFocus = key; _choiceGone = false; }
+            else if (_choiceFocus != null)
+            {
+                bool offered = ChoiceOffered(_choiceFocus);
+                if (!_choiceGone)
+                {
+                    if (offered) _choiceFocus = null;
+                    else { _choiceGone = true; _choiceGoneAt = UnityEngine.Time.unscaledTime; }
+                }
+                else if (UnityEngine.Time.unscaledTime - _choiceGoneAt > 5f) _choiceFocus = null;
+                else if (offered && Navigation.Active?.MoveTo(ControlId.Structural(_choiceFocus), true, interrupt: false) == true) _choiceFocus = null;
+            }
             // The final boss's draft lands on its first card as it shows.
             bool starDraft = EncounterState.StarDraft().Count > 0;
             if (starDraft && !_starDraft) { _pendingLanding = StarDraftId(0); _pendingSpeak = true; }
@@ -201,6 +230,14 @@ namespace DiceVoders.Module.Screens
             if (EncounterEvents.Settled || selecting) _phase = phase;
             // Queued: the game caused it, and the lines saying so (the scoring, "Shop") come first.
             if (_pendingLanding != null && Navigation.Active?.MoveTo(_pendingLanding, _pendingSpeak, interrupt: false) == true) _pendingLanding = null;
+        }
+
+        // Whether the shop offers the choice with this focus key.
+        private static bool ChoiceOffered(string key)
+        {
+            foreach (var choice in EncounterState.Choices())
+                if (ChoiceId(choice).StructuralKey as string == key) return true;
+            return false;
         }
 
         // The running selection's targets, as a key that changes when they do.
@@ -279,9 +316,63 @@ namespace DiceVoders.Module.Screens
         {
             var phase = EncounterState.Phase;
             if (SpecialRewardStrip.Shown() != null) SpecialRewardStrip.Build(b, BoardStop);
-            else if (phase == Phase.Player) BuildDice(b);
-            else if (phase == Phase.Draft) BuildShop(b);
+            else if (phase == Phase.Player) { BuildDice(b); BuildAbilities(b); }
+            else if (phase == Phase.Draft) { BuildShop(b); BuildAbilities(b); }
             else if (phase == Phase.FinalBossDraft) BuildStarDraft(b);
+        }
+
+        // The game's buttons under the dice and the shop (the abilities knob), a row below theirs: the
+        // Reroll button ("Reroll Button, Chrono 2": R's reroll), the Budge button ("Budge Button,
+        // Budge 6", "undo" while a budge can be undone, Enter then Q's undo; budging is A and S), the
+        // Mini-Dice ("Mini-Dice, 5"). Each with its tooltip on Backspace. Keys that act on a die or an
+        // item (A, S, F) act on the one last focused.
+        private static void BuildAbilities(GraphBuilder b)
+        {
+            if (EncounterState.Abilities() == null) return;
+            var reroll = EncounterState.AbilityButton("ChronoButton");
+            var budge = EncounterState.AbilityButton("BudgeButton");
+            var mini = EncounterState.MiniDicePanel();
+            if (reroll == null && budge == null && mini == null) return;
+            b.StartRow(BoardStop);
+            if (reroll != null)
+                b.AddItem(ControlId.Structural("enc:ability:reroll"), Ability(reroll.gameObject, reroll.Tooltip, () => Chrono(), EncounterKeys.Reroll));
+            if (budge != null)
+                b.AddItem(ControlId.Structural("enc:ability:budge"), Ability(budge.gameObject, budge.Tooltip,
+                    () => CanUndoBudge() ? Strings.EncUndo : Budge(),
+                    () => { if (CanUndoBudge()) EncounterKeys.Cancel(); else Speech.Say(Strings.EncNothingToUndo, interrupt: true); }));
+            if (mini != null)
+                b.AddItem(ControlId.Structural("enc:ability:minidice"), Ability(mini.gameObject, mini.Tooltip,
+                    () => GameText.Of(mini.MiniDiceNumberText), null));
+            b.EndRow();
+        }
+
+        private static bool CanUndoBudge()
+        {
+            try { return EncounterState.Controller?.CanUndoBudge == true; }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading the budge's undo failed: " + e.Message); return false; }
+        }
+
+        // A knob part: its tooltip's title and what it shows ("Reroll Button, Chrono 2"); a button when
+        // it does something.
+        private static NodeVtable Ability(UnityEngine.GameObject view, UnityEngine.GameObject tooltip, Func<string> figure, Action activate)
+        {
+            Func<string> label = () =>
+            {
+                var parts = new List<string> { Keywords.LocalizedTitle(tooltip) ?? view.name, figure() };
+                parts.RemoveAll(string.IsNullOrEmpty);
+                return string.Join(", ", parts);
+            };
+            Func<IEnumerable<string>> details = () => Keywords.Tooltip(tooltip, localized: true);
+            var vt = activate != null ? GameNodes.Button(label, activate) : new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                SearchText = label,
+            };
+            vt.Details = details;
+            vt.OnSecondary = () => SayDetails(details());
+            vt.QuietVanish = true;
+            return vt;
         }
 
         // The final boss's draft, where the shop goes: "Choose One" of three star cards (handicaps the
@@ -616,7 +707,7 @@ namespace DiceVoders.Module.Screens
                 SearchText = label,
                 IsSelected = () => first,
                 QuietVanish = true,
-                OnFocus = () => EncounterState.Hover(die),
+                OnFocus = () => { _lastDie = DieId(die).StructuralKey as string; EncounterState.Hover(die); },
             };
         }
 
@@ -659,7 +750,7 @@ namespace DiceVoders.Module.Screens
                 SearchText = () => ChoiceName(choice),
                 IsSelected = () => first,
                 QuietVanish = true,
-                OnFocus = () => EncounterState.Hover(choice),
+                OnFocus = () => { _lastChoice = ChoiceId(choice).StructuralKey as string; EncounterState.Hover(choice); },
                 OnActivate = () => EncounterState.Click(choice),
                 Details = () => ChoiceDetails(choice),
                 OnSecondary = () => SayDetails(ChoiceDetails(choice)),

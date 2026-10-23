@@ -52,6 +52,9 @@ namespace DiceVoders.Core.Encounter
         public HashSet<int> Honey = new HashSet<int>();
         /// <summary>The shop's choices on offer, by name, in its order (empty outside the shop).</summary>
         public List<string> Shop = new List<string>();
+        /// <summary>The last offer this shop showed, kept while it is empty (a reroll empties it, then
+        /// refills it).</summary>
+        public List<string> LastOffer = new List<string>();
         /// <summary>The cloud's name ("Cloudy"), the game's.</summary>
         public string CloudLabel;
 

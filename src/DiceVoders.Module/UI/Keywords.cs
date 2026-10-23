@@ -173,6 +173,14 @@ namespace DiceVoders.Module.UI
             return lines;
         }
 
+        /// <summary>A tooltip object's title as its localization fills it (a hidden one keeps the
+        /// prefab's placeholder until first shown).</summary>
+        public static string LocalizedTitle(UnityEngine.GameObject tooltip)
+        {
+            var tip = tooltip != null ? tooltip.GetComponentInChildren<StarVaders.Tooltip>(true) : null;
+            return tip != null ? GameText.Clean(Localized(tip.TitleText)) : null;
+        }
+
         // The text's localized string, else its text.
         private static string Localized(TMPro.TMP_Text tmp)
         {

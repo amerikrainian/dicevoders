@@ -397,6 +397,36 @@ namespace DiceVoders.Module.Encounter
             return null;
         }
 
+        /// <summary>The abilities knob under the dice and the shop (<c>BottomPanel/AbilitiesKnob</c>: the
+        /// Reroll and Budge buttons, the Mini-Dice panel), found from the controller's budge icon; null
+        /// when not shown.</summary>
+        public static Transform Abilities()
+        {
+            try
+            {
+                for (var t = Controller?.BudgeIconImage != null ? Controller.BudgeIconImage.transform : null; t != null; t = t.parent)
+                    if (t.name == "AbilitiesKnob") return t.gameObject.activeInHierarchy ? t : null;
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: finding the abilities knob failed: " + e.Message); }
+            return null;
+        }
+
+        /// <summary>The knob's button of that name ("ChronoButton", "BudgeButton"), when shown.</summary>
+        public static ButtonView AbilityButton(string name)
+        {
+            var knob = Abilities();
+            if (knob == null) return null;
+            foreach (var button in knob.GetComponentsInChildren<ButtonView>(false))
+                if (button.gameObject.name == name) return button;
+            return null;
+        }
+
+        public static MiniDicePanel MiniDicePanel()
+        {
+            var knob = Abilities();
+            return knob != null ? knob.GetComponentInChildren<MiniDicePanel>(false) : null;
+        }
+
         /// <summary>The final boss's draft (<see cref="Phase.FinalBossDraft"/>: "Choose One" of three star
         /// cards, handicaps Star takes on), its cards as shown; empty outside it.</summary>
         public static List<StarCardView> StarDraft()

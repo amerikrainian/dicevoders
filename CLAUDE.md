@@ -389,6 +389,15 @@ sends `keybd_event`.
     mod's) and the held cards (`FinalBossPanel.StarCardViews`, filled ones); a taken card and HP
     changes are said. Its target reads "Star" (the pilot panel keeps the last pilot's ability).
     Seen live: reached with `stage.py skip` from act 1, Overclock taken.
+  - The abilities knob under the dice and the shop (`BottomPanel/AbilitiesKnob`, found from
+    `EncounterController.BudgeIconImage`) is a row below theirs: "Reroll Button, Chrono 2" (Enter =
+    R's reroll), "Budge Button, Budge 6" ("undo" while `CanUndoBudge`, Enter = Q's undo; else "nothing
+    to undo": budging is A/S), "Mini-Dice, 5" (`MiniDicePanel`); their tooltips are localization-only
+    (`Keywords.LocalizedTitle`, `Tooltip(.., localized: true)`). A, S, F on the row act on the die or
+    shop item last focused (recorded as each takes the focus). A shop reroll empties the offer and
+    refills it: the snapshot's `LastOffer` makes it "Shop: ...", and focus that fell off a choice as it
+    emptied returns to it (not one left on purpose). Q holds the narration (`EncounterEvents.Hold`)
+    while it says the undo itself.
   - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
     slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
     Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details

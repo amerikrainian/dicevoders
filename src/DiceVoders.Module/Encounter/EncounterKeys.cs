@@ -161,7 +161,7 @@ namespace DiceVoders.Module.Encounter
 
         // R: reroll the dice that are not frozen with Chrono; the roll is said by the events. With no
         // Chrono left, says so (the game ignores the key); refused otherwise, says that.
-        private static void Reroll()
+        internal static void Reroll()
         {
             if ((Encounter.Int(EncounterValue.ChronoToken) ?? 0) <= 0)
             {
@@ -179,9 +179,10 @@ namespace DiceVoders.Module.Encounter
 
         // Q: the game's cancel (undoes a budge, leaves a choice); dice it changes are said and taken
         // as the baseline.
-        private static void Cancel()
+        internal static void Cancel()
         {
             string before = Faces();
+            EncounterEvents.Hold(10);
             if (!Run("cancel", k => k.OnCancel(Context()))) return;
             Later.Frames(5, () =>
             {
