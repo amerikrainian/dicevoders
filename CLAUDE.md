@@ -77,9 +77,13 @@ closed; Core/Module: `dotnet build src/DiceVoders.Module/DiceVoders.Module.cspro
 waits for the dev server). Tests: `dotnet test src/DiceVoders.Tests/DiceVoders.Tests.csproj`
 (Core + Contracts, no game). After adding a string: `DVO_WRITE_LANG_TEMPLATE=1` on that test run
 regenerates `lang/en.txt`; every other lang file needs the key too.
-The version lives in `Directory.Build.props` alone (0.0.1). Not ported yet: the release scripts
-(`build_release.ps1`, `create-release.ps1`), the Rust installer, the mdbook manual; starvaders-access
-has all of them with constants to retarget. The update check asks
+The version lives in `Directory.Build.props` alone (0.0.1). Release: `build_release.ps1` (the game-folder zip
+`releases\DiceVoders-v<version>.zip`: BepInEx, the four mod dlls and `lang\` under
+`BepInEx\plugins\DiceVoders`, `prism.dll`, a BepInEx.cfg with the console off; no patcher),
+`build-installer.ps1` (the Rust installer in `installer\`, `releases\DiceVodersInstaller.exe`;
+`test-installer.ps1` runs its tests), `create-release.ps1 vX.Y.Z` (the GitHub release from a pushed
+tag and its CHANGELOG section). Not ported yet: the mdbook manual (`docs_src`, its Pages workflow);
+`build_release.ps1` already bundles it once `docs_src\book.toml` exists. The repo has no remote yet. The update check asks
 `amerikrainian/dicevoders`'s latest release and logs a 404 until one exists.
 
 ## Architecture (guildrun's, see its CLAUDE.md for the long form)
