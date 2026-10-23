@@ -140,6 +140,7 @@ namespace DiceVoders.Core.Strings
             // A unit's strength (the game's STR); {0} = the figure.
             D("enc.strength", "{0} strength"),
             D("enc.empty", "empty"),
+            D("enc.nothing", "nothing"),
             D("enc.honey", "honey"),
             D("enc.negative", "negative"),
             // A unit's charges; {0} = left, {1} = the most it holds.
@@ -272,6 +273,8 @@ namespace DiceVoders.Core.Strings
             D("bind.enc.go_column4", "Go to column 4"),
             D("bind.enc.go_column5", "Go to column 5"),
             D("bind.enc.go_column6", "Go to column 6"),
+            D("bind.enc.next", "Next unit or target"),
+            D("bind.enc.prev", "Previous unit or target"),
 
             D("screen.mod_menu", "DiceVoders"),
             D("mod.settings", "Settings"),
@@ -487,6 +490,7 @@ namespace DiceVoders.Core.Strings
         public static string EncColumn(int column) => F("enc.column", column);
         public static string EncFigure(string label, string figure) => F("enc.figure", label, figure);
         public static string EncStrength(string figure) => F("enc.strength", figure);
+        public static string EncNothing => Get("enc.nothing");
         public static string EncEmpty => Get("enc.empty");
         public static string EncHoney => Get("enc.honey");
         public static string EncNegative => Get("enc.negative");

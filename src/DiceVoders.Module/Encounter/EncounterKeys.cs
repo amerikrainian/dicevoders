@@ -21,7 +21,8 @@ namespace DiceVoders.Module.Encounter
     /// screen and the other overlays too) Ctrl+A the attack against the target ("30/100 attack"), Ctrl+T
     /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target, Ctrl+M Mult. 1 to
     /// 6 read that column whole (its header, then its cells top first), from anywhere in the encounter;
-    /// Shift with them goes there (the same row from a cell, else the header). On the grid and its header row, Home and End go
+    /// Shift with them goes there (the same row from a cell, else the header). Period and comma step
+    /// to the next and previous target while the game waits on one, else unit, in reading order. On the grid and its header row, Home and End go
     /// to the row's ends, Page Up and Page Down to the grid's top and bottom rows in the same column;
     /// elsewhere Home and End are the navigator's own. The game's own keys are its actions' keys, read
     /// from the game (<see cref="GameKeyBinding"/>, so its rebinding carries over), and run its own
@@ -71,6 +72,12 @@ namespace DiceVoders.Module.Encounter
                 .AddBinding(GameKey("Proceed", KeyCode.E));
             InputManager.Register("enc.cancel", "Cancel", InputCategory.Game, Cancel)
                 .AddBinding(GameKey("Cancel", KeyCode.Q));
+
+            // Period and comma: the next and previous target in a choice, else unit, in reading order.
+            InputManager.Register("enc.next", "Next unit or target", InputCategory.Game, () => Step(1))
+                .AddBinding(new KeyboardBinding(KeyCode.Period)).Repeating();
+            InputManager.Register("enc.prev", "Previous unit or target", InputCategory.Game, () => Step(-1))
+                .AddBinding(new KeyboardBinding(KeyCode.Comma)).Repeating();
 
             InputManager.Register("enc.first_column", "First column", InputCategory.Game, () => Edge(UiActions.Home, (x, y) => (0, y)))
                 .AddBinding(new KeyboardBinding(KeyCode.Home));
@@ -274,6 +281,64 @@ namespace DiceVoders.Module.Encounter
             if (Encounter.Controller == null || x >= Encounter.Columns) return;
             var tile = EncounterScreen.FocusedTile();
             JumpTo(tile.HasValue ? EncounterScreen.TileId(x, tile.Value.Y) : EncounterScreen.ColumnId(x));
+        }
+
+        // ---- stepping ----
+
+        // The board's places in reading order: the headers, then the cells top row first. While the
+        // game waits on a target, the headers and cells that take it; otherwise the cells with a unit.
+        private static List<ControlId> Members()
+        {
+            var members = new List<ControlId>();
+            bool selecting = Encounter.Selecting;
+            if (selecting)
+                for (int x = 0; x < Encounter.Columns; x++)
+                    if (Encounter.SlotTarget(x) != null) members.Add(EncounterScreen.ColumnId(x));
+            for (int y = Encounter.Rows - 1; y >= 0; y--)
+                for (int x = 0; x < Encounter.Columns; x++)
+                    if (selecting ? Encounter.TargetAt(x, y) != null : Encounter.At(x, y) != null)
+                        members.Add(EncounterScreen.TileId(x, y));
+            return members;
+        }
+
+        // The focus's place in that order: a header's index, a cell's after the headers; -1 off the board.
+        private static int Place()
+        {
+            var tile = EncounterScreen.FocusedTile();
+            if (tile.HasValue) return Encounter.Columns + (Encounter.Rows - 1 - tile.Value.Y) * Encounter.Columns + tile.Value.X;
+            return EncounterScreen.FocusedColumn() ?? -1;
+        }
+
+        private static int Place(ControlId id)
+        {
+            string key = id.StructuralKey as string;
+            if (key.StartsWith("enc:col:")) return int.Parse(key.Substring("enc:col:".Length));
+            var parts = key.Substring("enc:tile:".Length).Split(',');
+            return Encounter.Columns + (Encounter.Rows - 1 - int.Parse(parts[1])) * Encounter.Columns + int.Parse(parts[0]);
+        }
+
+        // Period and comma: the next or previous member after the focus, wrapping; from off the board,
+        // the first or the last. "nothing" when there is none.
+        private static void Step(int step)
+        {
+            if (Encounter.Controller == null) return;
+            List<ControlId> members;
+            try { members = Members(); }
+            catch (Exception e) { CoreLog.Warning("EncounterKeys: reading the board's members failed: " + e.Message); return; }
+            if (members.Count == 0) { Speech.Say(Strings.EncNothing, interrupt: true); return; }
+            int at = Place();
+            ControlId to = null;
+            if (step > 0)
+            {
+                foreach (var m in members) if (at < 0 || Place(m) > at) { to = m; break; }
+                to = to ?? members[0];
+            }
+            else
+            {
+                for (int i = members.Count - 1; i >= 0; i--) if (at < 0 || Place(members[i]) < at) { to = members[i]; break; }
+                to = to ?? members[members.Count - 1];
+            }
+            JumpTo(to);
         }
 
         // "column 4, Dice Power 2, Meteor, 0/10 XP, 4, 3, Migo, 10 strength, 4, 2, empty, 4, 1, no

@@ -282,7 +282,9 @@ sends `keybd_event`.
     are matched by `ArtifactID.Number` instead. Keys (`EncounterKeys`, Game category): C
     coordinates, 1 to 6 that column whole (`HeaderText`, then each `CellText` top first; the game's
     own 1 to 3, SelectCard, have no handler in this game), Shift+1 to 6 there (the same row from a
-    cell, else the header; `EncounterKeys.JumpTo` remembers where it left for the jump back), Ctrl+S the game menu's stats, Home/End row ends, PgUp/PgDn grid top and bottom; in the
+    cell, else the header; `EncounterKeys.JumpTo` remembers where it left for the jump back), period and comma the
+    next and previous unit, or while `Selecting` target (headers then cells top first, wrapping;
+    "nothing" when none), Ctrl+S the game menu's stats, Home/End row ends, PgUp/PgDn grid top and bottom; in the
     Run category (`UI/RunKeys`: live while `Encounter.Controller` exists, declared by the encounter and
     the overlays over it: pause, result, victory, constellations, tips, guide, settings, confirm)
     Ctrl+A attack ("0/100 attack"), Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice, Ctrl+O
