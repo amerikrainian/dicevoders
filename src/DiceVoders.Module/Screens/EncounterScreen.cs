@@ -937,11 +937,17 @@ namespace DiceVoders.Module.Screens
 
         // "Perks": the game's word, from its compendium's page heading "Perks (1-24)", the range
         // dropped (it has no other plural).
-        private static string Perks()
+        internal static string Perks() => Heading("Powers_Subtitle_1", "Perks");
+
+        /// <summary>"Units": the game's word, its compendium's page heading.</summary>
+        internal static string Units() => Heading("Units_Subtitle", "Units");
+
+        // A compendium page heading as a word, a trailing range ("(1-24)") dropped.
+        private static string Heading(string key, string fallback)
         {
-            string heading = GameLoc.Get("Powers_Subtitle_1");
+            string heading = GameLoc.Get(key);
             string word = heading != null ? Range.Replace(heading, "").Trim() : null;
-            return string.IsNullOrEmpty(word) ? "Perks" : word;
+            return string.IsNullOrEmpty(word) ? fallback : word;
         }
 
         private static NodeVtable Stat(Func<string> text, Func<IEnumerable<string>> details = null) => new NodeVtable
