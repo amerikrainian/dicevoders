@@ -254,6 +254,8 @@ namespace DiceVoders.Module.Encounter
             var column = EncounterScreen.FocusedColumn();
             if (column == null)
             {
+                // A row off the grid (the dice, the shop, a reward screen): along it.
+                if (uiKey != null && (Navigation.Active as GraphNavigator)?.JumpRowEdge(uiKey == UiActions.Home) == true) return;
                 var ui = uiKey != null ? InputManager.Find(uiKey) : null;
                 if (ui != null) Navigation.DispatchJustPressed(ui);
                 return;

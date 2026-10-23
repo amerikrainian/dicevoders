@@ -100,6 +100,7 @@ enc.attack={0}/{1} attack
 enc.hearts=Hearts
 enc.swap=Swap
 enc.cant_budge=can't budge
+enc.cant_take=can't take
 enc.cant_freeze=can't freeze
 enc.cant_reroll=can't reroll
 enc.rolled=rolled {0}

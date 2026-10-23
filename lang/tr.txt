@@ -98,6 +98,7 @@ enc.attack={0}/{1} saldırı
 enc.hearts=Kalpler
 enc.swap=Takas
 enc.cant_budge=kaydırılamaz
+enc.cant_take=alınamaz
 enc.cant_freeze=dondurulamaz
 enc.cant_reroll=yeniden atılamaz
 enc.rolled=atıldı {0}

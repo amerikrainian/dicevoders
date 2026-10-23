@@ -98,6 +98,7 @@ enc.attack=атака {0}/{1}
 enc.hearts=Сердца
 enc.swap=Обмен
 enc.cant_budge=нельзя сдвинуть
+enc.cant_take=нельзя взять
 enc.cant_freeze=нельзя заморозить
 enc.cant_reroll=нельзя перебросить
 enc.rolled=выпало {0}

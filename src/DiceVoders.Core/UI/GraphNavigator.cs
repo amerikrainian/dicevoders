@@ -136,6 +136,18 @@ namespace DiceVoders.Core.UI
 
         public override object FocusedStopKey => _graph?.CurrentNode?.StopKey;
 
+        /// <summary>Home/End along a row: the first or last node left or right of the focus, said as a
+        /// move. False when the focus is in no row (nothing wired left or right), for the caller to
+        /// fall back on the usual Home/End.</summary>
+        public bool JumpRowEdge(bool first)
+        {
+            var node = _graph?.CurrentNode;
+            if (node == null || !(node.Transitions.ContainsKey(GraphDir.Left) || node.Transitions.ContainsKey(GraphDir.Right))) return false;
+            var move = _graph.MoveToEdge(first ? GraphDir.Left : GraphDir.Right);
+            if (move.Moved) AnnounceMove(move);
+            return true;
+        }
+
         public override bool MoveTo(ControlId id, bool speak = true, bool interrupt = true)
         {
             if (id == null || _graph == null || !_graph.Rerender()) return false;

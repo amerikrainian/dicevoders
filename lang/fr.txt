@@ -98,6 +98,7 @@ enc.attack={0}/{1} d'attaque
 enc.hearts=Cœurs
 enc.swap=Échange
 enc.cant_budge=impossible d'ajuster
+enc.cant_take=impossible à prendre
 enc.cant_freeze=impossible de geler
 enc.cant_reroll=impossible de relancer
 enc.rolled=obtenu {0}

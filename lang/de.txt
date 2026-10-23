@@ -98,6 +98,7 @@ enc.attack={0}/{1} Angriff
 enc.hearts=Herzen
 enc.swap=Tausch
 enc.cant_budge=kann nicht verschieben
+enc.cant_take=nicht möglich
 enc.cant_freeze=kann nicht einfrieren
 enc.cant_reroll=kann nicht neu würfeln
 enc.rolled=gewürfelt {0}

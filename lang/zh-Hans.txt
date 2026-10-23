@@ -98,6 +98,7 @@ enc.attack=攻击 {0}/{1}
 enc.hearts=红心
 enc.swap=交换
 enc.cant_budge=无法微调
+enc.cant_take=无法领取
 enc.cant_freeze=无法冻结
 enc.cant_reroll=无法重掷
 enc.rolled=掷出 {0}

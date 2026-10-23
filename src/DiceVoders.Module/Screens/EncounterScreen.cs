@@ -140,6 +140,7 @@ namespace DiceVoders.Module.Screens
         private bool _selecting;
         private IntPtr _reward;
         private bool _shopLanding, _starDraft;
+        private string _targets;
         private ControlId _pendingLanding;
         private bool _pendingSpeak;
 
@@ -157,6 +158,19 @@ namespace DiceVoders.Module.Screens
             {
                 var first = FirstTarget();
                 if (first != null) { _pendingLanding = first; _pendingSpeak = true; }
+                _targets = TargetsKey();
+            }
+            else if (selecting)
+            {
+                // A selection chained on the last (Swap or Move: what, then where) keeps the game
+                // selecting with other targets: focus on none of them goes to the first.
+                string targets = TargetsKey();
+                if (targets != _targets)
+                {
+                    _targets = targets;
+                    var first = FirstTarget();
+                    if (first != null && !FocusOnTarget()) { _pendingLanding = first; _pendingSpeak = true; }
+                }
             }
             else if (!selecting && phase != _phase && EncounterEvents.Settled)
             {
@@ -187,6 +201,27 @@ namespace DiceVoders.Module.Screens
             if (EncounterEvents.Settled || selecting) _phase = phase;
             // Queued: the game caused it, and the lines saying so (the scoring, "Shop") come first.
             if (_pendingLanding != null && Navigation.Active?.MoveTo(_pendingLanding, _pendingSpeak, interrupt: false) == true) _pendingLanding = null;
+        }
+
+        // The running selection's targets, as a key that changes when they do.
+        private static string TargetsKey()
+        {
+            var sb = new System.Text.StringBuilder();
+            for (int x = 0; x < EncounterState.Columns; x++)
+                if (EncounterState.SlotTarget(x) != null) sb.Append('c').Append(x);
+            for (int y = 0; y < EncounterState.Rows; y++)
+                for (int x = 0; x < EncounterState.Columns; x++)
+                    if (EncounterState.TargetAt(x, y) != null) sb.Append('t').Append(x).Append(',').Append(y);
+            return sb.ToString();
+        }
+
+        // Whether the focus is on a cell or header the selection takes.
+        private static bool FocusOnTarget()
+        {
+            var tile = FocusedTile();
+            if (tile.HasValue) return EncounterState.TargetAt(tile.Value.X, tile.Value.Y) != null;
+            var column = FocusedColumn();
+            return column.HasValue && EncounterState.SlotTarget(column.Value) != null;
         }
 
         // The first cell or header the running selection takes, reading order (headers, then the

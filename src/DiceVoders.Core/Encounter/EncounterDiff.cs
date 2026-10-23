@@ -13,7 +13,7 @@ namespace DiceVoders.Core.Encounter
     /// <item>the turn's scoring once the player phase is left with more attack, one line ("column 3:
     /// 20, column 5: 10, 30/100 attack"), when no <see cref="Step"/> said it column by column; attack
     /// changing otherwise ("40/100 attack");</item>
-    /// <item>the target reached, a heart lost, Blood Beast's Rage changing and Beast Mode coming and going;</item>
+    /// <item>the target reached, hearts lost or gained, Blood Beast's Rage changing and Beast Mode coming and going;</item>
     /// <item>units: destroyed ("Time Angel at 6, 1 destroyed"), added ("Migo added at 4, 1"), moved
     /// ("Migo moved to 3, 2"), strength ("all units +5 strength" when every one that stayed changed
     /// alike, else "Migo at 2, 1: 20 strength"), states gained and lost, charge;</item>
@@ -56,7 +56,7 @@ namespace DiceVoders.Core.Encounter
                 lines.Add(S.EncAttack(now.TotalText, now.TargetText));
             if (!newTarget && prev.Total < prev.Target && now.Total >= now.Target && now.Target > 0 && !string.IsNullOrEmpty(now.TargetReachedText))
                 lines.Add(now.TargetReachedText);
-            if (now.Hearts < prev.Hearts)
+            if (now.Hearts != prev.Hearts)
                 lines.Add(S.EncFigure(S.EncHearts, now.Hearts.ToString()));
             var heldBefore = new List<string>(prev.StarCards);
             foreach (var card in now.StarCards)

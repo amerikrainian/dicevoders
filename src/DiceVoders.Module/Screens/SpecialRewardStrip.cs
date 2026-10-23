@@ -70,7 +70,7 @@ namespace DiceVoders.Module.Screens
             {
                 var button = item.TryCast<ButtonView>();
                 bool reward = loot && button != null && button.Tooltip != null;
-                var node = reward && !pickOne ? Reward(button) : Node(item, screen.transform);
+                var node = reward && !pickOne ? Reward(button) : Node(item, screen.transform, localized: reward);
                 if (node == null) continue;
                 // The buttons with nothing to say for themselves (Proceed) come after what they take.
                 if (button != null && !reward && Keywords.Tooltip(button.Tooltip).Count == 0 && button.GetComponentInChildren<ArtifactView>(false) == null) last.Add(node);
@@ -84,6 +84,12 @@ namespace DiceVoders.Module.Screens
             }
             b.EndRow();
             b.PopContext();
+        }
+
+        private static bool FullHearts()
+        {
+            try { return (Encounter.Encounter.Int(EncounterValue.Hearts) ?? 0) >= 5; }
+            catch (Exception e) { CoreLog.Warning("SpecialRewardStrip: reading the hearts failed: " + e.Message); return false; }
         }
 
         private static bool Scarcity()
@@ -111,7 +117,8 @@ namespace DiceVoders.Module.Screens
 
         // A button (with the artifact it shows, if any), or an artifact outside any button; null for
         // the rest (an artifact inside a button is that button's).
-        private static NodeVtable Node(AViewItem item, Transform screen)
+        // localized: the loot's buttons (under Scarcity), whose tooltips only localization fills.
+        private static NodeVtable Node(AViewItem item, Transform screen, bool localized = false)
         {
             var artifactView = item.TryCast<ArtifactView>();
             if (artifactView != null)
@@ -123,10 +130,20 @@ namespace DiceVoders.Module.Screens
             if (button == null) return null;
             var shown = button.GetComponentInChildren<ArtifactView>(false);
             if (shown != null && Model(shown) != null) return Artifact(shown, button);
-            Func<string> label = () => ButtonLabel(button);
+            Func<List<string>> lines = () => Keywords.Tooltip(button.Tooltip, localized);
+            Func<string> label = () => ButtonLabel(button, lines());
             var vt = ViewNodes.Button(button, label);
-            vt.Details = () => Keywords.Tooltip(button.Tooltip);
-            vt.OnSecondary = () => SayDetails(Keywords.Tooltip(button.Tooltip));
+            // Under Scarcity the Heart is refused at full Hearts (OnPressReceiveHeart returns at 5):
+            // the game says nothing, so the mod does.
+            var click = vt.OnActivate;
+            vt.OnActivate = () =>
+            {
+                if (button.transform.parent != null && button.transform.parent.name == "HeartHolder" && FullHearts())
+                    Speech.Say(Strings.EncCantTake, interrupt: true);
+                else click?.Invoke();
+            };
+            vt.Details = lines;
+            vt.OnSecondary = () => SayDetails(lines());
             return vt;
         }
 

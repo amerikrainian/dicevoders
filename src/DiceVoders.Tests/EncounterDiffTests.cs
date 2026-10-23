@@ -87,6 +87,7 @@ namespace DiceVoders.Tests
         public void A_lost_heart_is_said()
         {
             Assert.Contains("Hearts 4", EncounterDiff.Lines(Snap("Draft", hearts: 5), Snap("Draft", hearts: 4)));
+            Assert.Contains("Hearts 5", EncounterDiff.Lines(Snap("Draft", hearts: 4), Snap("Draft", hearts: 5)));
         }
 
         private static UnitSnap Unit(string id, string name, int x, int y, double strength, params string[] states) => new UnitSnap

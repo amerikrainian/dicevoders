@@ -157,6 +157,8 @@ namespace DiceVoders.Core.Strings
             D("enc.swap", "Swap"),
             // The game refused a budge (no Budge left, the face at its end, already budged this roll).
             D("enc.cant_budge", "can't budge"),
+            // A reward the game refuses (the Heart at full Hearts, under Scarcity).
+            D("enc.cant_take", "can't take"),
             D("enc.cant_freeze", "can't freeze"),
             D("enc.cant_reroll", "can't reroll"),
             // The dice after a roll; {0} = the faces in the tray's order.
@@ -480,6 +482,7 @@ namespace DiceVoders.Core.Strings
         public static string EncHearts => Get("enc.hearts");
         public static string EncSwap => Get("enc.swap");
         public static string EncCantBudge => Get("enc.cant_budge");
+        public static string EncCantTake => Get("enc.cant_take");
         public static string EncCantFreeze => Get("enc.cant_freeze");
         public static string EncCantReroll => Get("enc.cant_reroll");
         public static string EncRolled(string faces) => F("enc.rolled", faces);
