@@ -83,7 +83,7 @@ The version lives in `Directory.Build.props` alone (0.0.1). Release: `build_rele
 `build-installer.ps1` (the Rust installer in `installer\`, `releases\DiceVodersInstaller.exe`;
 `test-installer.ps1` runs its tests), `create-release.ps1 vX.Y.Z` (the GitHub release from a pushed
 tag and its CHANGELOG section). Not ported yet: the mdbook manual (`docs_src`, its Pages workflow);
-`build_release.ps1` already bundles it once `docs_src\book.toml` exists. The repo has no remote yet. The update check asks
+`build_release.ps1` already bundles it once `docs_src\book.toml` exists. The repo is https://github.com/amerikrainian/dicevoders (public, `origin`; nothing pushed yet). The update check asks
 `amerikrainian/dicevoders`'s latest release and logs a 404 until one exists.
 
 ## Architecture (guildrun's, see its CLAUDE.md for the long form)
