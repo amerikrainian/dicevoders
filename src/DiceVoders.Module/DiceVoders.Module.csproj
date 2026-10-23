@@ -25,7 +25,7 @@
   <!--
     Fast iteration deploy (Debug only): copy just the two reloadable DLLs (Core + Module) into the plugin
     folder. Both are overwrite-safe while the game runs (byte-loaded, never locked), so the day-to-day
-    loop is dotnet build on this project then POST /reload (or F6 in-game). The lang files go along:
+    loop is dotnet build on this project then POST /reload. The lang files go along:
     a reload reads the game language's file again, so a translation is tried the same way.
   -->
   <Target Name="DeployModule" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">

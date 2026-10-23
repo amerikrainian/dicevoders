@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using StarVaders;
 using DiceVoders.Core.Graph;
+using DiceVoders.Core.Input;
 using DiceVoders.Core.Strings;
 using DiceVoders.Core.UI;
+using DiceVoders.Module.Input;
 using DiceVoders.Module.Interop;
 using DiceVoders.Module.UI;
 using TMPro;
+using UnityEngine;
 using Screen = DiceVoders.Core.Screens.Screen;
 
 namespace DiceVoders.Module.Screens
@@ -16,11 +19,20 @@ namespace DiceVoders.Module.Screens
     /// is the game's own any-key handler (<c>BootupController.OnPressAnything</c>). Up once the game
     /// has finished loading its save (<c>IsFinishedLoadingGame</c>: before that the handler ignores a
     /// press) and until the press starts the transition out (<c>IsEndingScene</c>).
+    /// <para>Any key is the press, as in the game: the screen declares no input categories (only the
+    /// Global keys, F1 and the mod's Ctrl+Shift chords, stay live) and no type-ahead, and any plain key
+    /// going down calls the handler. Not counted: the modifiers alone and anything with Ctrl, Alt or
+    /// Insert held (silencing or commanding the screen reader), and the function keys (key help).</para>
     /// </summary>
     public sealed class BootScreen : Screen
     {
         public override string Key => "boot";
         public override string ScreenName => Strings.ScreenTitle;
+
+        public override IReadOnlyList<InputCategory> InputCategories => NoCategories;
+        public override bool AllowsTypeahead => false;
+
+        private static readonly InputCategory[] NoCategories = { };
 
         private static BootupController Controller => GameScenes.Controller<BootupController>();
 
@@ -36,6 +48,24 @@ namespace DiceVoders.Module.Screens
             if (c == null) return;
             b.AddItem(ControlId.Structural("boot:start"), GameNodes.Button(() => PromptText(c), () => c.OnPressAnything()));
         }
+
+        private int _lastUpdateFrame = -1;
+
+        // Counted only when this screen was focused the frame before too: the Escape that closes the key
+        // help over it pops the help in this frame's input tick and must not be the any-key as well.
+        public override void OnUpdate()
+        {
+            int frame = Time.frameCount;
+            bool focusedBefore = _lastUpdateFrame == frame - 1;
+            _lastUpdateFrame = frame;
+            if (!focusedBefore || !FocusMode.Active || OsKeys.CtrlHeld || OsKeys.AltHeld || OsKeys.Held(KeyCode.Insert)) return;
+            if (OsKeys.FirstPressed(CountsAsAnyKey) == null) return;
+            var c = Controller;
+            if (c != null && c.IsFinishedLoadingGame && !c.IsEndingScene) c.OnPressAnything();
+        }
+
+        private static bool CountsAsAnyKey(KeyCode k) =>
+            !(k >= KeyCode.F1 && k <= KeyCode.F15) && k != KeyCode.Insert && !OsKeys.IsModifier(k);
 
         // The prompt as the game draws it (localized), under the click-text group.
         private static string PromptText(BootupController c)

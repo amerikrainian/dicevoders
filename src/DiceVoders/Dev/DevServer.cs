@@ -382,10 +382,6 @@ namespace DiceVoders.Dev
             return driver != null ? driver.DescribeNav() : "[no module] nav driver unavailable\n";
         }
 
-        /// <summary>F6 reloads through here (on the main thread) so the evaluator resets exactly like
-        /// POST /reload.</summary>
-        public string ReloadFromHost() => ReloadModule();
-
         // Reload the feature side, then reset the evaluator so /eval recompiles against fresh types.
         private string ReloadModule()
         {

@@ -72,7 +72,7 @@ Steam again at boot (`SyncSteamAchievements`) and on load.
 Contracts + Roslyn deps + Core + Module to `<game>\BepInEx\plugins\DiceVoders\`, `prism.dll`
 next to `DiceVaders.exe`, `lang\*.txt` beside the plugin. A host or Contracts change needs the game
 closed; Core/Module: `dotnet build src/DiceVoders.Module/DiceVoders.Module.csproj` then
-`dev.py reload` (or F6 in game). First-time setup: `.\setup-bepinex.ps1`, launch once through Steam
+`dev.py reload`. First-time setup: `.\setup-bepinex.ps1`, launch once through Steam
 (interop generates, about a minute), build. Launch: `dev.py launch` (Steam `-applaunch 3917700`,
 waits for the dev server). Tests: `dotnet test src/DiceVoders.Tests/DiceVoders.Tests.csproj`
 (Core + Contracts, no game). After adding a string: `DVO_WRITE_LANG_TEMPLATE=1` on that test run
@@ -110,9 +110,8 @@ Actions" in the repo settings). The repo is https://github.com/amerikrainian/dic
 ## Input
 `Module/Input/OsKeys` reads the OS (`GetAsyncKeyState`, once per frame, only while the game window
 is foreground); `KeyboardBinding` keeps its `KeyCode` identity on top; `FocusMode` disables the
-Input System keyboard and the EventSystem's navigation. Host F6 uses the same OS read. The dev
-driver's `/input` dispatches mod actions directly, so it does not exercise `OsKeys`: real keys need
-a scratch script that brings the game forward (`AttachThreadInput` + `SetForegroundWindow`) and
+Input System keyboard and the EventSystem's navigation. The dev driver's `/input` dispatches mod
+actions directly, so it does not exercise `OsKeys`: real keys need a scratch script that brings the game forward (`AttachThreadInput` + `SetForegroundWindow`) and
 sends `keybd_event` (the arrows need `KEYEVENTF_EXTENDEDKEY`, or the mod never sees them; leave a
 moment after a key that opens a screen, or the next is lost while it arrives).
 
@@ -128,7 +127,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
   `Prose(scope, skip)` (a panel's texts outside view items, top to bottom as drawn, one per line).
 - Screens so far:
   - `BootScreen` (the title, "PRESS ANY BUTTON TO PLAY": `BootupController.OnPressAnything`, up
-    while `IsFinishedLoadingGame && !IsEndingScene`). Unchanged from starvaders.
+    while `IsFinishedLoadingGame && !IsEndingScene`). Starvaders': no input categories, no
+    type-ahead, any plain key down is the press (not modifiers alone, Ctrl/Alt/Insert held, F keys).
   - `MainMenuScreen` (`MainMenuController`): the scene's shown clickable items outside the popup and
     the language picker, in hierarchy order; the column (Resume Game, its delete icon read "Delete
     run", Start Game, Options, Exit, Strategy Guide) then the edge icons (`ExtraButtons*`,
