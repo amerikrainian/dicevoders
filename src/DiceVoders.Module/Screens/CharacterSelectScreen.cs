@@ -218,7 +218,7 @@ namespace DiceVoders.Module.Screens
                 if (locked != null && locked.gameObject.activeInHierarchy)
                 {
                     taken.Add(locked.Pointer);
-                    slots.Add((locked.transform, LockedNode(locked), "cs:unique:" + i));
+                    slots.Add((locked.transform, LockedNode(locked, unlocked, view), "cs:unique:" + i));
                 }
                 else if (unlocked != null && unlocked.activeInHierarchy && view != null && Model(view) != null)
                     slots.Add((view.transform, ArtifactNode(view, true), "cs:unique:" + i));
@@ -273,7 +273,8 @@ namespace DiceVoders.Module.Screens
             };
         }
 
-        private static NodeVtable LockedNode(LockedArtifactItemView item)
+        // unlocked, view: the slot's revealed side, said once a ready unique's click reveals it.
+        private static NodeVtable LockedNode(LockedArtifactItemView item, GameObject unlocked, ArtifactView view)
         {
             // By its condition (the slot draws a bare lock, its title only "Locked LV.6 Unique"):
             // the title for Backspace.
@@ -282,7 +283,30 @@ namespace DiceVoders.Module.Screens
             var vt = ViewNodes.Button(item, label);
             vt.Details = details;
             vt.OnSecondary = () => SayDetails(details());
+            // A ready unique ("Press to unlock!") turns into its artifact under the same place: the
+            // reveal is said, the slot being another kind of node by then.
+            var click = vt.OnActivate;
+            vt.OnActivate = () =>
+            {
+                click?.Invoke();
+                if (unlocked != null && view != null) SayReveal(unlocked, view, 0);
+            };
             return vt;
+        }
+
+        // Watches the slot for its artifact, two seconds at most (the reveal animates).
+        private static void SayReveal(GameObject unlocked, ArtifactView view, int waited)
+        {
+            Later.Frames(6, () =>
+            {
+                if (unlocked != null && unlocked.activeInHierarchy && Model(view) != null)
+                {
+                    string label = EncounterScreen.ArtifactLabel(Model(view));
+                    if (label != null) Speech.Say(label, interrupt: true);
+                    return;
+                }
+                if (waited < 20) SayReveal(unlocked, view, waited + 1);
+            }, "unique reveal");
         }
 
         private static string LockedText(LockedArtifactItemView item, bool title)

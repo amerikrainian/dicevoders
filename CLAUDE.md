@@ -157,9 +157,13 @@ sends `keybd_event`.
     (`OnExitPressed`) last, Escape too. `GameScenes.Items` can hold items destroyed since (a unique's
     lock, once unlocked): every loop skips `item == null` first, and the build is guarded so one
     failure does not leave the screen without nodes (it did: arrows went dead). Seen live: after the tutorial, after New Chapter Unlocked
-    (CH1 open, three commanders unlocked), The Captain chosen. Not seen: a unique ready to unlock
-    ("Press to unlock!", whose click reveals it and writes the save), the challenges, the missions'
-    commander images, Launch!.
+    (CH1 open, three commanders unlocked), The Captain chosen. A unique ready to unlock ("You've unlocked
+    this by defeating 2 pilots! Press to unlock!", its click reveals it and writes the save) says the
+    revealed artifact ("Sky Arbiter"), the slot turning into another kind of node; seen live on a
+    third, throwaway profile (P-3) with `LoggerDataSO.CommanderPilotsDefeated[Mothership]` set to 4 and
+    `IsTutorialComplete`. The challenges and Launch! seen live too. On that fresh profile the game marks
+    no commander icon selected (`IsSelected`, `SelectedObject` off on all) though `CurrentCommander` is
+    set and its panel shows: read as the game draws it. Not seen: the missions' commander images.
   - `CompendiumScreen` (`CompendiumController`, CompendiumSceneAdditive over the main menu, from its
     Compendium icon, `GlossaryIcon`, which reads "Compendium, 12%": an edge icon is its tooltip's
     name with its caption; layer 10, exclusive; up while `Canvas` shows), named by `Pages/Title`.
