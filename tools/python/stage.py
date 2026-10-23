@@ -7,8 +7,9 @@ hidden debug panel (StarVaders.DebugController: in the encounter scene, inactive
   skip                      the debug panel's Skip Round (one target; run again for more)
   pilot NAME [--index I]    put a pilot in the run's pilot order (default: the next undefeated slot)
   pilots                    every pilot name
-  offer NAME [--slot S]     make shop choice S (default 0) offer a unit or an artifact by its game
-                            name (EntityName / ArtifactName: Oculus, FourDPrinter...); in the shop only
+  offer NAME [--slot S]     make shop choice S (default 0) offer a unit, an artifact or a spell by its
+                            game name (EntityName / ArtifactName / DraftType: Oculus, FourDPrinter,
+                            Swap...); in the shop only
   find TEXT                 unit and artifact names containing TEXT
   gain money|budge|chrono|heart [N]   the debug panel's Gain buttons, N times (default 1)
   set VALUE N               set an EncounterValue (Hearts, GlobalMult, TotalScore...) to N
@@ -105,6 +106,7 @@ c.EncounterView.MapPanel.UpdateMap(c);
 var hits = new System.Collections.Generic.List<string>();
 foreach (var n in System.Enum.GetNames(typeof(StarVaders.EntityName))) if (n.IndexOf({cs(args.text)}, System.StringComparison.OrdinalIgnoreCase) >= 0) hits.Add("unit " + n);
 foreach (var n in System.Enum.GetNames(typeof(StarVaders.ArtifactName))) if (n.IndexOf({cs(args.text)}, System.StringComparison.OrdinalIgnoreCase) >= 0) hits.Add("artifact " + n);
+foreach (var n in System.Enum.GetNames(typeof(StarVaders.DraftType))) if (n.IndexOf({cs(args.text)}, System.StringComparison.OrdinalIgnoreCase) >= 0) hits.Add("spell " + n);
 return hits.Count == 0 ? "none" : string.Join(", ", hits);
 """)
     if args.cmd == "offer":
@@ -113,9 +115,10 @@ if (c.CurrentPhase != StarVaders.Phase.Draft) return "not in the shop (" + c.Cur
 var choices = c.DraftPanel.DraftChoices;
 int s = {args.slot};
 if (s < 0 || s >= choices.Count) return "slot " + s + " outside the shop (" + choices.Count + ")";
-StarVaders.EntityName unit; StarVaders.ArtifactName artifact;
+StarVaders.EntityName unit; StarVaders.ArtifactName artifact; StarVaders.DraftType spell;
 if (System.Enum.TryParse({cs(args.name)}, true, out unit)) choices[s].DebugInitializeUnit(c, s, unit);
 else if (System.Enum.TryParse({cs(args.name)}, true, out artifact)) choices[s].Initialize(c, StarVaders.DraftType.Artifact, artifact, 0f, s, false, 0f, true);
+else if (System.Enum.TryParse({cs(args.name)}, true, out spell) && spell != StarVaders.DraftType.None) choices[s].Initialize(c, spell, StarVaders.ArtifactName.None, 0f, s, false, 0f, true);
 else return "no unit or artifact named " + {cs(args.name)} + " (try: stage.py find)";
 return "slot " + s + " now offers " + {cs(args.name)};
 """)
