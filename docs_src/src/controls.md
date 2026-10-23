@@ -65,6 +65,7 @@ Live in an encounter and on the screens over it (the game menu, the result scree
 | Key | Function |
 | --- | --- |
 | C | Coordinates of the focused cell, or the column of a header |
+| 1 to 6 | Read that column: its header, then its cells top first |
 | Ctrl+S | The game menu, on its stats overlay |
 
 ## The Board

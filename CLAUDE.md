@@ -280,7 +280,8 @@ sends `keybd_event`.
     A tip waiting for an action ("Press the LAUNCH button") is said once on arrival
     (`OnUpdate`). `ModelItemDict` and `ArtifactViewDict` are keyed by the boxed `ID`: artifacts
     are matched by `ArtifactID.Number` instead. Keys (`EncounterKeys`, Game category): C
-    coordinates, Ctrl+S the game menu's stats, Home/End row ends, PgUp/PgDn grid top and bottom; in the
+    coordinates, 1 to 6 that column whole (`HeaderText`, then each `CellText` top first; the game's
+    own 1 to 3, SelectCard, have no handler in this game), Ctrl+S the game menu's stats, Home/End row ends, PgUp/PgDn grid top and bottom; in the
     Run category (`UI/RunKeys`: live while `Encounter.Controller` exists, declared by the encounter and
     the overlays over it: pause, result, victory, constellations, tips, guide, settings, confirm)
     Ctrl+A attack ("0/100 attack"), Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice, Ctrl+O

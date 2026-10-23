@@ -18,7 +18,8 @@ namespace DiceVoders.Module.Encounter
     /// one thing and are silent where there is nothing to read: C the focused tile's coordinates (a
     /// header's column); in the Run category (<see cref="RunKeys"/>: over the game menu, the result
     /// screen and the other overlays too) Ctrl+A the attack against the target ("30/100 attack"), Ctrl+T
-    /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target, Ctrl+M Mult. On the grid and its header row, Home and End go
+    /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target, Ctrl+M Mult. 1 to
+    /// 6 read that column whole (its header, then its cells top first), from anywhere in the encounter. On the grid and its header row, Home and End go
     /// to the row's ends, Page Up and Page Down to the grid's top and bottom rows in the same column;
     /// elsewhere Home and End are the navigator's own. The game's own keys are its actions' keys, read
     /// from the game (<see cref="GameKeyBinding"/>, so its rebinding carries over), and run its own
@@ -33,6 +34,12 @@ namespace DiceVoders.Module.Encounter
         public static void Register()
         {
             Read("enc.coords", "Coordinates", KeyCode.C, Coords);
+            // 1 to 6: a column read whole, where the focus is: a die's face names the column it scores.
+            for (int n = 1; n <= 6; n++)
+            {
+                int x = n - 1;
+                Read("enc.column" + n, "Read column " + n, KeyCode.Alpha0 + n, () => ColumnLine(x));
+            }
             // The run's figures (RunKeys): live over the game menu and the other overlays too.
             Read("enc.attack", "Attack", KeyCode.A, EncounterScreen.Attack, ctrl: true, category: InputCategory.Run);
             Read("enc.turns", "Turns and hearts", KeyCode.T, () => Join(EncounterScreen.Turns(), EncounterScreen.Hearts()), ctrl: true, category: InputCategory.Run);
@@ -239,6 +246,16 @@ namespace DiceVoders.Module.Encounter
             var list = new List<string>();
             foreach (var p in parts) if (!string.IsNullOrEmpty(p)) list.Add(p);
             return list.Count > 0 ? string.Join(", ", list) : null;
+        }
+
+        // "column 4, Dice Power 2, Meteor, 0/10 XP, 4, 3, Migo, 10 strength, 4, 2, empty, 4, 1, no
+        // tile": the header, then the cells top first, each as focusing it reads it.
+        private static string ColumnLine(int x)
+        {
+            if (Encounter.Controller == null || x >= Encounter.Columns) return null;
+            var parts = new List<string> { EncounterScreen.HeaderText(x) };
+            for (int y = Encounter.Rows - 1; y >= 0; y--) parts.Add(EncounterScreen.CellText(x, y));
+            return Join(parts.ToArray());
         }
 
         private static string Coords()
