@@ -16,7 +16,7 @@ That list is the reference, and it is always current. [Controls](controls.md) is
 
 An encounter has two control groups; Tab moves between them.
 
-- The board. Its top row is the column headers: each column's Dice Power and the perk in its slot. Below it, the grid, top row first; a cell reads its coordinates, column then row, with row 1 at the bottom, and the unit on it. Under the grid is whatever the turn is at: your dice and Launch while you roll, the shop's choices and Proceed in the shop, the targets while the game asks you to pick one (period and comma step through them). Below that, the reroll, budge, and Mini-Dice buttons. Alt+D goes to the dice or the shop from anywhere on the board, and Alt+Backspace comes back.
+- The board. Its top row is the column headers: each column's Dice Power and the artifact in its slot. Below it, the grid, top row first; a cell reads its coordinates, column then row, with row 1 at the bottom, and the unit on it. Under the grid is whatever the turn is at: your dice and Launch while you roll, the shop's choices and Proceed in the shop, the targets while the game asks you to pick one (period and comma step through them). Below that, the reroll, budge, and Mini-Dice buttons. Alt+D goes to the dice or the shop from anywhere on the board, and Alt+Backspace comes back.
 - The status: the target, your attack against it, turns left, hearts, tokens, Mult, then your perks.
 
 Escape opens the game menu; Ctrl+S opens it on the game's stats overlay.
