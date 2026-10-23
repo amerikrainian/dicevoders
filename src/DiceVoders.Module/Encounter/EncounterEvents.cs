@@ -36,6 +36,7 @@ namespace DiceVoders.Module.Encounter
             var c = Encounter.Controller;
             if (c == null) { _controller = IntPtr.Zero; _last = null; _idle = 0; return; }
             if (c.Pointer != _controller) { _controller = c.Pointer; _last = null; _idle = 0; _column = -1; }
+            TurnBoard();
 
             var tip = Tips.Current;
             bool waiting = tip != null && Tips.WaitsForClick(tip);
@@ -47,6 +48,35 @@ namespace DiceVoders.Module.Encounter
             if (now == null) return;
             if (_last != null) Say(EncounterDiff.Lines(_last, now));
             _last = now;
+        }
+
+        // The scoring board under the grid (EncounterView.CurrentScoreBoard) sums the turn: its attack
+        // counting up, its Mult beside it ("X 2.0") once there is any, then the two combined
+        // (CombineAndScore: CurrentScore times GlobalMult, written to CenterTotalScoreText, then shown,
+        // then counted down into the score panel). Said once per scoring as the total shows, and only
+        // with a Mult: without one the total is the columns' attack, already said.
+        private static bool _turnSaid;
+
+        private static void TurnBoard()
+        {
+            if (Encounter.Phase != Phase.Scoring) { _turnSaid = false; return; }
+            if (_turnSaid) return;
+            try
+            {
+                var board = Encounter.View?.CurrentScoreBoard;
+                var total = board?.CenterTotalScoreText;
+                if (total == null || !total.gameObject.activeInHierarchy) return;
+                _turnSaid = true;
+                // Read whether shown or not: the attack and Mult are hidden as the total shows.
+                // "X 2.0" reads as "2", as the status's Mult.
+                string mult = Encounter.WholeMult(GameText.Of(board.CurrentMultText)?.TrimStart('X', 'x').Trim());
+                string attack = GameText.Of(board.CurrentAttackScoreText);
+                string sum = GameText.Of(total);
+                if (string.IsNullOrEmpty(mult) || attack == null || sum == null) return;
+                string label = GameLoc.Get("GlobalMult_Keyword") ?? "Mult";
+                Say(new List<string> { Core.Strings.Strings.EncTurnScore(attack, Core.Strings.Strings.EncFigure(label, mult), sum) });
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterEvents: reading the scoring board failed: " + e.Message); }
         }
 
         private static void Say(List<string> lines)
@@ -172,7 +202,7 @@ namespace DiceVoders.Module.Encounter
                     TargetName = Screens.EncounterScreen.Target(),
                     Act = GameText.Of(Encounter.View?.MapPanel?.actText),
                     Mult = model.GetBigDoubleValue(EncounterValue.GlobalMult).ToDouble(),
-                    MultText = Encounter.Big(EncounterValue.GlobalMult),
+                    MultText = Encounter.Mult(),
                     MultLabel = GameLoc.Get("GlobalMult_Keyword") ?? "Mult",
                     CloudLabel = GameLoc.Get("Cloudy_TooltipTitle") ?? "Cloudy",
                 };

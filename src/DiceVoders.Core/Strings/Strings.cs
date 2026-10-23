@@ -165,6 +165,9 @@ namespace DiceVoders.Core.Strings
             D("enc.column_attack", "column {0}: {1}"),
             // Several dice scoring one column together; {0} = how many, {1} = their name ("3 Mini-Dice").
             D("enc.dice_count", "{0} {1}"),
+            // The scoring board's sum once a turn's attack is multiplied; {0} = the attack, {1} = the
+            // Mult ("Mult 2.0"), {2} = what the turn adds.
+            D("enc.turn_score", "turn: {0}, {1}, {2}"),
             // The shop phase opening after a turn.
             D("enc.shop", "Shop"),
             // A tile the grid does not have yet (the shop's Build Tile adds them).
@@ -451,6 +454,7 @@ namespace DiceVoders.Core.Strings
         public static string EncRolled(string faces) => F("enc.rolled", faces);
         public static string EncColumnAttack(int column, string attack) => F("enc.column_attack", column, attack);
         public static string EncDiceCount(int count, string dice) => F("enc.dice_count", count, dice);
+        public static string EncTurnScore(string attack, string mult, string total) => F("enc.turn_score", attack, mult, total);
         public static string EncShop => Get("enc.shop");
         public static string EncNoTile => Get("enc.no_tile");
         public static string EncTarget => Get("enc.target");

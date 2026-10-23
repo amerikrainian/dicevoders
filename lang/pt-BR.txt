@@ -103,6 +103,7 @@ enc.cant_reroll=não dá para rolar de novo
 enc.rolled=saiu {0}
 enc.column_attack=coluna {0}: {1}
 enc.dice_count={0} {1}
+enc.turn_score=turno: {0}, {1}, {2}
 enc.shop=loja
 enc.no_tile=sem casa
 enc.target=alvo

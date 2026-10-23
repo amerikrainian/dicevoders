@@ -274,8 +274,17 @@ sends `keybd_event`.
     4: 80", then what it set off: "4D Printer level 2", "new tile at 5, 1", "Mult 2"; the gain is
     the column units' `AttackGainedThisTurn` summed, end less start; a base die's column that changed
     nothing is silent, a mini-die's always said, "Mini-Dice, column 5: 0", "3 Mini-Dice, column 1:
-    0"; the Mini-Dice count spent in the scoring unsaid). The shop's settled snapshot then says the
-    end of the turn, "300/500 attack", "Shop". The old one-line summary ("column 3: 20, column 5:
+    0"; the Mini-Dice count spent in the scoring unsaid). Then the scoring board under the grid
+    (`EncounterView.CurrentScoreBoard`, `StellarVisScoreBoard`: the turn's attack counting up, "X 2.0"
+    beside it once there is Mult, then `CombineAndScore` writes CurrentScore times GlobalMult to
+    `CenterTotalScoreText` and shows it), polled each frame of the scoring and said as the total
+    shows, only with a Mult: "turn: 210, Mult 2.5, 525". The shop's settled snapshot then says the
+    end of the turn, "1,220/500 attack", "Shop". Mult reads as the board prints it
+    (`BigNumber.FormatBigDouble(value, "F1", null)`, its zero fraction dropped: `Encounter.Mult`,
+    `WholeMult`): `BigDouble.ToString()` rounds to a whole number, so 2.5 read "3". No barks: the
+    typing sound after a score is the score panel's flip digits (`ScorePanel.AnimateText`,
+    `SoundName.P_Typing`, its one caller); the floating popups (`FloatingUpText` Level Up/attack up,
+    `FloatingScoreText`, `FloatingIcon`) are covered by the steps; `P_ChaosDialogue` is never played. The old one-line summary ("column 3: 20, column 5:
     10, 30/100 attack", `AttackGainedLastTurn` once the shop opens) stays for a turn no step said.
     The result screen settles too: the last turn's total is said before it. Also said: target
     reached, a heart lost, "shop", a new turn ("3 Turns, rolled 2, 4, 6"), a reroll; and every other

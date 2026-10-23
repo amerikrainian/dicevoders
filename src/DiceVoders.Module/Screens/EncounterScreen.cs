@@ -701,7 +701,7 @@ namespace DiceVoders.Module.Screens
 
         public static string Hearts() => Figure(Strings.EncHearts, EncounterValue.Hearts);
 
-        public static string Mult() => Strings.EncFigure(GameLoc.Get("GlobalMult_Keyword") ?? "Mult", EncounterState.Big(EncounterValue.GlobalMult));
+        public static string Mult() => Strings.EncFigure(GameLoc.Get("GlobalMult_Keyword") ?? "Mult", EncounterState.Mult());
 
         /// <summary>The tokens, in the game's words: Budge, Chrono, Swap, Mini-Dice, the shop's Cash.</summary>
         public static List<KeyValuePair<string, Func<string>>> TokenLines() => new List<KeyValuePair<string, Func<string>>>

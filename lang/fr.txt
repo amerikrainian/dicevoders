@@ -103,6 +103,7 @@ enc.cant_reroll=impossible de relancer
 enc.rolled=obtenu {0}
 enc.column_attack=colonne {0} : {1}
 enc.dice_count={0} {1}
+enc.turn_score=tour : {0}, {1}, {2}
 enc.shop=boutique
 enc.no_tile=pas de case
 enc.target=cible

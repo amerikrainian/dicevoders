@@ -105,6 +105,7 @@ enc.cant_reroll=can't reroll
 enc.rolled=rolled {0}
 enc.column_attack=column {0}: {1}
 enc.dice_count={0} {1}
+enc.turn_score=turn: {0}, {1}, {2}
 enc.shop=Shop
 enc.no_tile=no tile
 enc.target=target

@@ -103,6 +103,7 @@ enc.cant_reroll=振り直しできません
 enc.rolled=出目 {0}
 enc.column_attack={0}列: {1}
 enc.dice_count={0} {1}
+enc.turn_score=ターン: {0}、{1}、{2}
 enc.shop=ショップ
 enc.no_tile=マスなし
 enc.target=対象

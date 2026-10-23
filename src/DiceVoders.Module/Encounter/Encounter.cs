@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using BreakInfinity;
 using StarVaders;
 using DiceVoders.Core;
 using DiceVoders.Module.Interop;
@@ -85,6 +87,21 @@ namespace DiceVoders.Module.Encounter
             try { return model.GetBigDoubleValue(value).ToString(); }
             catch (Exception e) { CoreLog.Warning("Encounter: reading " + value + " failed: " + e.Message); return null; }
         }
+
+        /// <summary>Mult as the scoring board prints it (<c>FormatBigDouble</c> with "F1": "2.5", where
+        /// <see cref="Big"/> rounds to "3"), its fraction left out when zero: "2".</summary>
+        public static string Mult()
+        {
+            var model = Model;
+            if (model == null) return null;
+            try { return WholeMult(BigDouble.BigNumber.FormatBigDouble(model.GetBigDoubleValue(EncounterValue.GlobalMult), "F1", null)); }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading Mult failed: " + e.Message); return null; }
+        }
+
+        /// <summary>A printed Mult without a zero fraction: "2.0" reads "2", "2.50" "2.5", "1,000.0"
+        /// "1,000" (the comma is the game's thousands separator).</summary>
+        public static string WholeMult(string mult) => mult == null ? null
+            : Regex.Replace(mult, @"^([\d,]+)(?:(\.\d*?)0+)$", m => m.Groups[2].Value.Length > 1 ? m.Groups[1].Value + m.Groups[2].Value : m.Groups[1].Value);
 
         // ---- the board ----
 

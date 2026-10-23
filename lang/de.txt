@@ -103,6 +103,7 @@ enc.cant_reroll=kann nicht neu würfeln
 enc.rolled=gewürfelt {0}
 enc.column_attack=Spalte {0}: {1}
 enc.dice_count={0} {1}
+enc.turn_score=Zug: {0}, {1}, {2}
 enc.shop=Laden
 enc.no_tile=kein Feld
 enc.target=Ziel
