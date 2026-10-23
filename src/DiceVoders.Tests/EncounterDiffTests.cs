@@ -53,6 +53,18 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void A_pilot_s_die_joins_the_roll_and_is_said_when_it_changes()
+        {
+            var draft = Snap("Draft", turns: 3);
+            var turn = Snap("Player", turns: 3, dice: new[] { 3, 3, 5 });
+            turn.PilotDie = 3;
+            Assert.Equal(new[] { "3 Turns, rolled 3, 3, 5, pilot die 3" }, EncounterDiff.Lines(draft, turn));
+            var budged = Snap("Player", turns: 3, dice: new[] { 3, 3, 5 });
+            budged.PilotDie = 4;
+            Assert.Equal(new[] { "pilot die 4" }, EncounterDiff.Lines(turn, budged));
+        }
+
+        [Fact]
         public void A_reroll_in_the_turn_says_the_new_faces()
         {
             Assert.Equal(new[] { "rolled 1, 5, 6" },

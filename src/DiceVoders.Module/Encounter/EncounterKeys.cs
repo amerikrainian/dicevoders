@@ -202,6 +202,8 @@ namespace DiceVoders.Module.Encounter
         {
             var parts = new List<string>();
             foreach (var die in Encounter.Dice()) parts.Add(EncounterScreen.DieText(die));
+            var pilotDie = Encounter.PilotDie();
+            if (pilotDie != null) parts.Add(EncounterScreen.DieText(pilotDie));
             return Join(parts.ToArray());
         }
 

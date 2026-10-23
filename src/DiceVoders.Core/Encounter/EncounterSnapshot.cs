@@ -28,6 +28,8 @@ namespace DiceVoders.Core.Encounter
         public List<Figure> Tokens = new List<Figure>();
         /// <summary>The base dice faces in the tray's order; 0 for one still rolling.</summary>
         public List<int> Dice = new List<int>();
+        /// <summary>A pilot's own die (Kaia's, on the pilot panel), its face; 0 for none or rolling.</summary>
+        public int PilotDie;
         /// <summary>The attack each column gained this turn, as printed ("0" for none), left to right.</summary>
         public List<string> ColumnAttack = new List<string>();
         public List<UnitSnap> Units = new List<UnitSnap>();

@@ -355,6 +355,12 @@ sends `keybd_event`.
     leads the readout as "target" does, "blocked, column 4, Dice Power 1, 4D Printer, ..." (status
     artifacts, cells alike), and is an event, "4D Printer: blocked", "Locked Slot: blocked lost"
     (Xenn re-picks as the turn ends, before "Shop"). Seen live with Xenn staged as act 2's pilot.
+  - A pilot's own die (Kaia's: its face is the trapped column; the game's "Some pilots will use DICE
+    against you!") is drawn on the pilot panel (`PilotPanel/AbilityPanel/DangerDice`, `IsDangerDice`),
+    not in the tray: `Encounter.PilotDie`, the dice row's last die ("4, pilot die, cracked"), Budge's
+    target as the tray's are, Ctrl+D, the roll ("rolled 3, 3, 5, pilot die 3"; "pilot die 4" when it
+    changes in the turn). A column with `GridColumn.TrapObject` shown leads with "trapped" (Kaia's
+    "When trapped column is scored..."). Seen live with Kaia, the trap following a budged die.
   - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
     slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
     Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details

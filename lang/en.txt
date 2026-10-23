@@ -117,6 +117,7 @@ enc.dir_up_right=up-right
 enc.dir_down_left=down-left
 enc.dir_down_right=down-right
 enc.blocked=blocked
+enc.trapped=trapped
 enc.shop=Shop
 enc.no_tile=no tile
 enc.target=target

@@ -115,6 +115,7 @@ enc.dir_up_right=右上
 enc.dir_down_left=左下
 enc.dir_down_right=右下
 enc.blocked=被封锁
+enc.trapped=陷阱
 enc.shop=商店
 enc.no_tile=无格子
 enc.target=目标

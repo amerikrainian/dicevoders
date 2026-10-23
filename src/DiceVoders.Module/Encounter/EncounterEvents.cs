@@ -226,6 +226,8 @@ namespace DiceVoders.Module.Encounter
                     CloudLabel = GameLoc.Get("Cloudy_TooltipTitle") ?? "Cloudy",
                 };
                 foreach (var die in Encounter.Dice()) s.Dice.Add(die.isRolling ? 0 : die.Value);
+                var pilotDie = Encounter.PilotDie();
+                if (pilotDie != null && !pilotDie.isRolling) s.PilotDie = pilotDie.Value;
                 ColumnAttack(model, s.ColumnAttack);
                 Tokens(s.Tokens);
                 Units(model, s.Units);

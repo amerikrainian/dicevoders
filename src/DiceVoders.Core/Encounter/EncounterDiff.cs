@@ -89,6 +89,8 @@ namespace DiceVoders.Core.Encounter
                     lines.Add(string.IsNullOrEmpty(now.TurnsText) ? Rolled(now) : now.TurnsText + ", " + Rolled(now));
                 else if (!SameDice(prev, now))
                     lines.Add(Rolled(now));
+                else if (now.PilotDie != prev.PilotDie && now.PilotDie > 0)
+                    lines.Add(S.EncFigure(S.EncPilotDie, now.PilotDie.ToString()));
             }
             // Turns left change with the phase as a matter of course (the new turn's line says them):
             // within a phase, they are news (an extra turn, a turn taken away).
@@ -227,7 +229,13 @@ namespace DiceVoders.Core.Encounter
             return true;
         }
 
-        private static string Rolled(EncounterSnapshot s) => S.EncRolled(string.Join(", ", s.Dice));
+        // "rolled 3, 3, 5", a pilot's die after: "rolled 3, 3, 5, pilot die 3".
+        private static string Rolled(EncounterSnapshot s)
+        {
+            string faces = string.Join(", ", s.Dice);
+            if (s.PilotDie > 0) faces += ", " + S.EncFigure(S.EncPilotDie, s.PilotDie.ToString());
+            return S.EncRolled(faces);
+        }
 
         // The faces as a set: the tray re-sorts its dice a moment after a budge, which is no roll.
         private static bool SameDice(EncounterSnapshot a, EncounterSnapshot b)

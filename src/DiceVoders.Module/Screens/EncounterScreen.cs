@@ -115,7 +115,8 @@ namespace DiceVoders.Module.Screens
             int instance = int.Parse(id.Substring("enc:die:".Length));
             foreach (var die in EncounterState.Dice())
                 if (die.GetInstanceID() == instance) return die;
-            return null;
+            var pilotDie = EncounterState.PilotDie();
+            return pilotDie != null && pilotDie.GetInstanceID() == instance ? pilotDie : null;
         }
 
         private static string FocusedKey() =>
@@ -252,6 +253,9 @@ namespace DiceVoders.Module.Screens
             b.StartRow(BoardStop, strictColumns: true);
             for (int i = 0; i < dice.Count; i++)
                 b.AddItem(DieId(dice[i]), Die(dice[i], i == 0));
+            // A pilot's die (drawn on the pilot panel; Budge takes it as it takes the tray's).
+            var pilotDie = EncounterState.PilotDie();
+            if (pilotDie != null) b.AddItem(DieId(pilotDie), Die(pilotDie, dice.Count == 0));
             if (launch != null)
                 b.AddItem(ControlId.Structural("enc:launch"), StripButton(launch, () => ViewNodes.Label(launch) ?? GameLoc.Get("Launch_Misc")));
             b.EndRow();
@@ -317,8 +321,9 @@ namespace DiceVoders.Module.Screens
             var parts = new List<string>();
             // A target: the game's mark for what placing does ("Replace", "Level Up!"), else "target".
             if (EncounterState.SlotTarget(x) != null) parts.Add(EncounterState.SlotMark(x) ?? Strings.EncTarget);
-            // Blocked leads, as "target" does: what the column's artifact will not do this turn.
+            // Blocked and trapped lead, as "target" does: what the column will do differently.
             if (EncounterState.Blocked(EncounterState.Artifact(x))) parts.Add(Strings.EncBlocked);
+            if (EncounterState.Trapped(x)) parts.Add(Strings.EncTrapped);
             parts.Add(Strings.EncColumn(x + 1));
             int power = EncounterState.DicePower(x);
             if (power > 0) parts.Add(Strings.EncFigure(GameLoc.Get("DicePower_Misc") ?? "Dice Power", power.ToString()));

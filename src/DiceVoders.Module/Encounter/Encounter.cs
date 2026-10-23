@@ -377,6 +377,29 @@ namespace DiceVoders.Module.Encounter
         // ---- the dice ----
 
         /// <summary>The base dice in play, in the tray's drawn order.</summary>
+        /// <summary>A pilot's own die (Kaia's: its face is the trapped column), drawn on the pilot
+        /// panel, not in the tray (<c>PilotPanel/AbilityPanel/DangerDice</c>, <see cref="StarVaders.Dice.IsDangerDice"/>);
+        /// null when the fight has none.</summary>
+        public static Dice PilotDie()
+        {
+            var panel = Controller?.PilotPanel;
+            if (panel == null || !panel.gameObject.activeInHierarchy) return null;
+            try
+            {
+                foreach (var die in panel.GetComponentsInChildren<Dice>(false))
+                    if (die.IsDangerDice) return die;
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading the pilot's die failed: " + e.Message); }
+            return null;
+        }
+
+        /// <summary>Whether the column shows a trap (Kaia's Booby Trap, <see cref="GridColumn.TrapObject"/>).</summary>
+        public static bool Trapped(int x)
+        {
+            try { var trap = Column(x)?.TrapObject; return trap != null && trap.activeInHierarchy; }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading column " + (x + 1) + "'s trap failed: " + e.Message); return false; }
+        }
+
         public static List<Dice> Dice()
         {
             var dice = new List<Dice>();

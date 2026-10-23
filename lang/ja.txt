@@ -115,6 +115,7 @@ enc.dir_up_right=右上
 enc.dir_down_left=左下
 enc.dir_down_right=右下
 enc.blocked=ブロック中
+enc.trapped=罠
 enc.shop=ショップ
 enc.no_tile=マスなし
 enc.target=対象
