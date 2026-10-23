@@ -234,6 +234,13 @@ namespace DiceVoders.Module.Screens
             _selecting = selecting;
             if (EncounterEvents.Settled || selecting) _phase = phase;
             // Queued: the game caused it, and the lines saying so (the scoring, "Shop") come first.
+            // Focus already there has landed (MoveTo refuses a move to where it is): left pending, the
+            // landing would pull the focus back the moment it moved away.
+            if (_pendingLanding != null && Equals(FocusedKey(), _pendingLanding.StructuralKey))
+            {
+                if (_pendingSpeak) Navigation.AnnounceCurrent();
+                _pendingLanding = null;
+            }
             if (_pendingLanding != null && Navigation.Active?.MoveTo(_pendingLanding, _pendingSpeak, interrupt: false) == true) _pendingLanding = null;
         }
 
