@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DiceVoders.Core;
+using DiceVoders.Core.Graph;
 using DiceVoders.Core.Input;
 using DiceVoders.Core.Strings;
 using DiceVoders.Core.UI;
@@ -19,7 +20,8 @@ namespace DiceVoders.Module.Encounter
     /// header's column); in the Run category (<see cref="RunKeys"/>: over the game menu, the result
     /// screen and the other overlays too) Ctrl+A the attack against the target ("30/100 attack"), Ctrl+T
     /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target, Ctrl+M Mult. 1 to
-    /// 6 read that column whole (its header, then its cells top first), from anywhere in the encounter. On the grid and its header row, Home and End go
+    /// 6 read that column whole (its header, then its cells top first), from anywhere in the encounter;
+    /// Shift with them goes there (the same row from a cell, else the header). On the grid and its header row, Home and End go
     /// to the row's ends, Page Up and Page Down to the grid's top and bottom rows in the same column;
     /// elsewhere Home and End are the navigator's own. The game's own keys are its actions' keys, read
     /// from the game (<see cref="GameKeyBinding"/>, so its rebinding carries over), and run its own
@@ -39,6 +41,8 @@ namespace DiceVoders.Module.Encounter
             {
                 int x = n - 1;
                 Read("enc.column" + n, "Read column " + n, KeyCode.Alpha0 + n, () => ColumnLine(x));
+                InputManager.Register("enc.go_column" + n, "Go to column " + n, InputCategory.Game, () => GoToColumn(x))
+                    .AddBinding(new KeyboardBinding(KeyCode.Alpha0 + n, shift: true));
             }
             // The run's figures (RunKeys): live over the game menu and the other overlays too.
             Read("enc.attack", "Attack", KeyCode.A, EncounterScreen.Attack, ctrl: true, category: InputCategory.Run);
@@ -246,6 +250,30 @@ namespace DiceVoders.Module.Encounter
             var list = new List<string>();
             foreach (var p in parts) if (!string.IsNullOrEmpty(p)) list.Add(p);
             return list.Count > 0 ? string.Join(", ", list) : null;
+        }
+
+        // ---- jumps ----
+
+        private static ControlId _back;
+
+        /// <summary>Move the focus to the node, spoken as a move, remembering where it was; on the
+        /// node already, it is read again.</summary>
+        private static void JumpTo(ControlId id)
+        {
+            var nav = Navigation.Active as GraphNavigator;
+            var from = nav?.FocusedNode?.Id;
+            if (id == null || nav == null) return;
+            // Already there: read again, interrupting, as a move would (AnnounceCurrent queues).
+            if (Equals(from, id)) { Speech.Say(GraphAnnouncer.ComposeFull(nav.FocusedNode), interrupt: true); return; }
+            if (nav.MoveTo(id)) _back = from;
+        }
+
+        // Shift+1 to 6: that column, on the same row from a cell, else its header.
+        private static void GoToColumn(int x)
+        {
+            if (Encounter.Controller == null || x >= Encounter.Columns) return;
+            var tile = EncounterScreen.FocusedTile();
+            JumpTo(tile.HasValue ? EncounterScreen.TileId(x, tile.Value.Y) : EncounterScreen.ColumnId(x));
         }
 
         // "column 4, Dice Power 2, Meteor, 0/10 XP, 4, 3, Migo, 10 strength, 4, 2, empty, 4, 1, no

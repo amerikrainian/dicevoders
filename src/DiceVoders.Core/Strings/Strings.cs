@@ -266,6 +266,12 @@ namespace DiceVoders.Core.Strings
             D("bind.enc.column4", "Read column 4"),
             D("bind.enc.column5", "Read column 5"),
             D("bind.enc.column6", "Read column 6"),
+            D("bind.enc.go_column1", "Go to column 1"),
+            D("bind.enc.go_column2", "Go to column 2"),
+            D("bind.enc.go_column3", "Go to column 3"),
+            D("bind.enc.go_column4", "Go to column 4"),
+            D("bind.enc.go_column5", "Go to column 5"),
+            D("bind.enc.go_column6", "Go to column 6"),
 
             D("screen.mod_menu", "DiceVoders"),
             D("mod.settings", "Settings"),

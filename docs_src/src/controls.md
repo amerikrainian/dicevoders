@@ -75,6 +75,7 @@ Live in an encounter and on the screens over it (the game menu, the result scree
 | Arrows | Move one cell |
 | Home / End | First / last column of the row |
 | Page Up / Page Down | Top / bottom row of the column |
+| Shift+1 to 6 | Go to that column: the same row from a cell, else its header |
 | Enter | While choosing a target, choose it; in the shop, buy |
 | Backspace | Details: the unit's or perk's tooltip and keywords |
 | Escape | The game menu; while choosing a target, cancel |
