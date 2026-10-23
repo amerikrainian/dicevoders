@@ -398,6 +398,14 @@ sends `keybd_event`.
     refills it: the snapshot's `LastOffer` makes it "Shop: ...", and focus that fell off a choice as it
     emptied returns to it (not one left on purpose). Q holds the narration (`EncounterEvents.Hold`)
     while it says the undo itself.
+  - A new encounter met mid-turn (a run begun, Rewind Turn, Resume Game) says where it stands as its
+    first settled frame is taken, "3 Turns, rolled 3, 6, 6" (`EncounterDiff.TurnLine`), and its turn
+    lands on the first die as a new turn's does (the screen notices the controller changing). Seen
+    live: Rewind Turn, Save and Exit then Resume Game, Options (its Sandbox tab holds "Disable
+    Constellations System"), the Strategy Guide from the game menu, the skip simulation ("Mini-Dice
+    3", "Shop rarity, +25 %", then the success screen), Game Over ("PILOTS DEFEATED : 0", Exit), the
+    Overseer's level-up ("Choose One" of the perks to level, Backspace each one's next level), the
+    hub's challenges (selecting one unselects the chapter).
   - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
     slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
     Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details

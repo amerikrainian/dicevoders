@@ -65,6 +65,14 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void An_encounter_met_mid_turn_says_the_turn()
+        {
+            Assert.Equal("3 Turns, rolled 3, 6, 6", EncounterDiff.TurnLine(Snap("Player", turns: 3, dice: new[] { 3, 6, 6 })));
+            Assert.Null(EncounterDiff.TurnLine(Snap("Draft")));
+            Assert.Null(EncounterDiff.TurnLine(Snap("Player", dice: new[] { 3, 0, 6 })));
+        }
+
+        [Fact]
         public void A_reroll_in_the_turn_says_the_new_faces()
         {
             Assert.Equal(new[] { "rolled 1, 5, 6" },

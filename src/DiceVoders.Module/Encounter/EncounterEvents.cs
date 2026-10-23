@@ -55,6 +55,13 @@ namespace DiceVoders.Module.Encounter
             var now = Take();
             if (now == null) return;
             if (_last != null) Say(EncounterDiff.Lines(_last, now));
+            else
+            {
+                // A new encounter (a run begun, a turn rewound, a run loaded) met on the player's turn:
+                // where it stands. Otherwise its first change says it.
+                string turn = EncounterDiff.TurnLine(now);
+                if (turn != null) Speech.Say(turn);
+            }
             _last = now;
         }
 

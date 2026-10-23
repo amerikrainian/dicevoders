@@ -160,9 +160,14 @@ namespace DiceVoders.Module.Screens
             SayActionTip();
         }
 
+        private IntPtr _controller;
+
         private void Landings()
         {
             var phase = EncounterState.Phase;
+            // A new encounter under the same screen (a rewound turn): its turn lands as a new one.
+            var controller = EncounterState.Controller != null ? EncounterState.Controller.Pointer : IntPtr.Zero;
+            if (controller != _controller) { _controller = controller; _phase = Phase.None; }
             bool selecting = EncounterState.Selecting;
             if (selecting && !_selecting)
             {

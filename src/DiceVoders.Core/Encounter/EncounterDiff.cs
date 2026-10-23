@@ -142,6 +142,14 @@ namespace DiceVoders.Core.Encounter
             return rest;
         }
 
+        /// <summary>The turn as it stands ("3 Turns, rolled 3, 6, 6"), for an encounter met mid-turn (a
+        /// rewound turn, a loaded run): null outside the player's turn or while dice roll.</summary>
+        public static string TurnLine(EncounterSnapshot s)
+        {
+            if (s == null || s.Phase != PlayerPhase || s.DiceRolling || s.Dice.Count == 0) return null;
+            return string.IsNullOrEmpty(s.TurnsText) ? Rolled(s) : s.TurnsText + ", " + Rolled(s);
+        }
+
         private static string Place(int x, int y) => S.EncCoord(x + 1, y + 1);
 
         private static void Units(EncounterSnapshot prev, EncounterSnapshot now, List<string> lines)
