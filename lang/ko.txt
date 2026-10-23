@@ -38,6 +38,7 @@ nav.position={0}/{1}
 nav.no_tooltip=설명 없음
 nav.no_details=세부 정보 없음
 buffer.ui=컨트롤
+buffer.events=이벤트
 buffer.none=버퍼 내용 없음
 buffer.line={0}: {1}
 drag.no_target=끌 대상 없음

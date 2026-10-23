@@ -40,6 +40,7 @@ nav.position={0}/{1}
 nav.no_tooltip=no description
 nav.no_details=no details
 buffer.ui=control
+buffer.events=events
 buffer.none=no buffer lines
 buffer.line={0}: {1}
 drag.no_target=nothing to drag

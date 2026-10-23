@@ -38,6 +38,7 @@ nav.position={0}/{1}
 nav.no_tooltip=нет описания
 nav.no_details=нет подробностей
 buffer.ui=элемент управления
+buffer.events=события
 buffer.none=буферы пусты
 buffer.line={0}: {1}
 drag.no_target=нечего перетаскивать

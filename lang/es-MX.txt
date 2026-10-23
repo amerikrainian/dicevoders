@@ -38,6 +38,7 @@ nav.position={0}/{1}
 nav.no_tooltip=sin descripción
 nav.no_details=sin detalles
 buffer.ui=control
+buffer.events=eventos
 buffer.none=sin líneas de búfer
 buffer.line={0}: {1}
 drag.no_target=nada que arrastrar

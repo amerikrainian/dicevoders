@@ -38,6 +38,7 @@ nav.position={0}/{1}
 nav.no_tooltip=açıklama yok
 nav.no_details=ayrıntı yok
 buffer.ui=denetim
+buffer.events=olaylar
 buffer.none=arabellek satırı yok
 buffer.line={0}: {1}
 drag.no_target=sürüklenecek bir şey yok

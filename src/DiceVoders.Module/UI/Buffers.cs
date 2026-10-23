@@ -8,8 +8,9 @@ namespace DiceVoders.Module.UI
 {
     /// <summary>
     /// The mod's buffer roster and its review keys (Ctrl plus arrows), the Harkest Dungeon pattern:
-    /// review lists for the information a focus announcement leaves out. So far only the focused
-    /// control's own lines (its head, then one line per description part and detail). Every buffer
+    /// review lists for the information a focus announcement leaves out: the focused control's own
+    /// lines (its head, then one line per description part and detail); the encounter's events (every
+    /// line the narration said, uncapped, oldest first, opening on the newest). Every buffer
     /// reads live on each keypress; a focus change rewinds every buffer (one that follows its latest
     /// line to its end) and leaves review on whichever buffer is being read.
     /// </summary>
@@ -25,6 +26,9 @@ namespace DiceVoders.Module.UI
             Manager = new BufferManager();
             Controls = new BufferControls(Manager, (text, interrupt) => Core.Speech.Say(text, interrupt: interrupt));
             Manager.Add(new Buffer(BufferKeys.Ui, () => Strings.BufferUi)).SetSource(() => NodeLines.Lines(Navigation.FocusedNode));
+            // The encounter's narration, oldest first, opening on the newest; empty outside a run.
+            var events = Manager.Add(new Buffer(BufferKeys.Events, () => Strings.BufferEvents) { FollowLatest = true });
+            events.SetSource(() => Encounter.Encounter.Controller != null ? Encounter.EncounterEvents.Log : null);
         }
 
         /// <summary>Per frame: a focus change (by key or by the game moving things) rewinds every

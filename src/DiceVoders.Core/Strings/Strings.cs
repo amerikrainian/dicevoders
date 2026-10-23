@@ -73,6 +73,7 @@ namespace DiceVoders.Core.Strings
             // Buffer review (Ctrl plus arrows): the buffer names, the "name: line" readout on switching,
             // and the words when every buffer is empty.
             D("buffer.ui", "control"),
+            D("buffer.events", "events"),
             D("buffer.none", "no buffer lines"),
             // {0} = the buffer's name, {1} = its current line.
             D("buffer.line", "{0}: {1}"),
@@ -440,6 +441,7 @@ namespace DiceVoders.Core.Strings
         public static string NoTooltip => Get("nav.no_tooltip");
         public static string NoDetails => Get("nav.no_details");
         public static string BufferUi => Get("buffer.ui");
+        public static string BufferEvents => Get("buffer.events");
         public static string BufferNone => Get("buffer.none");
         public static string BufferLine(string name, string line) => F("buffer.line", name, line);
         public static string NoDragTarget => Get("drag.no_target");

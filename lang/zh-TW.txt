@@ -38,6 +38,7 @@ nav.position={0}/{1}
 nav.no_tooltip=無說明
 nav.no_details=無詳細資訊
 buffer.ui=控制項
+buffer.events=事件
 buffer.none=緩衝區無內容
 buffer.line={0}：{1}
 drag.no_target=無可拖曳項目

@@ -94,7 +94,11 @@ Actions" in the repo settings). The repo is https://github.com/amerikrainian/dic
   Prism, `HostPump`, `ModuleLoader`, dev server), **Core** (netstandard2.0, reloadable, engine-free,
   unit-tested: key graph, navigator, buffers, input manager, screens, strings), **Module** (net6.0,
   reloadable, engine-coupled: day-to-day work), **Tests**.
-- Buffers: only `ui` (the focused control's lines) so far; `BufferKeys` lists the keys.
+- Buffers (`Module/UI/Buffers`, cycling order; `BufferKeys` lists the keys; an empty one is skipped):
+  `ui` (the focused control's lines), `events` (`EncounterEvents.Log`: every line the narration
+  said, uncapped, oldest first, opening on the newest; cleared by a new controller: a run begun or
+  resumed, a turn rewound; empty outside a run). The manual does not list the buffers (starvaders'
+  does not either).
 - Not ported from starvaders: its game screens, the fight (Core `Fight/`, Module `Fight/`), the
   popup reader. The encounter is this game's own (`Module/Encounter/`, Core `Encounter/`).
 

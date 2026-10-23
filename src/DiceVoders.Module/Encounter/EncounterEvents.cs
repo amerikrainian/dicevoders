@@ -17,11 +17,16 @@ namespace DiceVoders.Module.Encounter
     /// task engine has been idle with no die rolling for <see cref="SettleFrames"/> frames. The
     /// scoring, which never settles, adds a snapshot as each column starts and ends (<see cref="ColumnSteps"/>).
     /// Ticked by the module before the screens, so an event is heard before the focus landing it
-    /// causes. A new controller (a new encounter) is a fresh baseline, said nothing of.
+    /// causes. A new controller (a new encounter) is a fresh baseline, said nothing of. Every line
+    /// said is appended to <see cref="Log"/> (the events buffer), cleared by a new controller (a run
+    /// begun or resumed, a turn rewound).
     /// </summary>
     internal static class EncounterEvents
     {
         private const int SettleFrames = 3;
+
+        /// <summary>Every line said in the current encounter, oldest first.</summary>
+        public static readonly List<string> Log = new List<string>();
 
         private static IntPtr _controller;
         private static EncounterSnapshot _last;
@@ -43,7 +48,7 @@ namespace DiceVoders.Module.Encounter
             if (_held > 0) { _held--; return; }
             var c = Encounter.Controller;
             if (c == null) { _controller = IntPtr.Zero; _last = null; _idle = 0; return; }
-            if (c.Pointer != _controller) { _controller = c.Pointer; _last = null; _idle = 0; _column = -1; }
+            if (c.Pointer != _controller) { _controller = c.Pointer; _last = null; _idle = 0; _column = -1; Log.Clear(); }
             TurnBoard();
 
             var tip = Tips.Current;
@@ -60,7 +65,7 @@ namespace DiceVoders.Module.Encounter
                 // A new encounter (a run begun, a turn rewound, a run loaded) met on the player's turn:
                 // where it stands. Otherwise its first change says it.
                 string turn = EncounterDiff.TurnLine(now);
-                if (turn != null) Speech.Say(turn);
+                if (turn != null) Say(new List<string> { turn });
             }
             _last = now;
         }
@@ -98,6 +103,7 @@ namespace DiceVoders.Module.Encounter
         {
             if (lines.Count > 0) LogRaw();
             foreach (var line in lines) Speech.Say(line);
+            Log.AddRange(lines);
         }
 
         // The turn's scoring is one busy stretch (the dice launched, each column scored in turn, the

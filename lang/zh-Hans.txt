@@ -38,6 +38,7 @@ nav.position={0}/{1}
 nav.no_tooltip=无描述
 nav.no_details=无详情
 buffer.ui=控件
+buffer.events=事件
 buffer.none=缓冲区为空
 buffer.line={0}：{1}
 drag.no_target=无可拖动项
