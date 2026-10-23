@@ -16,8 +16,9 @@ namespace DiceVoders.Module.Encounter
     /// <summary>
     /// The encounter's keys (the Game category, live while the encounter screen is). Read keys speak
     /// one thing and are silent where there is nothing to read: C the focused tile's coordinates (a
-    /// header's column), Ctrl+A the attack against the target ("30/100 attack"), Ctrl+T turns left and hearts, Ctrl+R
-    /// the tokens, Ctrl+D the dice, Ctrl+O the target, Ctrl+M Mult. On the grid and its header row, Home and End go
+    /// header's column); in the Run category (<see cref="RunKeys"/>: over the game menu, the result
+    /// screen and the other overlays too) Ctrl+A the attack against the target ("30/100 attack"), Ctrl+T
+    /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target, Ctrl+M Mult. On the grid and its header row, Home and End go
     /// to the row's ends, Page Up and Page Down to the grid's top and bottom rows in the same column;
     /// elsewhere Home and End are the navigator's own. The game's own keys are its actions' keys, read
     /// from the game (<see cref="GameKeyBinding"/>, so its rebinding carries over), and run its own
@@ -32,19 +33,20 @@ namespace DiceVoders.Module.Encounter
         public static void Register()
         {
             Read("enc.coords", "Coordinates", KeyCode.C, Coords);
-            Read("enc.attack", "Attack", KeyCode.A, EncounterScreen.Attack, ctrl: true);
-            Read("enc.turns", "Turns and hearts", KeyCode.T, () => Join(EncounterScreen.Turns(), EncounterScreen.Hearts()), ctrl: true);
+            // The run's figures (RunKeys): live over the game menu and the other overlays too.
+            Read("enc.attack", "Attack", KeyCode.A, EncounterScreen.Attack, ctrl: true, category: InputCategory.Run);
+            Read("enc.turns", "Turns and hearts", KeyCode.T, () => Join(EncounterScreen.Turns(), EncounterScreen.Hearts()), ctrl: true, category: InputCategory.Run);
             Read("enc.tokens", "Tokens", KeyCode.R, () =>
             {
                 var parts = new List<string>();
                 foreach (var token in EncounterScreen.TokenLines()) parts.Add(token.Value());
                 return Join(parts.ToArray());
-            }, ctrl: true);
-            Read("enc.dice", "Dice", KeyCode.D, DiceLine, ctrl: true);
-            Read("enc.target", "Target", KeyCode.O, EncounterScreen.TargetLine, ctrl: true);
+            }, ctrl: true, category: InputCategory.Run);
+            Read("enc.dice", "Dice", KeyCode.D, DiceLine, ctrl: true, category: InputCategory.Run);
+            Read("enc.target", "Target", KeyCode.O, EncounterScreen.TargetLine, ctrl: true, category: InputCategory.Run);
             InputManager.Register("enc.stats", "Stats", InputCategory.Game, Stats)
                 .AddBinding(new KeyboardBinding(KeyCode.S, ctrl: true));
-            Read("enc.mult", "Mult", KeyCode.M, EncounterScreen.Mult, ctrl: true);
+            Read("enc.mult", "Mult", KeyCode.M, EncounterScreen.Mult, ctrl: true, category: InputCategory.Run);
 
             InputManager.Register("enc.budge_up", "Budge up", InputCategory.Game, () => Budge(up: true))
                 .AddBinding(GameKey("Increment", KeyCode.S));
@@ -220,9 +222,10 @@ namespace DiceVoders.Module.Encounter
         }
 
         // A read key: speaks its line, interrupting; nothing when the line is null.
-        private static void Read(string key, string label, KeyCode code, Func<string> line, bool ctrl = false)
+        private static void Read(string key, string label, KeyCode code, Func<string> line, bool ctrl = false,
+            InputCategory category = InputCategory.Game)
         {
-            InputManager.Register(key, label, InputCategory.Game, () =>
+            InputManager.Register(key, label, category, () =>
             {
                 string text = null;
                 try { text = line(); }

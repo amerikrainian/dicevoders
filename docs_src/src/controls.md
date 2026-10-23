@@ -47,17 +47,24 @@ These are the game's own actions, so they follow its Key Bindings options. The d
 
 On the reroll, budge, and Mini-Dice buttons, S, A, and F act on the die or shop choice you were last on. A budge or freeze says the die after; one the game refuses says so.
 
-## The Encounter: Glances
+## In a Run
+
+Live in an encounter and on the screens over it (the game menu, the result screens, constellations, tips).
 
 | Key | Function |
 | --- | --- |
-| C | Coordinates of the focused cell, or the column of a header |
 | Ctrl+A | Attack against the target |
 | Ctrl+T | Turns left and hearts |
 | Ctrl+R | Tokens |
 | Ctrl+D | Dice |
 | Ctrl+O | Target |
 | Ctrl+M | Mult |
+
+## The Encounter: Glances
+
+| Key | Function |
+| --- | --- |
+| C | Coordinates of the focused cell, or the column of a header |
 | Ctrl+S | The game menu, on its stats overlay |
 
 ## The Board

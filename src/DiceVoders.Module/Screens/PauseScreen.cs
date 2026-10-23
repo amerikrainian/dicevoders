@@ -4,6 +4,7 @@ using StarVaders;
 using StarVaders.PauseMenu;
 using DiceVoders.Core;
 using DiceVoders.Core.Graph;
+using DiceVoders.Core.Input;
 using DiceVoders.Core.Strings;
 using DiceVoders.Core.UI;
 using DiceVoders.Module.Encounter;
@@ -27,6 +28,7 @@ namespace DiceVoders.Module.Screens
         public override string Key => "pause";
         public override int Layer => 33;
         public override bool Exclusive => true;
+        public override IReadOnlyList<InputCategory> InputCategories => RunKeys.Categories;
         public override bool AllowsTypeahead => false;
 
         private static PauseMenuController Menu()

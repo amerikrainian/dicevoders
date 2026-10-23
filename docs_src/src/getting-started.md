@@ -21,7 +21,7 @@ An encounter has two control groups; Tab moves between them.
 
 When you launch, the scoring is said column by column as the game plays it, with what each column set off, then the turn's total. Everything else the turn changed follows once the board settles.
 
-The glance keys (Ctrl+A attack, Ctrl+T turns and hearts, and the rest under [Controls](controls.md#the-encounter-glances)) read a figure without moving focus. Escape opens the game menu; Ctrl+S opens it on the game's stats overlay.
+The glance keys (Ctrl+A attack, Ctrl+T turns and hearts, and the rest under [Controls](controls.md#in-a-run)) read a figure without moving focus, over the game menu and the result screens too. Escape opens the game menu; Ctrl+S opens it on the game's stats overlay.
 
 ## The Mod Menu
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DiceVoders.Core;
 using DiceVoders.Core.Graph;
+using DiceVoders.Core.Input;
 using DiceVoders.Core.UI;
 using DiceVoders.Module.UI;
 using Screen = DiceVoders.Core.Screens.Screen;
@@ -21,6 +22,7 @@ namespace DiceVoders.Module.Screens
         public override string Key => "tip";
         public override int Layer => 40;
         public override bool Exclusive => true;
+        public override IReadOnlyList<InputCategory> InputCategories => RunKeys.Categories;
         public override bool AllowsTypeahead => false;
 
         private IntPtr _tip;

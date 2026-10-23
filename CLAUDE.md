@@ -271,8 +271,13 @@ sends `keybd_event`.
     A tip waiting for an action ("Press the LAUNCH button") is said once on arrival
     (`OnUpdate`). `ModelItemDict` and `ArtifactViewDict` are keyed by the boxed `ID`: artifacts
     are matched by `ArtifactID.Number` instead. Keys (`EncounterKeys`, Game category): C
-    coordinates, Ctrl+A attack ("0/100 attack"), Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice,
-    Ctrl+O target, Ctrl+M Mult, Ctrl+S the game menu's stats, Home/End row ends, PgUp/PgDn grid top and bottom. The game's encounter keys
+    coordinates, Ctrl+S the game menu's stats, Home/End row ends, PgUp/PgDn grid top and bottom; in the
+    Run category (`UI/RunKeys`: live while `Encounter.Controller` exists, declared by the encounter and
+    the overlays over it: pause, result, victory, constellations, tips, guide, settings, confirm)
+    Ctrl+A attack ("0/100 attack"), Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice, Ctrl+O
+    target, Ctrl+M Mult. `/input` fires an action whether live or not: check liveness with
+    `InputManager.IsLive` through `/eval` (by reflection: the module's assemblies are not referenced,
+    and each reload loads a generation; take the last). The game's encounter keys
     (defaults, `EncounterInputHandler`'s PlayerInput): W/Space Click, Q Cancel, E Proceed
     (launch, leave the shop), R Reroll (Chrono), A Decrement and S Increment (budge), F Freeze,
     T ShowGuide, D NavigateNext, 1-3 SelectCard, Tab UINavigation. Ours for S, A, F, R, E, Q

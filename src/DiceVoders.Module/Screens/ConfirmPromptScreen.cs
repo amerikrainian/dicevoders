@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using StarVaders;
 using DiceVoders.Core.Graph;
+using DiceVoders.Core.Input;
 using DiceVoders.Core.Strings;
 using DiceVoders.Core.UI;
 using DiceVoders.Module.Interop;
@@ -26,6 +27,7 @@ namespace DiceVoders.Module.Screens
         public override string Key => "confirm";
         public override int Layer => 37;
         public override bool Exclusive => true;
+        public override IReadOnlyList<InputCategory> InputCategories => RunKeys.Categories;
         public override bool AllowsTypeahead => false;
         public override object InitialFocusStop => "buttons";
 

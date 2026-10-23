@@ -273,6 +273,7 @@ namespace DiceVoders.Core.Strings
             D("mod.category.global", "Global"),
             D("mod.category.ui", "UI"),
             D("mod.category.game", "Game"),
+            D("mod.category.run", "Run"),
             D("bind.mod.menu", "Mod menu"),
             // The context-sensitive key help (F1): the keys that do something on this screen, on this
             // control. Enter on a row runs it.

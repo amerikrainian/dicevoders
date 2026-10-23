@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using StarVaders;
 using DiceVoders.Core.Graph;
+using DiceVoders.Core.Input;
 using DiceVoders.Core.Strings;
 using DiceVoders.Core.UI;
 using DiceVoders.Module.Interop;
@@ -34,6 +35,7 @@ namespace DiceVoders.Module.Screens
         }
         public override int Layer => 35;
         public override bool Exclusive => true;
+        public override IReadOnlyList<InputCategory> InputCategories => RunKeys.Categories;
         public override object InitialFocusStop => "tabs";
 
         private static SettingsSceneController Controller => GameScenes.Controller<SettingsSceneController>();

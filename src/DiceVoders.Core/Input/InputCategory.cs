@@ -14,7 +14,10 @@ namespace DiceVoders.Core.Input
         Global,
         /// <summary>Screen/menu navigation: live when the focused screen declares it.</summary>
         UI,
-        /// <summary>In-run gameplay keys (the battle/run readers), declared by the run screens.</summary>
+        /// <summary>The encounter's gameplay keys (the board, the dice, the shop), declared by the encounter screen.</summary>
         Game,
+        /// <summary>Keys that read the run itself (attack, turns and hearts, tokens...), live anywhere in a
+        /// run: declared by the encounter and the overlays above it while it is underneath.</summary>
+        Run,
     }
 }
