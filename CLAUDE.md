@@ -281,7 +281,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     A tip waiting for an action ("Press the LAUNCH button") is said once on arrival
     (`OnUpdate`). `ModelItemDict` and `ArtifactViewDict` are keyed by the boxed `ID`: artifacts
     are matched by `ArtifactID.Number` instead. Keys (`EncounterKeys`, Game category): C
-    coordinates, 1 to 6 that column whole (`HeaderText`, then each `CellText` top first; the game's
+    coordinates, 1 to 6 that column whole (`HeaderText`, then each `CellText` top first, both without
+    the column: "Dice Power 1, Meteor, 0/10 XP, 3, no tile, 2, Migo, 10 strength..."; the game's
     own 1 to 3, SelectCard, have no handler in this game), Shift+1 to 6 there (the same row from a
     cell, else the header; `EncounterKeys.JumpTo` remembers where it left for the jump back), period and comma the
     next and previous unit, or while `Selecting` target (headers then cells top first, wrapping;

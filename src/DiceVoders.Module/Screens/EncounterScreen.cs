@@ -529,7 +529,9 @@ namespace DiceVoders.Module.Screens
             }
         }
 
-        internal static string HeaderText(int x)
+        /// <summary>The header's line; without <paramref name="column"/> its "column 3" is left out
+        /// (1 to 6 read the column the key names).</summary>
+        internal static string HeaderText(int x, bool column = true)
         {
             var parts = new List<string>();
             // A target: the game's mark for what placing does ("Replace", "Level Up!"), else "target".
@@ -537,7 +539,7 @@ namespace DiceVoders.Module.Screens
             // Blocked and trapped lead, as "target" does: what the column will do differently.
             if (EncounterState.Blocked(EncounterState.Artifact(x))) parts.Add(Strings.EncBlocked);
             if (EncounterState.Trapped(x)) parts.Add(Strings.EncTrapped);
-            parts.Add(Strings.EncColumn(x + 1));
+            if (column) parts.Add(Strings.EncColumn(x + 1));
             int power = EncounterState.DicePower(x);
             if (power > 0) parts.Add(Strings.EncFigure(GameLoc.Get("DicePower_Misc") ?? "Dice Power", power.ToString()));
             if (EncounterState.Honey(x)) parts.Add(Strings.EncHoney);
@@ -567,9 +569,11 @@ namespace DiceVoders.Module.Screens
             };
         }
 
-        internal static string CellText(int x, int y)
+        /// <summary>The cell's line; without <paramref name="column"/> its place is the row alone.</summary>
+        internal static string CellText(int x, int y, bool column = true)
         {
-            string text = Strings.EncCoord(x + 1, y + 1) + ", " + CellContents(x, y);
+            string place = column ? Strings.EncCoord(x + 1, y + 1) : (y + 1).ToString();
+            string text = place + ", " + CellContents(x, y);
             var unit = EncounterState.At(x, y);
             // A unit the game blocks, or any tile under Tippy (nothing placed there will score).
             if (unit != null && unit.IsBlocked || EncounterState.Built(x, y) && EncounterState.TippyCovers(x)) text = Strings.EncBlocked + ", " + text;

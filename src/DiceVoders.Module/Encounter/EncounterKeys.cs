@@ -355,13 +355,14 @@ namespace DiceVoders.Module.Encounter
             JumpTo(to);
         }
 
-        // "column 4, Dice Power 2, Meteor, 0/10 XP, 4, 3, Migo, 10 strength, 4, 2, empty, 4, 1, no
-        // tile": the header, then the cells top first, each as focusing it reads it.
+        // "Dice Power 2, Meteor, 0/10 XP, 3, Migo, 10 strength, 2, empty, 1, no tile": the header,
+        // then the cells top first, each as focusing it reads it but for the column, which the key
+        // pressed names.
         private static string ColumnLine(int x)
         {
             if (Encounter.Controller == null || x >= Encounter.Columns) return null;
-            var parts = new List<string> { EncounterScreen.HeaderText(x) };
-            for (int y = Encounter.Rows - 1; y >= 0; y--) parts.Add(EncounterScreen.CellText(x, y));
+            var parts = new List<string> { EncounterScreen.HeaderText(x, column: false) };
+            for (int y = Encounter.Rows - 1; y >= 0; y--) parts.Add(EncounterScreen.CellText(x, y, column: false));
             return Join(parts.ToArray());
         }
 
