@@ -2,7 +2,14 @@
 
 Every key the mod binds, by group, as it comes. Keys are keyboard only. F1 shows the subset that does something where you are; that is usually what you want.
 
-The mod menu's All keys lists the same, by group. The mod's own keys cannot be changed yet; the encounter keys the game itself binds follow the game's Key Bindings options.
+## Changing keys
+
+The mod menu's All keys lists the mod's keys by group (Global, Navigation, Encounter, Run). Enter on an action opens its keys: Enter on a key replaces or removes it, Add key gives the action another, and Reset to default puts its keys back. A new key is the first one you press, with whatever Ctrl, Shift and Alt you hold; Escape cancels. A key another action of the same group already has is refused, and the capture waits for another. A key used in another group is taken, and you are told what else it does: where both groups are live, the deeper one wins (in an encounter, the encounter's keys over navigation's). Changes save at once. Reset all keys, at the end of All keys, puts every key back.
+
+Two exceptions:
+
+- The encounter keys the game itself binds (budge, freeze, reroll, proceed, cancel) follow the game's Key Bindings options, so they are changed there, and the list says so.
+- The mod menu, Enter, Escape, Up and Down always keep at least one key.
 
 ## Global
 

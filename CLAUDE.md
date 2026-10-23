@@ -113,7 +113,8 @@ is foreground); `KeyboardBinding` keeps its `KeyCode` identity on top; `FocusMod
 Input System keyboard and the EventSystem's navigation. Host F6 uses the same OS read. The dev
 driver's `/input` dispatches mod actions directly, so it does not exercise `OsKeys`: real keys need
 a scratch script that brings the game forward (`AttachThreadInput` + `SetForegroundWindow`) and
-sends `keybd_event`.
+sends `keybd_event` (the arrows need `KEYEVENTF_EXTENDEDKEY`, or the mod never sees them; leave a
+moment after a key that opens a screen, or the next is lost while it arrives).
 
 ## Screens and game access
 - `Module/Interop/GameScenes`: the live scene controllers and input handlers, rebuilt only on
@@ -518,7 +519,22 @@ sends `keybd_event`.
     action) are the encounter's to read.
   - `ConfirmPromptScreen` (`ConfirmPromptController`, layer 37): starvaders', compiled against this
     game's controller (focus start from `GetFirstActiveViewItemToStartAt`), not yet seen live.
-  - `ModMenuScreen`, `HelpScreen`, `KeyCaptureScreen`: the mod's own, unchanged.
+  - `ModMenuScreen` (Settings, All keys, Close), `HelpScreen`, `KeyCaptureScreen`: the mod's own;
+    All keys is starvaders' rebinding (below).
+
+## Rebinding the mod's keys
+Starvaders' (`Core/Input/KeyBindings`, tested): the registered bindings are the defaults (`Snapshot`
+after `RegisterInput`), the store's `key_bindings` string (`enc.coords=keyboard:C keyboard:F3;...`,
+one entry per action differing from its defaults, unknown actions kept) is `Load`ed over them, every
+change saves at once. Rebindable = every default binding's type has a deserializer (so the `game`
+`GameKeyBinding`s, the game's Options' keys: S A F R E Q, are not). Conflicts within a category or
+with Global are refused (`InputBinding.Combos`, a game key's current keys included: S is refused as
+Budge up); other categories only overlap and are named. `Protected` (ui.up/down/activate/back,
+mod.menu) keep one key. UI: the mod menu's All keys = the categories (Global, Navigation,
+Encounter, Run; `CategoryKeysScreen`), an action's keys (`ActionKeysScreen`), the capture
+(`BindKeyScreen`: `CapturesRawInput`, every key up, `OsKeys.FirstPressed` of a non-modifier with the
+held modifiers, bare Escape cancels, every key up again before closing). Verified with real keys:
+a capture, the refusal, the new key working, Reset all keys.
 
 ## Dev driver (Debug only; `DVO_NO_DEV=1` disables, `DVO_DEV_PORT` sets the port, default 8773)
 Guildrun's server unchanged: `/input`, `/nav`, `/gui`, `/speech`, `/log`, `/eval` (Roslyn, every

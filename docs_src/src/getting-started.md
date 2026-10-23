@@ -27,4 +27,4 @@ The glance keys (Ctrl+A attack, Ctrl+T turns and hearts, and the rest under [Con
 
 ## The Mod Menu
 
-Ctrl+Shift+M opens it. Settings has two switches: Speak list positions, and Keyboard navigation on at launch. All keys lists every key the mod binds, by group.
+Ctrl+Shift+M opens it. Settings has two switches: Speak list positions, and Keyboard navigation on at launch. All keys lists every key the mod binds, by group, and changes them; see [Controls](controls.md#changing-keys).
