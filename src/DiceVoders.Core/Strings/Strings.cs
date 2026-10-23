@@ -275,6 +275,8 @@ namespace DiceVoders.Core.Strings
             D("bind.enc.go_column6", "Go to column 6"),
             D("bind.enc.next", "Next unit or target"),
             D("bind.enc.prev", "Previous unit or target"),
+            D("bind.enc.strip", "Go to the dice or the shop"),
+            D("bind.enc.jump_back", "Jump back"),
 
             D("screen.mod_menu", "DiceVoders"),
             D("mod.settings", "Settings"),

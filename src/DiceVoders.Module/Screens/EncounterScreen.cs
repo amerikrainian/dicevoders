@@ -237,6 +237,31 @@ namespace DiceVoders.Module.Screens
             if (_pendingLanding != null && Navigation.Active?.MoveTo(_pendingLanding, _pendingSpeak, interrupt: false) == true) _pendingLanding = null;
         }
 
+        /// <summary>The strip's first item, under the grid: a pilot's reward screen's first, else the
+        /// first die (Launch with none), the shop's first choice (Proceed with none), the final boss's
+        /// first card; null when the strip holds nothing.</summary>
+        internal static ControlId StripFirst()
+        {
+            var reward = SpecialRewardStrip.Shown();
+            if (reward != null) return SpecialRewardStrip.FirstId(reward);
+            switch (EncounterState.Phase)
+            {
+                case Phase.Player:
+                    var dice = EncounterState.Dice();
+                    if (dice.Count > 0) return DieId(dice[0]);
+                    var pilotDie = EncounterState.PilotDie();
+                    if (pilotDie != null) return DieId(pilotDie);
+                    return EncounterState.LaunchButton() != null ? ControlId.Structural("enc:launch") : null;
+                case Phase.Draft:
+                    var choices = EncounterState.Choices();
+                    if (choices.Count > 0) return ChoiceId(choices[0]);
+                    return EncounterState.ShopButton("BG/ProceedButton") != null ? ControlId.Structural("enc:proceed") : null;
+                case Phase.FinalBossDraft:
+                    return EncounterState.StarDraft().Count > 0 ? StarDraftId(0) : null;
+            }
+            return null;
+        }
+
         // Whether the shop offers the choice with this focus key.
         private static bool ChoiceOffered(string key)
         {

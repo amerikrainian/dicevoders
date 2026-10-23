@@ -22,7 +22,9 @@ namespace DiceVoders.Module.Encounter
     /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target, Ctrl+M Mult. 1 to
     /// 6 read that column whole (its header, then its cells top first), from anywhere in the encounter;
     /// Shift with them goes there (the same row from a cell, else the header). Period and comma step
-    /// to the next and previous target while the game waits on one, else unit, in reading order. On the grid and its header row, Home and End go
+    /// to the next and previous target while the game waits on one, else unit, in reading order. Alt+D
+    /// goes to the strip under the grid (the dice, the shop, a pilot's rewards), Alt+Backspace back to
+    /// where the last of these jumps left from. On the grid and its header row, Home and End go
     /// to the row's ends, Page Up and Page Down to the grid's top and bottom rows in the same column;
     /// elsewhere Home and End are the navigator's own. The game's own keys are its actions' keys, read
     /// from the game (<see cref="GameKeyBinding"/>, so its rebinding carries over), and run its own
@@ -78,6 +80,12 @@ namespace DiceVoders.Module.Encounter
                 .AddBinding(new KeyboardBinding(KeyCode.Period)).Repeating();
             InputManager.Register("enc.prev", "Previous unit or target", InputCategory.Game, () => Step(-1))
                 .AddBinding(new KeyboardBinding(KeyCode.Comma)).Repeating();
+
+            // Alt+D: the dice, the shop or the rewards under the grid; Alt+Backspace: back where a jump left.
+            InputManager.Register("enc.strip", "Go to the dice or the shop", InputCategory.Game, () => JumpTo(EncounterScreen.StripFirst()))
+                .AddBinding(new KeyboardBinding(KeyCode.D, alt: true));
+            InputManager.Register("enc.jump_back", "Jump back", InputCategory.Game, JumpBack)
+                .AddBinding(new KeyboardBinding(KeyCode.Backspace, alt: true));
 
             InputManager.Register("enc.first_column", "First column", InputCategory.Game, () => Edge(UiActions.Home, (x, y) => (0, y)))
                 .AddBinding(new KeyboardBinding(KeyCode.Home));
@@ -273,6 +281,12 @@ namespace DiceVoders.Module.Encounter
             // Already there: read again, interrupting, as a move would (AnnounceCurrent queues).
             if (Equals(from, id)) { Speech.Say(GraphAnnouncer.ComposeFull(nav.FocusedNode), interrupt: true); return; }
             if (nav.MoveTo(id)) _back = from;
+        }
+
+        // Alt+Backspace: where the last jump left from (a jump itself, so pressed again it returns).
+        private static void JumpBack()
+        {
+            if (_back != null) JumpTo(_back);
         }
 
         // Shift+1 to 6: that column, on the same row from a cell, else its header.

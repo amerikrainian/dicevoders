@@ -77,6 +77,8 @@ Live in an encounter and on the screens over it (the game menu, the result scree
 | Page Up / Page Down | Top / bottom row of the column |
 | Shift+1 to 6 | Go to that column: the same row from a cell, else its header |
 | . / , | Next / previous unit; while choosing a target, next / previous target |
+| Alt+D | Go to the dice, the shop's choices, or the rewards, under the grid |
+| Alt+Backspace | Jump back to where the last jump left from |
 | Enter | While choosing a target, choose it; in the shop, buy |
 | Backspace | Details: the unit's or perk's tooltip and keywords |
 | Escape | The game menu; while choosing a target, cancel |
