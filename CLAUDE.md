@@ -420,6 +420,15 @@ sends `keybd_event`.
     Seen live: the success screen after Skip remaining turns (phase `Simulation`). The panel sits
     under a view item, so `ViewNodes.Prose` skips only texts of items inside its scope. Not
     exercised: Proceed, the other three screens, `SimScreen` (the skipped turns played out).
+  - `VictoryScreen` (`EncounterController.VictoryPanel`, layer 31, exclusive; up while `isShowing`):
+    the run won, a dialog named by the shown ending's title (`NormalEndingObject`/`TrueEndingObject`/
+    `UltimateEndingObject` are the title's variants: "True End...?"), one stop: "Pilots Defeated: Bud,
+    Tippy" (drawn only as portraits: `EncounterModel.DefeatedPilots`, left out when none), "Best Turn:
+    40, Mult 1" (`BestTurnScoreText`, `BestTurnMultText` "X 1"), then Endless Mode, Exit to Menu, Hide.
+    Reached through the result panel's `VictoryScreen` ("VICTORY!", its Proceed =
+    `OnPressShowVictoryPanel`, or E), which also brings it back after Hide; `ResultScreen` reads it.
+    Seen by `ShowPanel()` over the final boss (it writes only `HasWonEndless`, past act 8); Exit to Menu
+    records the win in the save (victory stats): never pressed on a staged panel.
   - `ConstellationScreen` (`EncounterController.ConstellationController`, layer 32, exclusive; up while
     its object is active; holds arrival until its `Canvas` is opaque, 3 s at most): "Constellations"
     (`Constellations_Misc`), the run's random modifiers, shown at a run's start once unlocked and from

@@ -12,7 +12,7 @@ namespace DiceVoders.Module.Screens
     /// <summary>
     /// The encounter's result (<see cref="ResultPanel"/>), over the board: whichever of its end
     /// screens shows, a dialog named by its Title ("INVASION SUCCESSFUL", "SIMULATION FAILED",
-    /// "GAME OVER", the one-turn KO's "SUCCESS!"), one stop: its other lines ("NEXT TARGET : 500",
+    /// "GAME OVER", the one-turn KO's and the run won's "SUCCESS!"), one stop: its other lines ("NEXT TARGET : 500",
     /// "LOSE 1 HEART : EXTRA TURN"), then its buttons, by caption or else the game's "Proceed".
     /// Focus lands on the first line. The panel's simulation (<see cref="ResultPanel.SimScreen"/>,
     /// the skipped turns played out) is no dialog: nothing to choose there.
@@ -29,7 +29,9 @@ namespace DiceVoders.Module.Screens
             var panel = Encounter.Encounter.Controller?.ResultPanel;
             // Dismissed, the panel slides away with its end screen still switched on: its own flag says.
             if (panel == null || !panel.IsActive || !panel.gameObject.activeInHierarchy) return null;
-            foreach (var screen in new[] { panel.GreenScreen, panel.RedScreen, panel.OTKScreen, panel.GameOverScreen })
+            // VictoryScreen: the run won ("SUCCESS!"), whose Proceed opens the victory panel
+            // (OnPressShowVictoryPanel) and opens it again after its Hide.
+            foreach (var screen in new[] { panel.GreenScreen, panel.RedScreen, panel.OTKScreen, panel.GameOverScreen, panel.VictoryScreen })
                 if (screen != null && screen.activeInHierarchy) return screen;
             return null;
         }
