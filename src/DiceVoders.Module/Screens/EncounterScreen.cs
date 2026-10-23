@@ -360,7 +360,7 @@ namespace DiceVoders.Module.Screens
 
         // The game's buttons under the dice and the shop (the abilities knob), a row below theirs: the
         // Reroll button ("Reroll Button, Chrono 2": R's reroll), the Budge button ("Budge Button,
-        // Budge 6" as text; "undo", a button, while a budge can be undone, Enter then Q's undo;
+        // Budge 6, button, disabled"; "undo" while a budge can be undone, Enter then Q's undo;
         // budging is A and S), the
         // Mini-Dice ("Mini-Dice, 5"). Each with its tooltip on Backspace. Keys that act on a die or an
         // item (A, S, F) act on the one last focused.
@@ -374,12 +374,11 @@ namespace DiceVoders.Module.Screens
             b.StartRow(BoardStop);
             if (reroll != null)
                 b.AddItem(ControlId.Structural("enc:ability:reroll"), Ability(reroll.gameObject, reroll.Tooltip, () => Chrono(), EncounterKeys.Reroll));
-            // A button only while there is a budge to undo (the game's click then undoes it; with
-            // nothing to undo it only shows the dice's arrows to a mouse): otherwise the Budge left.
+            // Disabled while there is no budge to undo (the game's click then only shows the dice's
+            // arrows to a mouse); the Budge left read then, "undo" while it does something.
             if (budge != null)
-                b.AddItem(ControlId.Structural("enc:ability:budge"), CanUndoBudge()
-                    ? Ability(budge.gameObject, budge.Tooltip, () => Strings.EncUndo, EncounterKeys.Cancel)
-                    : Ability(budge.gameObject, budge.Tooltip, () => Budge(), null));
+                b.AddItem(ControlId.Structural("enc:ability:budge"), Ability(budge.gameObject, budge.Tooltip,
+                    () => CanUndoBudge() ? Strings.EncUndo : Budge(), EncounterKeys.Cancel, CanUndoBudge));
             if (mini != null)
                 b.AddItem(ControlId.Structural("enc:ability:minidice"), Ability(mini.gameObject, mini.Tooltip,
                     () => GameText.Of(mini.MiniDiceNumberText), null));
@@ -394,7 +393,8 @@ namespace DiceVoders.Module.Screens
 
         // A knob part: its tooltip's title and what it shows ("Reroll Button, Chrono 2"); a button when
         // it does something.
-        private static NodeVtable Ability(UnityEngine.GameObject view, UnityEngine.GameObject tooltip, Func<string> figure, Action activate)
+        private static NodeVtable Ability(UnityEngine.GameObject view, UnityEngine.GameObject tooltip, Func<string> figure, Action activate,
+            Func<bool> enabled = null)
         {
             Func<string> label = () =>
             {
@@ -403,7 +403,7 @@ namespace DiceVoders.Module.Screens
                 return string.Join(", ", parts);
             };
             Func<IEnumerable<string>> details = () => Keywords.Tooltip(tooltip, localized: true);
-            var vt = activate != null ? GameNodes.Button(label, activate) : new NodeVtable
+            var vt = activate != null ? GameNodes.Button(label, activate, enabled) : new NodeVtable
             {
                 ControlType = ControlTypes.Text,
                 Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },

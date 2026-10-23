@@ -424,8 +424,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     Seen live: reached with `stage.py skip` from act 1, Overclock taken.
   - The abilities knob under the dice and the shop (`BottomPanel/AbilitiesKnob`, found from
     `EncounterController.BudgeIconImage`) is a row below theirs: "Reroll Button, Chrono 2" (Enter =
-    R's reroll), "Budge Button, Budge 6" as text, a button only while `CanUndoBudge`, "Budge Button, undo"
-    (Enter = Q's undo; the game's `OnPressBudgeButton` undoes, else only shows the dice's arrows to a
+    R's reroll), "Budge Button, Budge 6, button, disabled", enabled only while `CanUndoBudge`, "Budge Button,
+    undo" (Enter = Q's undo; the game's `OnPressBudgeButton` undoes, else only shows the dice's arrows to a
     mouse: budging is A/S), "Mini-Dice, 5" (`MiniDicePanel`); their tooltips are localization-only
     (`Keywords.LocalizedTitle`, `Tooltip(.., localized: true)`). A, S, F on the row act on the die or
     shop item last focused (recorded as each takes the focus). A shop reroll empties the offer and
