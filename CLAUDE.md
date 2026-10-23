@@ -96,7 +96,8 @@ Actions" in the repo settings). The repo is https://github.com/amerikrainian/dic
   reloadable, engine-coupled: day-to-day work), **Tests**.
 - Buffers (`Module/UI/Buffers`, cycling order; `BufferKeys` lists the keys; an empty one is skipped):
   `ui` (the focused control's lines), `events` (`EncounterEvents.Log`: every line the narration
-  said, uncapped, oldest first, opening on the newest; cleared by a new controller: a run begun or
+  said, uncapped, oldest first, opening on the newest; a `FollowLatest` buffer steps backward,
+  `BufferControls`, so Ctrl+Up goes to older lines as it goes on elsewhere; cleared by a new controller: a run begun or
   resumed, a turn rewound; empty outside a run). The manual does not list the buffers (starvaders'
   does not either).
 - Not ported from starvaders: its game screens, the fight (Core `Fight/`, Module `Fight/`), the

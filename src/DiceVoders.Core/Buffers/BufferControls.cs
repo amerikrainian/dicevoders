@@ -6,7 +6,9 @@ namespace DiceVoders.Core.Buffers
     /// <summary>
     /// The four buffer review commands, composed and spoken here so every screen shares one
     /// behavior: switching a buffer speaks its name and current line; stepping speaks just the
-    /// line; the edges re-read the current line rather than going silent. Speech is injected so
+    /// line; the edges re-read the current line rather than going silent. A buffer that follows its
+    /// latest line (an event log, oldest first, opened on the newest) steps the other way, so Next
+    /// goes to older lines as it goes on in every other buffer. Speech is injected so
     /// this stays unit-testable. Ported from Harkest Dungeon (dd2a11y).
     /// </summary>
     public sealed class BufferControls
@@ -36,7 +38,8 @@ namespace DiceVoders.Core.Buffers
         {
             var buffer = _buffers.Current;
             if (buffer == null) { _speak(Strings.Strings.BufferNone, true); return; }
-            buffer.MoveNext();
+            if (buffer.FollowLatest) buffer.MovePrevious();
+            else buffer.MoveNext();
             ReportLine(buffer);
         }
 
@@ -44,7 +47,8 @@ namespace DiceVoders.Core.Buffers
         {
             var buffer = _buffers.Current;
             if (buffer == null) { _speak(Strings.Strings.BufferNone, true); return; }
-            buffer.MovePrevious();
+            if (buffer.FollowLatest) buffer.MoveNext();
+            else buffer.MovePrevious();
             ReportLine(buffer);
         }
 

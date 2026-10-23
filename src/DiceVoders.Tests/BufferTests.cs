@@ -136,6 +136,25 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void AnEventLogStepsFromTheNewestBackward()
+        {
+            var log = new List<string> { "oldest", "older", "newest" };
+            _manager.Add(new Buffer("ui", () => "control")).SetSource(() => new[] { "Continue" });
+            _manager.Add(new Buffer("events", () => "events") { FollowLatest = true }).SetSource(() => log);
+            _controls.NextBuffer();
+            Assert.Equal("events: newest", _spoken[_spoken.Count - 1]);
+            _controls.NextLine();
+            Assert.Equal("older", _spoken[_spoken.Count - 1]);
+            log.Add("arrived"); // a new event keeps the place
+            _controls.NextLine();
+            Assert.Equal("oldest", _spoken[_spoken.Count - 1]);
+            _controls.NextLine(); // at the edge: re-reads
+            Assert.Equal("oldest", _spoken[_spoken.Count - 1]);
+            _controls.PreviousLine();
+            Assert.Equal("older", _spoken[_spoken.Count - 1]);
+        }
+
+        [Fact]
         public void NoContentSpeaksNoBufferLines()
         {
             _manager.Add(new Buffer("ui", () => "control"));
