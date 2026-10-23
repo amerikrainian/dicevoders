@@ -124,6 +124,7 @@ enc.area_right_tiles=rechte Felder
 enc.area_buttons=Schaltflächen
 enc.rage=Wut
 enc.beast_mode=Bestienmodus
+enc.boss_hp=LP
 enc.shop=Laden
 enc.no_tile=kein Feld
 enc.target=Ziel

@@ -124,6 +124,7 @@ enc.area_right_tiles=右側格子
 enc.area_buttons=按鈕
 enc.rage=怒氣
 enc.beast_mode=野獸模式
+enc.boss_hp=生命值
 enc.shop=商店
 enc.no_tile=無格子
 enc.target=目標

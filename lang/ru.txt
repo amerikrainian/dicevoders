@@ -124,6 +124,7 @@ enc.area_right_tiles=правые клетки
 enc.area_buttons=кнопки
 enc.rage=Ярость
 enc.beast_mode=Режим зверя
+enc.boss_hp=ОЗ
 enc.shop=магазин
 enc.no_tile=нет клетки
 enc.target=цель

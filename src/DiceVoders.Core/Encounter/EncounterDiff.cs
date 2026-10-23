@@ -58,6 +58,11 @@ namespace DiceVoders.Core.Encounter
                 lines.Add(now.TargetReachedText);
             if (now.Hearts < prev.Hearts)
                 lines.Add(S.EncFigure(S.EncHearts, now.Hearts.ToString()));
+            var heldBefore = new List<string>(prev.StarCards);
+            foreach (var card in now.StarCards)
+                if (!heldBefore.Remove(card)) lines.Add(S.EncArtifactAdded(card));
+            if (now.BossHp >= 0 && prev.BossHp >= 0 && now.BossHp != prev.BossHp)
+                lines.Add(S.EncFigure(S.EncBossHp, now.BossHp.ToString()));
             // Blood Beast: Rage, and Beast Mode coming and going.
             if (now.Rage >= 0 && prev.Rage >= 0 && now.Rage != prev.Rage)
                 lines.Add(S.EncFigure(S.EncRage, now.Rage.ToString()));

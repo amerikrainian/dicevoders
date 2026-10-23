@@ -141,6 +141,22 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void The_final_boss_losing_hp_is_said()
+        {
+            var prev = Snap("Draft"); prev.BossHp = 3;
+            var now = Snap("Draft"); now.BossHp = 2;
+            Assert.Equal(new[] { "HP 2" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void A_star_card_taken_is_said()
+        {
+            var prev = Snap("FinalBossDraft");
+            var now = Snap("Draft"); now.StarCards.Add("Overclock");
+            Assert.Contains("Overclock added", EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
         public void Rage_and_beast_mode_are_said()
         {
             var prev = Snap("Player"); prev.Rage = 4;

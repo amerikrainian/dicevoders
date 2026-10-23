@@ -381,6 +381,14 @@ sends `keybd_event`.
     "..., Beast Mode, 3 Turns" (the game's `TurnsLeft_Misc`); said as they change ("Rage 5", "Beast
     Mode", "Beast Mode lost"). "Rage" and "Beast Mode" are the mod's (no key of their own). Seen live:
     Rage set to 4, a Sacrifice entering the game's Beast Mode.
+  - The final boss (True Ending runs, CH6 "The End?": `RunModName.TrueEnding`, `EncounterModel.IsFinalBoss`,
+    pilot Star, act 4 round 3): its draft (`Phase.FinalBossDraft`, `EncounterController.FinalBossDraft`:
+    "Choose One" of three star cards, handicaps Star takes on) is the row under the board, each card
+    its `CardTooltip` title, Backspace the tooltip, Enter its click; landed on as it shows. The
+    status stop adds "HP 3" (`FinalBossHP`, drawn only as `FinalBossPanel.PanicBarImage`; "HP" is the
+    mod's) and the held cards (`FinalBossPanel.StarCardViews`, filled ones); a taken card and HP
+    changes are said. Its target reads "Star" (the pilot panel keeps the last pilot's ability).
+    Seen live: reached with `stage.py skip` from act 1, Overclock taken.
   - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
     slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
     Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details

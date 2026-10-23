@@ -124,6 +124,7 @@ enc.area_right_tiles=右のマス
 enc.area_buttons=ボタン
 enc.rage=怒り
 enc.beast_mode=ビーストモード
+enc.boss_hp=HP
 enc.shop=ショップ
 enc.no_tile=マスなし
 enc.target=対象

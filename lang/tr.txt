@@ -124,6 +124,7 @@ enc.area_right_tiles=sağ kareler
 enc.area_buttons=düğmeler
 enc.rage=Öfke
 enc.beast_mode=Canavar modu
+enc.boss_hp=Can
 enc.shop=dükkan
 enc.no_tile=kare yok
 enc.target=hedef

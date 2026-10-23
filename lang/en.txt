@@ -126,6 +126,7 @@ enc.area_right_tiles=right tiles
 enc.area_buttons=buttons
 enc.rage=Rage
 enc.beast_mode=Beast Mode
+enc.boss_hp=HP
 enc.shop=Shop
 enc.no_tile=no tile
 enc.target=target

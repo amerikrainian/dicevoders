@@ -139,7 +139,7 @@ namespace DiceVoders.Module.Screens
         private Phase _phase = Phase.None;
         private bool _selecting;
         private IntPtr _reward;
-        private bool _shopLanding;
+        private bool _shopLanding, _starDraft;
         private ControlId _pendingLanding;
         private bool _pendingSpeak;
 
@@ -174,6 +174,10 @@ namespace DiceVoders.Module.Screens
                 var choices = EncounterState.Choices();
                 if (choices.Count > 0) { _pendingLanding = ChoiceId(choices[0]); _pendingSpeak = true; _shopLanding = false; }
             }
+            // The final boss's draft lands on its first card as it shows.
+            bool starDraft = EncounterState.StarDraft().Count > 0;
+            if (starDraft && !_starDraft) { _pendingLanding = StarDraftId(0); _pendingSpeak = true; }
+            _starDraft = starDraft;
             // Each reward screen (level up, loot, draft) lands on its first item as it shows.
             var reward = SpecialRewardStrip.Shown();
             var rewardPtr = reward != null ? reward.Pointer : IntPtr.Zero;
@@ -242,6 +246,52 @@ namespace DiceVoders.Module.Screens
             if (SpecialRewardStrip.Shown() != null) SpecialRewardStrip.Build(b, BoardStop);
             else if (phase == Phase.Player) BuildDice(b);
             else if (phase == Phase.Draft) BuildShop(b);
+            else if (phase == Phase.FinalBossDraft) BuildStarDraft(b);
+        }
+
+        // The final boss's draft, where the shop goes: "Choose One" of three star cards (handicaps the
+        // boss takes on: "Take Heart: When obtained Arrow Lose 2 Hearts..."), each its title, Backspace
+        // its description, Enter its click (FinalBossDraft.OnSelect).
+        private static void BuildStarDraft(GraphBuilder b)
+        {
+            var cards = EncounterState.StarDraft();
+            if (cards.Count == 0) return;
+            string title = null;
+            try
+            {
+                foreach (var tmp in EncounterState.Controller.FinalBossDraft.GetComponentsInChildren<TMPro.TMP_Text>(false))
+                    if (tmp.GetComponentInParent<StarCardView>() == null && (title = GameText.Of(tmp)) != null) break;
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading the final boss's draft title failed: " + e.Message); }
+            b.PushContext(title);
+            b.StartRow(BoardStop, strictColumns: true);
+            for (int i = 0; i < cards.Count; i++)
+            {
+                var vt = StarCard(cards[i], clickable: true);
+                vt.QuietVanish = true;
+                b.AddItem(StarDraftId(i), vt);
+            }
+            b.EndRow();
+            b.PopContext();
+        }
+
+        private static ControlId StarDraftId(int i) => ControlId.Structural("enc:stardraft:" + i);
+
+        // A star card: its title ("Take Heart"), Backspace its tooltip ("Take Heart: When obtained...").
+        internal static NodeVtable StarCard(StarCardView card, bool clickable)
+        {
+            Func<string> label = () => (card.CardTooltip != null ? GameText.Of(card.CardTooltip.TitleText) : null) ?? card.artifactName.ToString();
+            Func<IEnumerable<string>> details = () => card.CardTooltip != null ? Keywords.Tooltip(card.CardTooltip.gameObject) : new List<string>();
+            var vt = clickable ? GameNodes.Button(label, () => EncounterState.Click(card)) : new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                SearchText = label,
+            };
+            vt.OnFocus = () => EncounterState.Hover(card);
+            vt.Details = details;
+            vt.OnSecondary = () => SayDetails(details());
+            return vt;
         }
 
         private static void BuildDice(GraphBuilder b)
@@ -696,6 +746,11 @@ namespace DiceVoders.Module.Screens
                 b.AddItem(ControlId.Structural("enc:tip"), Stat(() => { var tip = ActionTip(); return tip != null ? Tips.Text(tip) : null; }));
             b.AddItem(ControlId.Structural("enc:target"), Stat(TargetLine, () => Keywords.Trigger(EncounterState.TargetTrigger())));
             if (TippyLine() != null) b.AddItem(ControlId.Structural("enc:tippy"), Stat(TippyLine));
+            // The final boss: its HP (the panic bar) and the star cards it holds.
+            if (EncounterState.BossHp() != null)
+                b.AddItem(ControlId.Structural("enc:bosshp"), Stat(() => { var hp = EncounterState.BossHp(); return hp != null ? Strings.EncFigure(Strings.EncBossHp, hp.Value.ToString()) : null; }));
+            var starCards = EncounterState.StarCards();
+            for (int i = 0; i < starCards.Count; i++) b.AddItem(ControlId.Structural("enc:starcard:" + i), StarCard(starCards[i], clickable: false));
             b.AddItem(ControlId.Structural("enc:attack"), Stat(Attack, () => Keywords.Trigger(EncounterState.ScoreTrigger())));
             b.AddItem(ControlId.Structural("enc:turns"), Stat(Turns));
             b.AddItem(ControlId.Structural("enc:hearts"), Stat(Hearts, () => Keywords.Trigger(EncounterState.HeartsTrigger())));

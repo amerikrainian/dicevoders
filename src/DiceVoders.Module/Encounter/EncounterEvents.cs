@@ -229,6 +229,9 @@ namespace DiceVoders.Module.Encounter
                 var pilotDie = Encounter.PilotDie();
                 if (pilotDie != null && !pilotDie.isRolling) s.PilotDie = pilotDie.Value;
                 s.Tippy = Screens.EncounterScreen.TippyLine();
+                s.BossHp = Encounter.BossHp() ?? -1;
+                foreach (var card in Encounter.StarCards())
+                    s.StarCards.Add((card.CardTooltip != null ? GameText.Of(card.CardTooltip.TitleText) : null) ?? card.artifactName.ToString());
                 if (Screens.EncounterScreen.HasRage())
                 {
                     s.Rage = Encounter.Int(EncounterValue.Rage) ?? 0;

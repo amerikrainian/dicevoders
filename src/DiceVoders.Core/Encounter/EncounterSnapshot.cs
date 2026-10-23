@@ -21,6 +21,10 @@ namespace DiceVoders.Core.Encounter
         /// <summary>Blood Beast's Rage (-1 for any other commander), and the turns left in Beast Mode (0
         /// outside it).</summary>
         public int Rage = -1, BeastTurns;
+        /// <summary>The final boss's HP (its panic bar), -1 outside that fight.</summary>
+        public int BossHp = -1;
+        /// <summary>The star cards the final boss holds, by title.</summary>
+        public List<string> StarCards = new List<string>();
         public double Total, Target;
         public string TotalText, TargetText;
         /// <summary>"TARGET REACHED!", the game's words.</summary>

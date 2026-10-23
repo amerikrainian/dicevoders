@@ -124,6 +124,7 @@ enc.area_right_tiles=casillas de la derecha
 enc.area_buttons=botones
 enc.rage=Furia
 enc.beast_mode=Modo bestia
+enc.boss_hp=PV
 enc.shop=tienda
 enc.no_tile=sin casilla
 enc.target=objetivo

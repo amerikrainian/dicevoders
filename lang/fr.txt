@@ -124,6 +124,7 @@ enc.area_right_tiles=cases de droite
 enc.area_buttons=boutons
 enc.rage=Rage
 enc.beast_mode=Mode bête
+enc.boss_hp=PV
 enc.shop=boutique
 enc.no_tile=pas de case
 enc.target=cible

@@ -288,6 +288,8 @@ namespace DiceVoders.Module.Encounter
             {
                 if (!c.EncounterModel.IsPilotTribute()) return null;
                 string name = c.EncounterModel.GetCurrentPilot().ToString();
+                // The final boss (Star) has no ability; its pilot panel keeps the last pilot's.
+                if (c.EncounterModel.IsFinalBoss) return name;
                 string ability = GameText.Of(c.PilotPanel?.AbilityTitleText);
                 return ability != null ? name + ", " + ability : name;
             }
@@ -393,6 +395,44 @@ namespace DiceVoders.Module.Encounter
             }
             catch (Exception e) { CoreLog.Warning("Encounter: reading the pilot's die failed: " + e.Message); }
             return null;
+        }
+
+        /// <summary>The final boss's draft (<see cref="Phase.FinalBossDraft"/>: "Choose One" of three star
+        /// cards, handicaps Star takes on), its cards as shown; empty outside it.</summary>
+        public static List<StarCardView> StarDraft()
+        {
+            var cards = new List<StarCardView>();
+            try
+            {
+                var draft = Controller?.FinalBossDraft;
+                if (draft == null || !draft.gameObject.activeInHierarchy || !draft.IsActive) return cards;
+                foreach (var card in draft.StarCardViews)
+                    if (card != null && card.gameObject.activeInHierarchy && card.artifactName != StarVaders.ArtifactName.None) cards.Add(card);
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading the final boss's draft failed: " + e.Message); }
+            return cards;
+        }
+
+        /// <summary>The star cards the final boss holds (<see cref="FinalBossPanel"/>'s slots, filled ones).</summary>
+        public static List<StarCardView> StarCards()
+        {
+            var cards = new List<StarCardView>();
+            try
+            {
+                var panel = Controller?.FinalBossPanel;
+                if (panel == null || !panel.gameObject.activeInHierarchy) return cards;
+                foreach (var card in panel.StarCardViews)
+                    if (card != null && card.gameObject.activeInHierarchy && card.artifactName != StarVaders.ArtifactName.None) cards.Add(card);
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading the final boss's star cards failed: " + e.Message); }
+            return cards;
+        }
+
+        /// <summary>The final boss's HP (drawn only as its panic bar), null outside that fight.</summary>
+        public static int? BossHp()
+        {
+            try { return Model != null && Model.IsFinalBoss ? Int(EncounterValue.FinalBossHP) : null; }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading the final boss's HP failed: " + e.Message); return null; }
         }
 
         /// <summary>Whether the tile shows a pilot's danger zone (Garu's Turret: the bottom tile of the
