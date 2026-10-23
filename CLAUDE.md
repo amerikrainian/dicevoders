@@ -82,8 +82,11 @@ The version lives in `Directory.Build.props` alone (0.0.1). Release: `build_rele
 `BepInEx\plugins\DiceVoders`, `prism.dll`, a BepInEx.cfg with the console off; no patcher),
 `build-installer.ps1` (the Rust installer in `installer\`, `releases\DiceVodersInstaller.exe`;
 `test-installer.ps1` runs its tests), `create-release.ps1 vX.Y.Z` (the GitHub release from a pushed
-tag and its CHANGELOG section). Not ported yet: the mdbook manual (`docs_src`, its Pages workflow);
-`build_release.ps1` already bundles it once `docs_src\book.toml` exists. The repo is https://github.com/amerikrainian/dicevoders (public, `origin`; nothing pushed yet). The update check asks
+tag and its CHANGELOG section). The manual: mdbook 0.5.2, `docs_src/src/*.md`
+(`mdbook build docs_src`, output `docs_src/book`, gitignored; Change Log includes `CHANGELOG.md`),
+bundled by `build_release.ps1` as `DiceVodersDocs`, published to GitHub Pages by
+`.github/workflows/build-docs.yml` on a push to main touching it (Pages must be set to "GitHub
+Actions" in the repo settings). The repo is https://github.com/amerikrainian/dicevoders (public, `origin`; nothing pushed yet). The update check asks
 `amerikrainian/dicevoders`'s latest release and logs a 404 until one exists.
 
 ## Architecture (guildrun's, see its CLAUDE.md for the long form)
