@@ -139,8 +139,11 @@ namespace DiceVoders.Module.UI
         }
 
         /// <summary>A hover tooltip object's <see cref="Tooltip"/> as drawn, as <see cref="Trigger"/>
-        /// reads it (a button's own, <see cref="ButtonView.Tooltip"/>).</summary>
-        public static List<string> Tooltip(UnityEngine.GameObject tooltip)
+        /// reads it (a button's own, <see cref="ButtonView.Tooltip"/>). <paramref name="localized"/>:
+        /// the title and description are their <c>LocalizeStringEvent</c>s' strings, for a tooltip whose
+        /// texts only those fill: hidden, they keep the prefab's placeholder ("4D-принтер") until the
+        /// game first shows them, and a disabled event refreshes nothing.</summary>
+        public static List<string> Tooltip(UnityEngine.GameObject tooltip, bool localized = false)
         {
             var lines = new List<string>();
             if (tooltip == null) return lines;
@@ -149,9 +152,9 @@ namespace DiceVoders.Module.UI
             {
                 var tip = tooltip.GetComponentInChildren<StarVaders.Tooltip>(true);
                 if (tip == null) return lines;
-                string title = GameText.Of(tip.TitleText);
+                string title = localized ? GameText.Clean(Localized(tip.TitleText)) : GameText.Of(tip.TitleText);
                 var desc = new List<string>();
-                string raw = tip.DescriptionText != null ? tip.DescriptionText.text : null;
+                string raw = localized ? Localized(tip.DescriptionText) : tip.DescriptionText != null ? tip.DescriptionText.text : null;
                 if (raw != null)
                     foreach (var part in raw.Split('\n'))
                     {
@@ -168,6 +171,16 @@ namespace DiceVoders.Module.UI
             }
             catch (Exception e) { CoreLog.Warning("Keywords: reading the tooltip " + name + " failed: " + e.Message); }
             return lines;
+        }
+
+        // The text's localized string, else its text.
+        private static string Localized(TMPro.TMP_Text tmp)
+        {
+            if (tmp == null) return null;
+            var ev = tmp.GetComponent<UnityEngine.Localization.Components.LocalizeStringEvent>();
+            if (ev == null || ev.StringReference == null || ev.StringReference.IsEmpty) return tmp.text;
+            try { return ev.StringReference.GetLocalizedString(); }
+            catch (Exception e) { CoreLog.Warning("Keywords: localizing " + tmp.name + " failed: " + e.Message); return tmp.text; }
         }
     }
 }

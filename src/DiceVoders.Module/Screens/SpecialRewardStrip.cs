@@ -95,15 +95,17 @@ namespace DiceVoders.Module.Screens
         // A reward shown, not chosen: its tooltip's title as text, Backspace the tooltip.
         private static NodeVtable Reward(ButtonView button)
         {
-            Func<string> label = () => ButtonLabel(button);
+            // Its tooltip is filled by localization alone, and only once shown: read from that.
+            Func<List<string>> lines = () => Keywords.Tooltip(button.Tooltip, localized: true);
+            Func<string> label = () => ButtonLabel(button, lines());
             return new NodeVtable
             {
                 ControlType = ControlTypes.Text,
                 Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
                 SearchText = label,
                 OnFocus = () => ViewNodes.Hover(button),
-                Details = () => Keywords.Tooltip(button.Tooltip),
-                OnSecondary = () => SayDetails(Keywords.Tooltip(button.Tooltip)),
+                Details = lines,
+                OnSecondary = () => SayDetails(lines()),
             };
         }
 
@@ -160,9 +162,10 @@ namespace DiceVoders.Module.Screens
 
         // The button's hover tooltip's title, else its caption, else the game's "Proceed" (the
         // proceed buttons draw only their key prompt).
-        private static string ButtonLabel(ButtonView button)
+        private static string ButtonLabel(ButtonView button) => ButtonLabel(button, Keywords.Tooltip(button.Tooltip));
+
+        private static string ButtonLabel(ButtonView button, List<string> lines)
         {
-            var lines = Keywords.Tooltip(button.Tooltip);
             if (lines.Count > 0)
             {
                 string first = lines[0];
