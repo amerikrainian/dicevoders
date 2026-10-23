@@ -38,7 +38,9 @@ namespace DiceVoders.Module.Screens
 
         public override void Build(GraphBuilder b)
         {
-            b.PushContext(Strings.ScreenModMenu);
+            // A context with no words of its own, there for the positions: opening says the menu's
+            // name itself (Toggle), so a label would say it a second time.
+            b.PushContext(null, null);
             b.AddItem(ControlId.Structural("modmenu:settings"), GameNodes.Button(() => Strings.ModSettings, () => PushChild(new ModSettingsScreen())));
             b.AddItem(ControlId.Structural("modmenu:keys"), GameNodes.Button(() => Strings.ModKeyHelp, () => PushChild(new KeyHelpScreen())));
             b.AddItem(ControlId.Structural("modmenu:close"), GameNodes.Button(() => Strings.ModClose, Close));
@@ -63,7 +65,7 @@ namespace DiceVoders.Module.Screens
         public override void Build(GraphBuilder b)
         {
             var settings = ModuleMain.Host != null ? ModuleMain.Host.Settings : null;
-            b.PushContext(Strings.ModSettings);
+            b.PushContext(null, null); // the screen name says "Settings"
             if (settings == null)
             {
                 b.AddItem(ControlId.Structural("modsettings:none"), GameNodes.Text(() => Strings.NoTooltip));
