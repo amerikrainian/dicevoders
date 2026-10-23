@@ -116,6 +116,7 @@ enc.dir_down_left=вниз-влево
 enc.dir_down_right=вниз-вправо
 enc.blocked=заблокирован
 enc.trapped=с ловушкой
+enc.danger=опасность
 enc.shop=магазин
 enc.no_tile=нет клетки
 enc.target=цель

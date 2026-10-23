@@ -116,6 +116,7 @@ enc.dir_down_left=sol alt
 enc.dir_down_right=sağ alt
 enc.blocked=engellendi
 enc.trapped=tuzaklı
+enc.danger=tehlike
 enc.shop=dükkan
 enc.no_tile=kare yok
 enc.target=hedef

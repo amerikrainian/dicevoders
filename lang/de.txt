@@ -116,6 +116,7 @@ enc.dir_down_left=unten links
 enc.dir_down_right=unten rechts
 enc.blocked=blockiert
 enc.trapped=mit Falle
+enc.danger=Gefahr
 enc.shop=Laden
 enc.no_tile=kein Feld
 enc.target=Ziel

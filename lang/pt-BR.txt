@@ -116,6 +116,7 @@ enc.dir_down_left=baixo à esquerda
 enc.dir_down_right=baixo à direita
 enc.blocked=bloqueado
 enc.trapped=com armadilha
+enc.danger=perigo
 enc.shop=loja
 enc.no_tile=sem casa
 enc.target=alvo

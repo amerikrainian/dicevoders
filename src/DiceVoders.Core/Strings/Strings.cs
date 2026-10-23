@@ -185,6 +185,8 @@ namespace DiceVoders.Core.Strings
             D("enc.blocked", "blocked"),
             // A column holding a pilot's trap (Kaia's Booby Trap: "When trapped column is scored...").
             D("enc.trapped", "trapped"),
+            // A tile under a pilot's danger zone (Garu's Turret strikes it as the turn ends).
+            D("enc.danger", "danger"),
             // The shop phase opening after a turn.
             D("enc.shop", "Shop"),
             // A tile the grid does not have yet (the shop's Build Tile adds them).
@@ -484,6 +486,7 @@ namespace DiceVoders.Core.Strings
         public static string EncDirDownRight => Get("enc.dir_down_right");
         public static string EncBlocked => Get("enc.blocked");
         public static string EncTrapped => Get("enc.trapped");
+        public static string EncDanger => Get("enc.danger");
         public static string EncShop => Get("enc.shop");
         public static string EncNoTile => Get("enc.no_tile");
         public static string EncTarget => Get("enc.target");

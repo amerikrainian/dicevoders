@@ -393,6 +393,14 @@ namespace DiceVoders.Module.Encounter
             return null;
         }
 
+        /// <summary>Whether the tile shows a pilot's danger zone (Garu's Turret: the bottom tile of the
+        /// column his die names, struck as the turn ends; <see cref="TileView"/>'s <see cref="DangerZoneView"/>).</summary>
+        public static bool Danger(int x, int y)
+        {
+            try { var zone = Tile(x, y)?._dangerZoneView; return zone != null && zone._isActive; }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading tile " + (x + 1) + ", " + (y + 1) + "'s danger zone failed: " + e.Message); return false; }
+        }
+
         /// <summary>Whether the column shows a trap (Kaia's Booby Trap, <see cref="GridColumn.TrapObject"/>).</summary>
         public static bool Trapped(int x)
         {

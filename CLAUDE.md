@@ -361,6 +361,10 @@ sends `keybd_event`.
     target as the tray's are, Ctrl+D, the roll ("rolled 3, 3, 5, pilot die 3"; "pilot die 4" when it
     changes in the turn). A column with `GridColumn.TrapObject` shown leads with "trapped" (Kaia's
     "When trapped column is scored..."). Seen live with Kaia, the trap following a budged die.
+  - Garu's Turret strikes the bottom tile of the column his die names (the pilot die, budgeable) as
+    the turn ends; the tile shows a danger zone (`TileView._dangerZoneView._isActive`, its
+    `DangerZoneMask` faded in): the cell leads with "danger" (`Encounter.Danger`). Seen live, the zone
+    following a budged die.
   - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
     slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
     Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details

@@ -359,6 +359,7 @@ namespace DiceVoders.Module.Screens
             string text = Strings.EncCoord(x + 1, y + 1) + ", " + CellContents(x, y);
             var unit = EncounterState.At(x, y);
             if (unit != null && unit.IsBlocked) text = Strings.EncBlocked + ", " + text;
+            if (EncounterState.Danger(x, y)) text = Strings.EncDanger + ", " + text;
             return EncounterState.TargetAt(x, y) != null ? Strings.EncTarget + ", " + text : text;
         }
 

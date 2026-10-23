@@ -116,6 +116,7 @@ enc.dir_down_left=abajo a la izquierda
 enc.dir_down_right=abajo a la derecha
 enc.blocked=bloqueado
 enc.trapped=con trampa
+enc.danger=peligro
 enc.shop=tienda
 enc.no_tile=sin casilla
 enc.target=objetivo

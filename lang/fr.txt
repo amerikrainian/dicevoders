@@ -116,6 +116,7 @@ enc.dir_down_left=bas gauche
 enc.dir_down_right=bas droite
 enc.blocked=bloqué
 enc.trapped=piégée
+enc.danger=danger
 enc.shop=boutique
 enc.no_tile=pas de case
 enc.target=cible
