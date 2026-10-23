@@ -97,7 +97,9 @@ Actions" in the repo settings). The repo is https://github.com/amerikrainian/dic
 - Buffers (`Module/UI/Buffers`, cycling order; `BufferKeys` lists the keys; an empty one is skipped):
   `ui` (the focused control's lines), `units` (`Encounter/EncounterBuffers`, named by the game's
   `Units_Subtitle`: each unit on the grid as its cell reads, its place after, "Migo, 10 strength, 2,
-  1", top row first; "blocked" leading as on the cell), `events` (`EncounterEvents.Log`: every line the narration
+  1", top row first; "blocked" leading as on the cell), `perks` (named by `Powers_Subtitle_1` as the status's row: the
+  columns' artifacts first, "column 4, Meteor, 0/10 XP: After you score...", then the starter perk,
+  then the others in slot order, each with its description; a pilot's left out), `events` (`EncounterEvents.Log`: every line the narration
   said, uncapped, oldest first, opening on the newest; a `FollowLatest` buffer steps backward,
   `BufferControls`, so Ctrl+Up goes to older lines as it goes on elsewhere; cleared by a new controller: a run begun or
   resumed, a turn rewound; empty outside a run). The manual does not list the buffers (starvaders'
