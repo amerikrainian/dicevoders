@@ -104,6 +104,7 @@ enc.rolled=salió {0}
 enc.column_attack=columna {0}: {1}
 enc.dice_count={0} {1}
 enc.turn_score=turno: {0}, {1}, {2}
+enc.affects=afecta a: {0}
 enc.shop=tienda
 enc.no_tile=sin casilla
 enc.target=objetivo

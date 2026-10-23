@@ -168,6 +168,9 @@ namespace DiceVoders.Core.Strings
             // The scoring board's sum once a turn's attack is multiplied; {0} = the attack, {1} = the
             // Mult ("Mult 2.0"), {2} = what the turn adds.
             D("enc.turn_score", "turn: {0}, {1}, {2}"),
+            // What the game lights on the board for the hovered item; {0} = the units, tiles and
+            // artifacts, comma-separated.
+            D("enc.affects", "affects: {0}"),
             // The shop phase opening after a turn.
             D("enc.shop", "Shop"),
             // A tile the grid does not have yet (the shop's Build Tile adds them).
@@ -455,6 +458,7 @@ namespace DiceVoders.Core.Strings
         public static string EncColumnAttack(int column, string attack) => F("enc.column_attack", column, attack);
         public static string EncDiceCount(int count, string dice) => F("enc.dice_count", count, dice);
         public static string EncTurnScore(string attack, string mult, string total) => F("enc.turn_score", attack, mult, total);
+        public static string EncAffects(string what) => F("enc.affects", what);
         public static string EncShop => Get("enc.shop");
         public static string EncNoTile => Get("enc.no_tile");
         public static string EncTarget => Get("enc.target");

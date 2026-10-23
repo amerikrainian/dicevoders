@@ -304,7 +304,7 @@ namespace DiceVoders.Module.Screens
         // The column's artifact, then Dice Power explained while the column has some.
         private static IEnumerable<string> HeaderDetails(int x)
         {
-            foreach (var line in ArtifactDetails(EncounterState.Artifact(x))) yield return line;
+            foreach (var line in ArtifactDetails(EncounterState.Artifact(x), highlighted: true)) yield return line;
             if (EncounterState.DicePower(x) > 0)
             {
                 string power = Keywords.Line(NestedTooltipName.DiceMult);
@@ -401,7 +401,42 @@ namespace DiceVoders.Module.Screens
             string name = EncounterState.Name(unit);
             yield return description != null ? name + ": " + description : name;
             if (rarity != null) yield return rarity;
+            string lit = Highlighted();
+            if (lit != null) yield return lit;
             foreach (var line in keywords) yield return line;
+        }
+
+        /// <summary>What the game highlights for the hovered item, as one line ("affects: Migo at
+        /// 2, 1, Migo at 4, 1"); null when nothing is. Hovering a unit, an artifact or a shop choice
+        /// lights the tiles and artifact slots its context tag names (<see cref="EncounterView.HighlightContextViews"/>:
+        /// Book of Life's Migo units), each view's <c>ContextHighlightObject</c> switched on; focus
+        /// hovers. Tiles top row first, a unit by name and place, an empty tile by place; then the
+        /// slots in order, an artifact by name, an empty column slot by its column.</summary>
+        internal static string Highlighted()
+        {
+            var parts = new List<string>();
+            try
+            {
+                for (int y = EncounterState.Rows - 1; y >= 0; y--)
+                    for (int x = 0; x < EncounterState.Columns; x++)
+                    {
+                        var tile = EncounterState.Tile(x, y);
+                        if (tile == null || tile.ContextHighlightObject == null || !tile.ContextHighlightObject.activeSelf) continue;
+                        var unit = EncounterState.At(x, y);
+                        string place = Strings.EncCoord(x + 1, y + 1);
+                        parts.Add(unit != null ? Strings.EncUnitAt(EncounterState.Name(unit), place) : place);
+                    }
+                int slots = EncounterState.Model?.ArtifactSlots?.Count ?? 0;
+                for (int slot = 0; slot < slots; slot++)
+                {
+                    var artifact = EncounterState.Artifact(slot);
+                    var view = slot < 6 ? EncounterState.SlotView(slot) : EncounterState.ArtifactView(artifact);
+                    if (view == null || view.ContextHighlightObject == null || !view.ContextHighlightObject.activeSelf) continue;
+                    parts.Add(artifact != null ? EncounterState.ArtifactName(artifact) : Strings.EncColumn(slot + 1));
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading the highlighted views failed: " + e.Message); }
+            return parts.Count > 0 ? Strings.EncAffects(string.Join(", ", parts)) : null;
         }
 
         /// <summary>"Meteor, LV. 2, 9/20 XP": the artifact's name, its level past the first, its XP;
@@ -423,13 +458,16 @@ namespace DiceVoders.Module.Screens
 
         // "Meteor [9/10 XP]: After you score a pair...", the game's title (its XP) leading, then the
         // rarity and scaling, then the keywords the game explains beside it.
-        internal static IEnumerable<string> ArtifactDetails(ArtifactModel artifact, ArtifactView view = null, bool withUnlockText = false)
+        internal static IEnumerable<string> ArtifactDetails(ArtifactModel artifact, ArtifactView view = null, bool withUnlockText = false, bool highlighted = false)
         {
             if (artifact == null) yield break;
             var (title, lines, keywords) = EncounterState.ArtifactTooltip(artifact, view, withUnlockText);
             title = title ?? EncounterState.ArtifactName(artifact);
             yield return lines.Count > 0 ? title + ": " + lines[0] : title;
             for (int i = 1; i < lines.Count; i++) yield return lines[i];
+            // What its hover lights on the board, while it is the one hovered (the board's own).
+            string lit = highlighted ? Highlighted() : null;
+            if (lit != null) yield return lit;
             foreach (var line in keywords) yield return line;
         }
 
@@ -563,6 +601,8 @@ namespace DiceVoders.Module.Screens
                 title = title ?? ChoiceName(choice);
                 lines.Add(description != null ? title + ": " + description : title);
                 foreach (var tmp in rest) { string text = Shown(tmp); if (text != null) lines.Add(text); }
+                string lit = Highlighted();
+                if (lit != null) lines.Add(lit);
                 lines.AddRange(unit ? Keywords.Of(choice.EntityTooltip) : Keywords.Of(choice.Tooltip));
             }
             catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a shop choice's tooltip failed: " + e.Message); }
@@ -628,8 +668,8 @@ namespace DiceVoders.Module.Screens
             Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(() => ArtifactLabel(EncounterState.Artifact(s))) },
             SearchText = () => EncounterState.ArtifactName(EncounterState.Artifact(s)),
             OnFocus = () => { var view = EncounterState.ArtifactView(EncounterState.Artifact(s)); if (view != null) EncounterState.Hover(view); },
-            Details = () => ArtifactDetails(EncounterState.Artifact(s)),
-            OnSecondary = () => SayDetails(ArtifactDetails(EncounterState.Artifact(s))),
+            Details = () => ArtifactDetails(EncounterState.Artifact(s), highlighted: true),
+            OnSecondary = () => SayDetails(ArtifactDetails(EncounterState.Artifact(s), highlighted: true)),
         };
 
         private static readonly System.Text.RegularExpressions.Regex Range =

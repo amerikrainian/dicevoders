@@ -342,6 +342,12 @@ sends `keybd_event`.
     Common/Uncommon/Rare/Legendary) reads with its name, bars as commas ("Current chances: Common 84%,
     Uncommon 13%, Rare 6%, Legendary 0%"). Seen live in the shop, with the choices' keywords (Comet:
     Base Dice, Mult; Shooter: Repeat; the spells carry none).
+  - Context highlighting: hovering a unit, artifact or shop choice lights the tiles and artifact
+    slots its `ContextHighlight` tag names (`EncounterView.HighlightContextViews`: Book of Life's
+    Migo units), each view's `ContextHighlightObject` switched on; focus hovers, so the details
+    (Backspace, the ui buffer) of column headers, cells, the status's artifacts and shop choices add
+    what is lit after the description: "affects: Migo at 2, 1, Migo at 4, 1" (`EncounterScreen.Highlighted`;
+    tiles top row first, empty ones by place; slots in order, an empty column slot by its column).
   - `PauseScreen` (`EncounterController.PauseMenuController`, layer 33, exclusive; up while
     `PausePanel` is active and `IsPaused`): "Game Menu". Escape on the encounter opens it: the
     navigator's `BackFallback` is the game's Menu key handler (`EncounterKeyInputController.OnMenu`:
@@ -390,7 +396,9 @@ sends `keybd_event`.
     `OnPressLevelUpProceed`), `PilotDraftScreen` ("You Receive": Budge/Chrono/Heart holders read as text by
     their tooltips' titles, "Get +3 Budge", then Proceed = `ContinueObject`'s `OnPressReceiveAllButton`,
     which gives all three; `OnPressReceive*` return at once unless `HasRunMod(Scarcity)`, when each is
-    a button receiving that one alone; seen live), `LegendaryDraftScreen` (three artifacts =
+    a button receiving that one alone; seen live; their tooltips are filled only by
+    `LocalizeStringEvent`s, which a hidden one leaves on the prefab's placeholder, "4D-принтер", so
+    they read from the events' `GetLocalizedString`: `Keywords.Tooltip(.., localized: true)`), `LegendaryDraftScreen` (three artifacts =
     `OnPressArtifactSelect`, `OnPressSkipForMoney`, `OnContinuePressed`), `OverseerLevelupScreen`. An
     artifact reads as on the board, Backspace its tooltip (`ArtifactDetails(model, view)`); a button
     by its hover tooltip's title (`ButtonView.Tooltip`, `Keywords.Tooltip`), else caption, else
