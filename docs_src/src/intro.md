@@ -5,8 +5,6 @@ DiceVoders is a screen reader and keyboard accessibility mod for DiceVaders, a r
 ## Features
 
 - Speech output through Prism, with support for common screen readers and speech backends.
-- The board as a grid you move around cell by cell, with the column headers and the dice beneath it.
-- The scoring said column by column as the game plays it out, then everything else a turn changes.
 - A review buffer for the focused control's details: tooltips, keywords, and what it affects.
 - A context-sensitive key list (F1) that shows only the keys that do something where you are.
 

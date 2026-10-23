@@ -24,7 +24,3 @@ That is the Steam overlay. Turn it off; see [Installation](installation.md#turn-
 ## The Keyboard Stopped Working
 
 You pressed Ctrl+Shift+A, which hands the keyboard to the game. Press it again.
-
-## The Game's Own Keys Do Nothing
-
-While the mod has the keyboard, the game does not hear it. The mod runs the game's encounter actions for you (budge, freeze, reroll, proceed, cancel, the game menu; see [Controls](controls.md#the-encounter-the-games-keys)); for anything else, Ctrl+Shift+A hands the keyboard to the game and takes it back.
