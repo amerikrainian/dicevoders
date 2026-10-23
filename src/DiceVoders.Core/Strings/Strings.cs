@@ -164,7 +164,6 @@ namespace DiceVoders.Core.Strings
             // The Budge button while a budge can be undone (the game draws an undo arrow on it), and
             // Enter on it when none can.
             D("enc.undo", "undo"),
-            D("enc.nothing_to_undo", "nothing to undo"),
             D("enc.cant_freeze", "can't freeze"),
             D("enc.cant_reroll", "can't reroll"),
             // The dice after a roll; {0} = the faces in the tray's order.
@@ -536,7 +535,6 @@ namespace DiceVoders.Core.Strings
         public static string EncCantBudge => Get("enc.cant_budge");
         public static string EncCantTake => Get("enc.cant_take");
         public static string EncUndo => Get("enc.undo");
-        public static string EncNothingToUndo => Get("enc.nothing_to_undo");
         public static string EncCantFreeze => Get("enc.cant_freeze");
         public static string EncCantReroll => Get("enc.cant_reroll");
         public static string EncRolled(string faces) => F("enc.rolled", faces);

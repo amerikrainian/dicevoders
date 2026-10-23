@@ -102,7 +102,6 @@ enc.swap=スワップ
 enc.cant_budge=調整できません
 enc.cant_take=受け取れない
 enc.undo=元に戻す
-enc.nothing_to_undo=元に戻すものなし
 enc.cant_freeze=凍結できません
 enc.cant_reroll=振り直しできません
 enc.rolled=出目 {0}

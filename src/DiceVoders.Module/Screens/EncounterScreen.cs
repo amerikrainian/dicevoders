@@ -360,7 +360,8 @@ namespace DiceVoders.Module.Screens
 
         // The game's buttons under the dice and the shop (the abilities knob), a row below theirs: the
         // Reroll button ("Reroll Button, Chrono 2": R's reroll), the Budge button ("Budge Button,
-        // Budge 6", "undo" while a budge can be undone, Enter then Q's undo; budging is A and S), the
+        // Budge 6" as text; "undo", a button, while a budge can be undone, Enter then Q's undo;
+        // budging is A and S), the
         // Mini-Dice ("Mini-Dice, 5"). Each with its tooltip on Backspace. Keys that act on a die or an
         // item (A, S, F) act on the one last focused.
         private static void BuildAbilities(GraphBuilder b)
@@ -373,10 +374,12 @@ namespace DiceVoders.Module.Screens
             b.StartRow(BoardStop);
             if (reroll != null)
                 b.AddItem(ControlId.Structural("enc:ability:reroll"), Ability(reroll.gameObject, reroll.Tooltip, () => Chrono(), EncounterKeys.Reroll));
+            // A button only while there is a budge to undo (the game's click then undoes it; with
+            // nothing to undo it only shows the dice's arrows to a mouse): otherwise the Budge left.
             if (budge != null)
-                b.AddItem(ControlId.Structural("enc:ability:budge"), Ability(budge.gameObject, budge.Tooltip,
-                    () => CanUndoBudge() ? Strings.EncUndo : Budge(),
-                    () => { if (CanUndoBudge()) EncounterKeys.Cancel(); else Speech.Say(Strings.EncNothingToUndo, interrupt: true); }));
+                b.AddItem(ControlId.Structural("enc:ability:budge"), CanUndoBudge()
+                    ? Ability(budge.gameObject, budge.Tooltip, () => Strings.EncUndo, EncounterKeys.Cancel)
+                    : Ability(budge.gameObject, budge.Tooltip, () => Budge(), null));
             if (mini != null)
                 b.AddItem(ControlId.Structural("enc:ability:minidice"), Ability(mini.gameObject, mini.Tooltip,
                     () => GameText.Of(mini.MiniDiceNumberText), null));

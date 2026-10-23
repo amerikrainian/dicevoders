@@ -102,7 +102,6 @@ enc.swap=交換
 enc.cant_budge=無法微調
 enc.cant_take=無法領取
 enc.undo=復原
-enc.nothing_to_undo=無可復原
 enc.cant_freeze=無法凍結
 enc.cant_reroll=無法重擲
 enc.rolled=擲出 {0}

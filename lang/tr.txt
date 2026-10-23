@@ -102,7 +102,6 @@ enc.swap=Takas
 enc.cant_budge=kaydırılamaz
 enc.cant_take=alınamaz
 enc.undo=geri al
-enc.nothing_to_undo=geri alınacak bir şey yok
 enc.cant_freeze=dondurulamaz
 enc.cant_reroll=yeniden atılamaz
 enc.rolled=atıldı {0}
