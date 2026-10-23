@@ -64,12 +64,18 @@ namespace DiceVoders.Module.Screens
             return label != null && label != item.gameObject.name ? label : GameLoc.Get("Proceed_Misc") ?? "Proceed";
         }
 
-        // The shown screen's heading: its first visible text named "Title".
+        // The shown screen's heading: its first visible text named "Title", else its first text (the
+        // one-turn KO's screen has only its "One-Turn KO!", KOText).
         private static TMPro.TMP_Text Title(Transform screen)
         {
+            TMPro.TMP_Text first = null;
             foreach (var tmp in screen.GetComponentsInChildren<TMPro.TMP_Text>(false))
-                if (tmp != null && tmp.gameObject.name == "Title" && !string.IsNullOrWhiteSpace(tmp.text)) return tmp;
-            return null;
+            {
+                if (tmp == null || string.IsNullOrWhiteSpace(tmp.text)) continue;
+                if (tmp.gameObject.name == "Title") return tmp;
+                if (first == null && tmp.GetComponentInParent<AViewItem>() == null) first = tmp;
+            }
+            return first;
         }
     }
 }

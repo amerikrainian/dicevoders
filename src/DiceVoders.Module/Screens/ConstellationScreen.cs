@@ -191,10 +191,9 @@ namespace DiceVoders.Module.Screens
                         var unit = entry.entityView != null ? entry.entityView.EntityModel : null;
                         if (unit == null) continue;
                         var (desc, rarity, keywords) = Encounter.Encounter.Tooltip(unit, entry.EntityTooltip);
-                        var parts = new List<string> { Encounter.Encounter.Name(unit) };
-                        if (desc != null) parts.Add(desc);
-                        if (rarity != null) parts.Add(rarity);
-                        lines.Add(string.Join(": ", parts));
+                        string name = Encounter.Encounter.Name(unit);
+                        lines.Add(desc != null ? name + ": " + desc : name);
+                        if (rarity != null) lines.Add(rarity);
                         foreach (var line in keywords) if (!lines.Contains(line)) lines.Add(line);
                     }
                 }

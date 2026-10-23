@@ -196,8 +196,13 @@ namespace DiceVoders.Core.Encounter
             foreach (var a in prev.Artifacts) before[a.Id] = a;
             var after = new Dictionary<int, ArtifactSnap>();
             foreach (var a in now.Artifacts) after[a.Id] = a;
+            // Two of a name (the Locked Slots) are told apart by their columns.
+            var names = new Dictionary<string, int>();
+            foreach (var a in now.Artifacts) names[a.Name ?? ""] = names.TryGetValue(a.Name ?? "", out int n) ? n + 1 : 1;
+            string Who(ArtifactSnap a) =>
+                a.Slot < 6 && names.TryGetValue(a.Name ?? "", out int count) && count > 1 ? a.Name + ", " + S.EncColumn(a.Slot + 1) : a.Name;
             foreach (var a in prev.Artifacts)
-                if (!after.ContainsKey(a.Id)) lines.Add(S.EncArtifactRemoved(a.Name));
+                if (!after.ContainsKey(a.Id)) lines.Add(S.EncArtifactRemoved(Who(a)));
             foreach (var a in now.Artifacts)
             {
                 if (!before.TryGetValue(a.Id, out var was))
@@ -206,9 +211,9 @@ namespace DiceVoders.Core.Encounter
                     continue;
                 }
                 if (was.Slot != a.Slot && a.Slot < 6) lines.Add(S.EncMoved(a.Name, S.EncColumn(a.Slot + 1)));
-                if (a.Level > was.Level) lines.Add(S.EncLevel(a.Name, a.Level));
-                if (a.Xp >= 0 && (a.Xp != was.Xp || a.XpNeeded != was.XpNeeded)) lines.Add(S.EncAt(a.Name, S.EncXp(a.Xp, a.XpNeeded)));
-                if (a.Blocked != was.Blocked) lines.Add(S.EncAt(a.Name, a.Blocked ? S.EncBlocked : S.EncLost(S.EncBlocked)));
+                if (a.Level > was.Level) lines.Add(S.EncLevel(Who(a), a.Level));
+                if (a.Xp >= 0 && (a.Xp != was.Xp || a.XpNeeded != was.XpNeeded)) lines.Add(S.EncAt(Who(a), S.EncXp(a.Xp, a.XpNeeded)));
+                if (a.Blocked != was.Blocked) lines.Add(S.EncAt(Who(a), a.Blocked ? S.EncBlocked : S.EncLost(S.EncBlocked)));
             }
         }
 

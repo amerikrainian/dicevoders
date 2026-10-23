@@ -42,9 +42,14 @@ namespace DiceVoders.Module.UI
         private static readonly Regex Quoted = new Regex(@"[""“”«»「」„]\s*([^""“”«»「」„]+?)\s*[""“”«»「」„]", RegexOptions.Compiled);
         private static readonly Regex PaddedQuote = new Regex(@"""\s+([^""]*?)\s+""", RegexOptions.Compiled);
 
+        // A rule of spaced dashes ("- - - - - ..."): a drawn divider between a text's parts (an
+        // artifact's unlock line, a constellation's addition to a unit), a break, not words.
+        private static readonly Regex Divider = new Regex(@"[ \t]*(?:-[ \t]*){5,}", RegexOptions.Compiled);
+
         public static string Clean(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
+            text = Divider.Replace(text, "\n");
             text = OpeningTarget.Replace(text, m => m.Groups[1].Value + m.Groups[2].Value + "<sprite name=\"" + LineTarget + "\">");
             text = Nobr.Replace(text, m => Sprite.Replace(m.Groups[1].Value, s => DecorStart + s.Groups[1].Value + IconEnd));
             text = Sprite.Replace(text, m => IconStart + m.Groups[1].Value + IconEnd);

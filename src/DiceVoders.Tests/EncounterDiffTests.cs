@@ -176,6 +176,18 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void Artifacts_of_one_name_are_told_apart_by_column()
+        {
+            var prev = Snap("Draft");
+            prev.Artifacts.Add(new ArtifactSnap { Id = 1, Name = "Locked Slot", Slot = 2, Xp = -1, Blocked = true });
+            prev.Artifacts.Add(new ArtifactSnap { Id = 2, Name = "Locked Slot", Slot = 4, Xp = -1 });
+            var now = Snap("Draft");
+            now.Artifacts.Add(new ArtifactSnap { Id = 1, Name = "Locked Slot", Slot = 2, Xp = -1 });
+            now.Artifacts.Add(new ArtifactSnap { Id = 2, Name = "Locked Slot", Slot = 4, Xp = -1 });
+            Assert.Equal(new[] { "Locked Slot, column 3: blocked lost" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
         public void Tippy_moving_is_said()
         {
             var prev = Snap("Draft"); prev.Tippy = "Tippy: right tiles";

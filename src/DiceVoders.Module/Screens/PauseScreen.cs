@@ -194,6 +194,8 @@ namespace DiceVoders.Module.Screens
             if (tmp == null || !tmp.gameObject.activeInHierarchy) return;
             string text = GameText.Of(tmp);
             if (text == null) return;
+            // A Mult as the status reads it: "30", not "30.0".
+            if (word == MultWord()) text = Encounter.Encounter.WholeMult(text.TrimStart('X', 'x').Trim());
             parts.Add(word != null ? Strings.EncFigure(word, text) : text);
         }
 
