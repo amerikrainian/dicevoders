@@ -259,19 +259,23 @@ namespace DiceVoders.Core.Encounter
             return true;
         }
 
-        // "rolled 3, 3, 5", a pilot's die after: "rolled 3, 3, 5, pilot die 3".
+        // "rolled 3, 3, 5", a Kraken die and a pilot's die after: "rolled 3, 3, 5, Kraken 4, pilot die 3".
         private static string Rolled(EncounterSnapshot s)
         {
             string faces = string.Join(", ", s.Dice);
+            foreach (int face in s.Kraken) faces += ", " + S.EncFigure(S.EncKrakenDie, face.ToString());
             if (s.PilotDie > 0) faces += ", " + S.EncFigure(S.EncPilotDie, s.PilotDie.ToString());
             return S.EncRolled(faces);
         }
 
         // The faces as a set: the tray re-sorts its dice a moment after a budge, which is no roll.
-        private static bool SameDice(EncounterSnapshot a, EncounterSnapshot b)
+        private static bool SameDice(EncounterSnapshot a, EncounterSnapshot b) =>
+            SameFaces(a.Dice, b.Dice) && SameFaces(a.Kraken, b.Kraken);
+
+        private static bool SameFaces(List<int> a, List<int> b)
         {
-            var x = new List<int>(a.Dice);
-            var y = new List<int>(b.Dice);
+            var x = new List<int>(a);
+            var y = new List<int>(b);
             x.Sort();
             y.Sort();
             if (x.Count != y.Count) return false;

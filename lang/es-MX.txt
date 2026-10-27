@@ -95,6 +95,7 @@ enc.frozen=congelado
 enc.permafrozen=congelado permanentemente
 enc.cracked=agrietado
 enc.pilot_die=dado de piloto
+enc.kraken_die=kraken
 enc.added_power=más {0} de poder
 enc.attack={0}/{1} de ataque
 enc.hearts=Corazones

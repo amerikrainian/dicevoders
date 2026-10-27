@@ -95,6 +95,7 @@ enc.frozen=donmuş
 enc.permafrozen=kalıcı donmuş
 enc.cracked=çatlak
 enc.pilot_die=pilot zarı
+enc.kraken_die=Kraken
 enc.added_power=artı {0} güç
 enc.attack={0}/{1} saldırı
 enc.hearts=Kalpler

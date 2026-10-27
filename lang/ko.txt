@@ -95,6 +95,7 @@ enc.frozen=얼림
 enc.permafrozen=영구 얼림
 enc.cracked=금 감
 enc.pilot_die=파일럿 주사위
+enc.kraken_die=크라켄
 enc.added_power=파워 +{0}
 enc.attack=공격 {0}/{1}
 enc.hearts=하트

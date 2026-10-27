@@ -95,6 +95,7 @@ enc.frozen=заморожен
 enc.permafrozen=заморожен навсегда
 enc.cracked=треснул
 enc.pilot_die=кубик пилота
+enc.kraken_die=кракен
 enc.added_power=плюс {0} силы
 enc.attack=атака {0}/{1}
 enc.hearts=Сердца

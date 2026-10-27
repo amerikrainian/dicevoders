@@ -264,7 +264,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     `ArtifactSlots[x]`, the first 6 slots being the columns', `GetColumnArtifacts`), the 6x3 grid
     top row first ("2, 1, Migo, 10 strength": tiles "x, y" 1-based, row 1 at the bottom; the
     model's y 0 IS the bottom, each `GridColumn`'s layout being reversed), then a strict strip:
-    in `Phase.Player` the dice in `DiceVisualOrder` ("3, frozen") and Launch
+    in `Phase.Player` the dice in `DiceVisualOrder` ("3, frozen"; a Kraken die, The Core's, `_index` 3 and
+    up as the game counts and draws them: "4, Kraken", the roll "rolled 5, 6, 6, Kraken 2") and Launch
     (`DicePanel/ProceedKnob/ProceedLine/LaunchPanel/LaunchButton`). Focus lands on the first die.
     Backspace on a unit runs the game's `EntityTooltip.UpdateTooltip` on the tile's own tooltip
     (a hidden one holds prefab placeholders: "Mutantenschwamm", Legendary) and reads it; an

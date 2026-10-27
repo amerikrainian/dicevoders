@@ -151,6 +151,8 @@ namespace DiceVoders.Core.Strings
             D("enc.cracked", "cracked"),
             // A die a pilot rolls against the player.
             D("enc.pilot_die", "pilot die"),
+            // The Core's extra die, as the game's perks name it ("an extra Kraken Base Dice").
+            D("enc.kraken_die", "Kraken"),
             // Dice Power a die adds on top of its own; {0} = the amount.
             D("enc.added_power", "plus {0} power"),
             // The attack gathered against the target: {0} = Total Attack, {1} = Target Defense.
@@ -528,6 +530,7 @@ namespace DiceVoders.Core.Strings
         public static string EncPermafrozen => Get("enc.permafrozen");
         public static string EncCracked => Get("enc.cracked");
         public static string EncPilotDie => Get("enc.pilot_die");
+        public static string EncKrakenDie => Get("enc.kraken_die");
         public static string EncAddedPower(int amount) => F("enc.added_power", amount);
         public static string EncAttack(string total, string target) => F("enc.attack", total, target);
         public static string EncHearts => Get("enc.hearts");

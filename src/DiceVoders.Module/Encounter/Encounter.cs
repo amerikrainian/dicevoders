@@ -397,6 +397,15 @@ namespace DiceVoders.Module.Encounter
             return null;
         }
 
+        /// <summary>A Kraken die (The Core's extra Kraken Base Dice, Hydra Head's second): the
+        /// tray's dice from the fourth on, as the game counts them (<c>DicePanel.GetAmountOfKrakenDiceNotRollingOfValue</c>:
+        /// <c>_index</c> 3 and up) and draws them (<c>T_DB_krakendice*</c> faces).</summary>
+        public static bool IsKraken(Dice die)
+        {
+            try { return die != null && !die.IsDangerDice && die._index >= 3; }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading a die's index failed: " + e.Message); return false; }
+        }
+
         /// <summary>The abilities knob under the dice and the shop (<c>BottomPanel/AbilitiesKnob</c>: the
         /// Reroll and Budge buttons, the Mini-Dice panel), found from the controller's budge icon; null
         /// when not shown.</summary>

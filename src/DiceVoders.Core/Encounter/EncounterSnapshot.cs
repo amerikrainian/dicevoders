@@ -35,6 +35,8 @@ namespace DiceVoders.Core.Encounter
         public List<Figure> Tokens = new List<Figure>();
         /// <summary>The base dice faces in the tray's order; 0 for one still rolling.</summary>
         public List<int> Dice = new List<int>();
+        /// <summary>The Kraken dice faces (The Core's, drawn apart in the tray), in its order; 0 for one rolling.</summary>
+        public List<int> Kraken = new List<int>();
         /// <summary>A pilot's own die (Kaia's, on the pilot panel), its face; 0 for none or rolling.</summary>
         public int PilotDie;
         /// <summary>What Tippy covers, as said ("Tippy: right tiles"); null outside Tippy's fight.</summary>
@@ -58,7 +60,7 @@ namespace DiceVoders.Core.Encounter
         /// <summary>The cloud's name ("Cloudy"), the game's.</summary>
         public string CloudLabel;
 
-        public bool DiceRolling => Dice.Contains(0);
+        public bool DiceRolling => Dice.Contains(0) || Kraken.Contains(0);
     }
 
     public sealed class Figure

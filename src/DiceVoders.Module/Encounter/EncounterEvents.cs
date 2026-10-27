@@ -246,7 +246,7 @@ namespace DiceVoders.Module.Encounter
                     MultLabel = GameLoc.Get("GlobalMult_Keyword") ?? "Mult",
                     CloudLabel = GameLoc.Get("Cloudy_TooltipTitle") ?? "Cloudy",
                 };
-                foreach (var die in Encounter.Dice()) s.Dice.Add(die.isRolling ? 0 : die.Value);
+                foreach (var die in Encounter.Dice()) (Encounter.IsKraken(die) ? s.Kraken : s.Dice).Add(die.isRolling ? 0 : die.Value);
                 var pilotDie = Encounter.PilotDie();
                 if (pilotDie != null && !pilotDie.isRolling) s.PilotDie = pilotDie.Value;
                 s.Tippy = Screens.EncounterScreen.TippyLine();

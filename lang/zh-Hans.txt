@@ -95,6 +95,7 @@ enc.frozen=已冻结
 enc.permafrozen=永久冻结
 enc.cracked=破裂
 enc.pilot_die=驾驶员骰子
+enc.kraken_die=海怪
 enc.added_power=加 {0} 骰力
 enc.attack=攻击 {0}/{1}
 enc.hearts=红心

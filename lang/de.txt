@@ -95,6 +95,7 @@ enc.frozen=eingefroren
 enc.permafrozen=dauerhaft eingefroren
 enc.cracked=gesprungen
 enc.pilot_die=Pilotenwürfel
+enc.kraken_die=Kraken
 enc.added_power=plus {0} Kraft
 enc.attack={0}/{1} Angriff
 enc.hearts=Herzen

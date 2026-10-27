@@ -95,6 +95,7 @@ enc.frozen=凍結
 enc.permafrozen=永久凍結
 enc.cracked=ひび割れ
 enc.pilot_die=パイロットのダイス
+enc.kraken_die=クラーケン
 enc.added_power=パワー +{0}
 enc.attack=攻撃 {0}/{1}
 enc.hearts=ハート

@@ -97,6 +97,7 @@ enc.frozen=frozen
 enc.permafrozen=permafrozen
 enc.cracked=cracked
 enc.pilot_die=pilot die
+enc.kraken_die=Kraken
 enc.added_power=plus {0} power
 enc.attack={0}/{1} attack
 enc.hearts=Hearts

@@ -741,7 +741,7 @@ namespace DiceVoders.Module.Screens
 
         // ---- the dice ----
 
-        // "3, frozen": the face (the column it scores) and the die's state.
+        // "3, frozen": the face (the column it scores) and the die's state; a Kraken die "4, Kraken".
         private static NodeVtable Die(Dice die, bool first)
         {
             Func<string> label = () => DieText(die);
@@ -763,6 +763,7 @@ namespace DiceVoders.Module.Screens
             {
                 parts.Add(die.isRolling ? Strings.EncRolling : die.Value.ToString());
                 if (die.IsDangerDice) parts.Add(Strings.EncPilotDie);
+                else if (EncounterState.IsKraken(die)) parts.Add(Strings.EncKrakenDie);
                 if (die.IsPermaFrozen) parts.Add(Strings.EncPermafrozen);
                 else if (die.IsLockedIn) parts.Add(Strings.EncFrozen);
                 if (die.IsCracked) parts.Add(Strings.EncCracked);

@@ -65,6 +65,21 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void A_kraken_die_follows_the_base_dice_and_its_change_is_a_new_roll()
+        {
+            var draft = Snap("Draft", turns: 3);
+            var turn = Snap("Player", turns: 3, dice: new[] { 1, 3, 3 });
+            turn.Kraken.Add(4);
+            Assert.Equal(new[] { "3 Turns, rolled 1, 3, 3, Kraken 4" }, EncounterDiff.Lines(draft, turn));
+            var budged = Snap("Player", turns: 3, dice: new[] { 1, 3, 3 });
+            budged.Kraken.Add(5);
+            Assert.Equal(new[] { "rolled 1, 3, 3, Kraken 5" }, EncounterDiff.Lines(turn, budged));
+            var rolling = Snap("Player", turns: 3, dice: new[] { 1, 3, 3 });
+            rolling.Kraken.Add(0);
+            Assert.Null(EncounterDiff.TurnLine(rolling));
+        }
+
+        [Fact]
         public void An_encounter_met_mid_turn_says_the_turn()
         {
             Assert.Equal("3 Turns, rolled 3, 6, 6", EncounterDiff.TurnLine(Snap("Player", turns: 3, dice: new[] { 3, 6, 6 })));
