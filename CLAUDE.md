@@ -293,7 +293,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     Run category (`UI/RunKeys`: live while `Encounter.Controller` exists, declared by the encounter and
     the overlays over it: pause, result, victory, constellations, tips, guide, settings, confirm)
     Ctrl+A attack ("0/100 attack"), Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice, Ctrl+O
-    target, Ctrl+M Mult. `/input` fires an action whether live or not: check liveness with
+    target (a pilot's ability after it: `PilotPanel.AbilityDescText`, "Roxy, Trailblazer, Act 1-3, Your
+    dice start cracked. ..."), Ctrl+M Mult. `/input` fires an action whether live or not: check liveness with
     `InputManager.IsLive` through `/eval` (by reflection: the module's assemblies are not referenced,
     and each reload loads a generation; take the last). The game's encounter keys
     (defaults, `EncounterInputHandler`'s PlayerInput): W/Space Click, Q Cancel, E Proceed
@@ -376,7 +377,7 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     Budge, Chrono, Mini-Dice, Cash = their keyword entries (Swap has none); hearts, attack and target =
     the board's `TooltipTriggerView` hovers (`HeartTooltipTrigger` "Commander Hearts",
     `ScoreTooltipTrigger` "Objective", `PilotPanelTooltipTrigger` in a pilot fight else
-    `MapTooltipTrigger`, both "VICTORY CONDITION"); the shop strip has "Shop rarity, +0 %"
+    `MapTooltipTrigger`, both "VICTORY CONDITION"; a pilot's ability before the target's); the shop strip has "Shop rarity, +0 %"
     (`DraftPanel/BG/RarityObject`, its `RarityNumber`) with its hover, whose chances the game tells apart
     by colour alone: a figure coloured as a rarity (`ContentGetter.GetRarityTextColor`, matched for
     Common/Uncommon/Rare/Legendary) reads with its name, bars as commas ("Current chances: Common 84%,

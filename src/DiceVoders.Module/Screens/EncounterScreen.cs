@@ -922,7 +922,7 @@ namespace DiceVoders.Module.Screens
             b.PushContext(null, positions: false);
             if (ActionTip() != null)
                 b.AddItem(ControlId.Structural("enc:tip"), Stat(() => { var tip = ActionTip(); return tip != null ? Tips.Text(tip) : null; }));
-            b.AddItem(ControlId.Structural("enc:target"), Stat(TargetLine, () => Keywords.Trigger(EncounterState.TargetTrigger())));
+            b.AddItem(ControlId.Structural("enc:target"), Stat(TargetLine, TargetDetails));
             if (TippyLine() != null) b.AddItem(ControlId.Structural("enc:tippy"), Stat(TippyLine));
             // The final boss: its HP (the panic bar) and the star cards it holds.
             if (EncounterState.BossHp() != null)
@@ -1037,6 +1037,24 @@ namespace DiceVoders.Module.Screens
             string target = Target();
             string act = GameText.Of(EncounterState.View?.MapPanel?.actText);
             return target != null && act != null ? target + ", " + act : target ?? act;
+        }
+
+        /// <summary>The target line, then a pilot's ability ("Roxy, Trailblazer, Act 1-3, Each turn,
+        /// ..."): Ctrl+O.</summary>
+        public static string TargetReadout()
+        {
+            string line = TargetLine(), ability = EncounterState.PilotAbility();
+            return line != null && ability != null ? line + ", " + ability : line ?? ability;
+        }
+
+        // A pilot's ability, then the target's hover ("VICTORY CONDITION: ...").
+        private static IEnumerable<string> TargetDetails()
+        {
+            var lines = new List<string>();
+            string ability = EncounterState.PilotAbility();
+            if (ability != null) lines.Add(ability);
+            lines.AddRange(Keywords.Trigger(EncounterState.TargetTrigger()));
+            return lines;
         }
 
         /// <summary>"Tippy: right tiles": what Tippy covers this turn; null when Tippy is not up.</summary>

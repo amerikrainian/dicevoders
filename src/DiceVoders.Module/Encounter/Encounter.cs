@@ -296,6 +296,21 @@ namespace DiceVoders.Module.Encounter
             catch (Exception e) { CoreLog.Warning("Encounter: reading the pilot target failed: " + e.Message); return null; }
         }
 
+        /// <summary>A pilot fight's ability as the pilot panel describes it under its title
+        /// (<see cref="PilotPanel.AbilityDescText"/>: Roxy's "Each turn, ..."); null outside one and
+        /// in the final boss's (its panel keeps the last pilot's).</summary>
+        public static string PilotAbility()
+        {
+            var c = Controller;
+            if (c == null) return null;
+            try
+            {
+                if (!c.EncounterModel.IsPilotTribute() || c.EncounterModel.IsFinalBoss) return null;
+                return GameText.Of(c.PilotPanel?.AbilityDescText);
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading the pilot's ability failed: " + e.Message); return null; }
+        }
+
         private static string WithPilot(ArtifactModel artifact, string text)
         {
             string pilot = PilotName(artifact);

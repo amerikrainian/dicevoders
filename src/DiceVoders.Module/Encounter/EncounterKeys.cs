@@ -19,7 +19,7 @@ namespace DiceVoders.Module.Encounter
     /// one thing and are silent where there is nothing to read: C the focused tile's coordinates (a
     /// header's column); in the Run category (<see cref="RunKeys"/>: over the game menu, the result
     /// screen and the other overlays too) Ctrl+A the attack against the target ("30/100 attack"), Ctrl+T
-    /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target, Ctrl+M Mult. 1 to
+    /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target (and a pilot's ability), Ctrl+M Mult. 1 to
     /// 6 read that column whole (its header, then its cells top first), from anywhere in the encounter;
     /// Shift with them goes there (the same row from a cell, else the header). Period and comma step
     /// to the next and previous target while the game waits on one, else unit, in reading order. Alt+D
@@ -57,7 +57,7 @@ namespace DiceVoders.Module.Encounter
                 return Join(parts.ToArray());
             }, ctrl: true, category: InputCategory.Run);
             Read("enc.dice", "Dice", KeyCode.D, DiceLine, ctrl: true, category: InputCategory.Run);
-            Read("enc.target", "Target", KeyCode.O, EncounterScreen.TargetLine, ctrl: true, category: InputCategory.Run);
+            Read("enc.target", "Target", KeyCode.O, EncounterScreen.TargetReadout, ctrl: true, category: InputCategory.Run);
             InputManager.Register("enc.stats", "Stats", InputCategory.Game, Stats)
                 .AddBinding(new KeyboardBinding(KeyCode.S, ctrl: true));
             Read("enc.mult", "Mult", KeyCode.M, EncounterScreen.Mult, ctrl: true, category: InputCategory.Run);
