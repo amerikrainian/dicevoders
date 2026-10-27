@@ -170,7 +170,12 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     (2/4)" (the slot draws a bare lock), Backspace its title "Locked LV.3 Unique", Enter its click; else `UnlockedArtifactViews[i]` by name,
     "Monocle", Backspace its tooltip with the game's unlock text, as `SetArtifacts` sets it
     (`SetModel(model, true)`: "You now have a chance to find this perk during a run with this
-    commander!", its dashed divider dropped): not a choice, a perk added to the run's pool); every other shown clickable in hierarchy order (Launch!, `StartButton`); Back
+    commander!", its dashed divider dropped): not a choice, a perk added to the run's pool); with the
+    Overseer chosen, its `OverseerFrame`: the two commanders whose perks it combines, a row of three per
+    side (`OverseerCommanderIcons`, `_index` 0 to 2 the left, 3 to 5 the right, top to bottom as drawn,
+    read as the hub's commanders; Enter = `OnPressOverseerIndex`, no save written; their hidden tooltips
+    hold the lock text, which the loop below used to read as six stray buttons), each followed by the
+    side's chosen perk (`OverseerCommander1/2ArtifactView`); every other shown clickable in hierarchy order (Launch!, `StartButton`); Back
     (`OnExitPressed`) last, Escape too. `GameScenes.Items` can hold items destroyed since (a unique's
     lock, once unlocked): every loop skips `item == null` first, and the build is guarded so one
     failure does not leave the screen without nodes (it did: arrows went dead). Seen live: after the tutorial, after New Chapter Unlocked

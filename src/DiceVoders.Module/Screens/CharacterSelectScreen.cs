@@ -20,7 +20,8 @@ namespace DiceVoders.Module.Screens
     /// the commanders as a row (<see cref="CharacterSelectionController.CommanderIcons"/> shown, left
     /// to right): a locked one as its tooltip shows it, the lock's title ("Locked - The Invasion
     /// Begins!") with its condition for Backspace, as a sighted player sees only a locked square; an
-    /// unlocked one by name; then every other button shown, in hierarchy order, by caption; Back
+    /// unlocked one by name; the chosen commander's panel (with the Overseer, the two commanders it
+    /// borrows from, a row a side); then every other button shown, in hierarchy order, by caption; Back
     /// (<see cref="CharacterSelectionController.OnExitPressed"/>) last, Escape too. Seen live only with
     /// the tutorial's panel up and after it: see CLAUDE.md for what has been read.
     /// </summary>
@@ -145,6 +146,7 @@ namespace DiceVoders.Module.Screens
 
             // The chosen commander's panel: name and level, the starting perk, its unique artifacts.
             BuildCommander(b, c, taken);
+            BuildOverseer(b, c, taken);
 
             // Whatever else is shown and clickable (Launch!), Back last.
             AViewItem back = null;
@@ -232,6 +234,41 @@ namespace DiceVoders.Module.Screens
                 b.StartRow("cs:uniques");
                 while (k < slots.Count && Math.Abs(slots[k].At.position.y - y) <= 5f) { b.AddItem(ControlId.Structural(slots[k].Id), slots[k].Node); k++; }
                 b.EndRow();
+            }
+        }
+
+        // The Overseer's frame (OverseerFrame, shown while the Overseer is chosen): the two commanders
+        // whose starting perks it combines, each side three icons drawn top to bottom around that
+        // side's perk (OverseerCommanderIcons: 0 to 2 the left, OverseerCommander1; 3 to 5 the right),
+        // one chosen; a row each, as the commanders are read, then the chosen one's perk. Enter is the
+        // game's click (OnPressOverseerIndex: the side's commander and perk change; no save written).
+        private static void BuildOverseer(GraphBuilder b, CharacterSelectionController c, HashSet<IntPtr> taken)
+        {
+            var all = c.OverseerCommanderIcons;
+            if (all == null) return;
+            var perks = new[] { c.OverseerCommander1ArtifactView, c.OverseerCommander2ArtifactView };
+            for (int side = 0; side < 2; side++)
+            {
+                var icons = new List<CommanderIconView>();
+                foreach (var icon in all)
+                    if (icon != null && icon.gameObject.activeInHierarchy && icon._index / 3 == side) icons.Add(icon);
+                icons.Sort((l, r) => r.transform.position.y.CompareTo(l.transform.position.y));
+                if (icons.Count > 0)
+                {
+                    b.StartRow("cs:overseer:" + side, entry: () => Math.Max(0, icons.FindIndex(i => Selected(i))));
+                    foreach (var icon in icons)
+                    {
+                        taken.Add(icon.Pointer);
+                        b.AddItem(ControlId.Structural("cs:overseer:" + side + ":" + icon.CommanderName), Commander(icon));
+                    }
+                    b.EndRow();
+                }
+                var perk = perks[side];
+                if (perk != null && perk.gameObject.activeInHierarchy && Model(perk) != null)
+                {
+                    taken.Add(perk.Pointer);
+                    b.AddItem(ControlId.Structural("cs:overseer:perk:" + side), ArtifactNode(perk, false));
+                }
             }
         }
 
