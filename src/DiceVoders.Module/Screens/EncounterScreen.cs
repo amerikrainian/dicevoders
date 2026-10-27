@@ -813,22 +813,28 @@ namespace DiceVoders.Module.Screens
             return string.Join(", ", parts);
         }
 
-        // "Skip remaining turns", then what the game draws beside it after a target taken in the first
-        // turn: "One-Turn KO!, +50% SHOP RARITY" (ProceedLine/OTKO).
+        // "Skip remaining turns", then the rarity the game draws beside it: "+25% SHOP RARITY"
+        // (ProceedLine/Normal's SkipTurnsRarityText; its "TARGET REACHED!" left out, the skip showing
+        // only then), after a target taken in the first turn "One-Turn KO!, +50% SHOP RARITY"
+        // (ProceedLine/OTKO).
         private static string SkipLabel(AViewItem skip)
         {
             var parts = new List<string> { (GameLoc.Get("SkipTurns_Misc") ?? "Skip remaining turns").TrimEnd(':', ' ') };
             try
             {
                 var otko = skip.transform.parent != null ? skip.transform.parent.Find("OTKO") : null;
+                var rarity = EncounterState.Controller?.DraftPanel?.SkipTurnsRarityText;
                 if (otko != null && otko.gameObject.activeInHierarchy)
                     foreach (var tmp in otko.GetComponentsInChildren<TMPro.TMP_Text>(false))
                     {
                         string text = GameText.Of(tmp);
                         if (text != null) parts.Add(text);
                     }
+                else if (rarity != null && rarity.gameObject.activeInHierarchy)
+                    parts.Add(GameText.Of(rarity));
             }
-            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading the skip's one-turn KO failed: " + e.Message); }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading the skip's shop rarity failed: " + e.Message); }
+            parts.RemoveAll(string.IsNullOrEmpty);
             return string.Join(", ", parts);
         }
 

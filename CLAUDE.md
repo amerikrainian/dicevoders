@@ -347,8 +347,10 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     shop (`Phase.Draft`) strip: `DraftPanel.DraftChoices` still `IsActive` ("Meteor, Artifact, 2
     cash[, Uncommon][, cursed][, frozen][, can't afford]": `tempRarity`, `isCursed`, `IsLocked`,
     `CantBuyCostIcon`), then Proceed (`BG/ProceedButton`) and Skip remaining turns
-    (`SkipTurns/ProceedLine/SkipButton`, when shown; after a target taken in the first turn it adds the
-    drawn "One-Turn KO!, +50% SHOP RARITY", `ProceedLine/OTKO`; no skip cash is drawn). A choice's text is in `EntityTooltip` for a unit
+    (`SkipTurns/ProceedLine/SkipButton`, when shown, with the rarity drawn beside it: "+10% SHOP
+    RARITY", "+25%" with 2 turns left, `DraftPanel.SkipTurnsRarityText` under `ProceedLine/Normal`, whose
+    "TARGET REACHED!" is left out; after a target taken in the first turn the drawn "One-Turn KO!, +50%
+    SHOP RARITY", `ProceedLine/OTKO`, instead; no skip cash is drawn). A choice's text is in `EntityTooltip` for a unit
     (title in `TitleLongerText`), `Tooltip` otherwise (the other holds prefab placeholders); hidden
     tooltips, so a text counts only by its own `activeSelf` (spells have no scaling line). Enter
     buys (the game's click); F freezes. Selections (`SelectionController.IsSelecting`): cells whose
