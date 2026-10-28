@@ -874,7 +874,12 @@ namespace DiceVoders.Module.Screens
                 else if (choice.DraftType == DraftType.Artifact) parts.Add(GameLoc.Get("Artifact_Misc"));
                 parts.Add(Strings.EncCost(choice.DraftCost));
                 if (choice.tempRarity != Rarity.Common) parts.Add(GameLoc.Get(choice.tempRarity + "_Misc") ?? choice.tempRarity.ToString());
-                if (choice.isCursed) parts.Add(Strings.EncCursed);
+                if (choice.isCursed)
+                {
+                    parts.Add(Strings.EncCursed);
+                    string hearts = CursedCost(choice);
+                    if (hearts != null) parts.Add(Strings.EncFigure(Strings.EncHearts, hearts));
+                }
                 if (choice.IsLocked) parts.Add(Strings.EncFrozen);
                 if (choice.CantBuyCostIcon != null && choice.CantBuyCostIcon.activeInHierarchy) parts.Add(Strings.EncCantAfford);
             }
@@ -883,10 +888,38 @@ namespace DiceVoders.Module.Screens
             return string.Join(", ", parts);
         }
 
+        // The hearts a cursed choice costs, drawn only on its frame (the cursed rare or legendary
+        // frame, the astral or warped one: "-1"), or in Blood Beast's Beast Mode on the blood sticker
+        // over it ("0").
+        private static string CursedCost(DraftChoice choice)
+        {
+            try
+            {
+                var holder = choice.HemophageObject != null && choice.HemophageObject.activeSelf ? choice.HemophageObject.transform
+                    : choice.currentFrameImage != null && choice.currentFrameImage.gameObject.activeSelf ? choice.currentFrameImage.transform : null;
+                if (holder == null) return null;
+                foreach (var tmp in holder.GetComponentsInChildren<TMPro.TMP_Text>(false))
+                {
+                    string text = GameText.Of(tmp);
+                    if (text != null) return text;
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a cursed choice's heart cost failed: " + e.Message); }
+            return null;
+        }
+
+        // What cursed means, in the game's words: the Cursed Shop rule's ("Some items in the shop have
+        // a chance to be CURSED, which costs hearts to buy."), its list dash dropped.
+        private static string CursedLine()
+        {
+            string text = GameLoc.Get("CursedShop_Desc")?.Trim();
+            return text != null ? text.TrimStart('-', ' ') : null;
+        }
+
         // A unit's tooltip is its EntityTooltip; anything else's its Tooltip (the other holds the
         // prefab's placeholder text): "title: description" (an artifact's title with its XP, a unit's
-        // the longer one it draws), then the rarity and the scaling, each only where switched on, then
-        // the keywords the game explains beside it.
+        // the longer one it draws), then the rarity and the scaling, each only where switched on, what
+        // cursed means when it is, then the keywords the game explains beside it.
         private static IEnumerable<string> ChoiceDetails(DraftChoice choice)
         {
             var lines = new List<string>();
@@ -902,6 +935,7 @@ namespace DiceVoders.Module.Screens
                 title = title ?? ChoiceName(choice);
                 lines.Add(description != null ? title + ": " + description : title);
                 foreach (var tmp in rest) { string text = Shown(tmp); if (text != null) lines.Add(text); }
+                if (choice.isCursed) { string cursed = CursedLine(); if (cursed != null) lines.Add(cursed); }
                 string lit = Highlighted();
                 if (lit != null) lines.Add(lit);
                 lines.AddRange(unit ? Keywords.Of(choice.EntityTooltip) : Keywords.Of(choice.Tooltip));
