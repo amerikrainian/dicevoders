@@ -1,5 +1,10 @@
 # Changelog
 
+## V0.0.3
+
+- We now properly read curse modifiers.
+- Some astral items included a stray = in their descriptions. This has been fixed.
+
 ## V0.0.2
 
 - Kraken dice are now read properly.
