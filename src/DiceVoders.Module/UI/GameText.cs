@@ -46,9 +46,14 @@ namespace DiceVoders.Module.UI
         // artifact's unlock line, a constellation's addition to a unit), a break, not words.
         private static readonly Regex Divider = new Regex(@"[ \t]*(?:-[ \t]*){5,}", RegexOptions.Compiled);
 
+        // An astral artifact's title opens with a red "=", which the titles' font (StarvadersGun)
+        // draws as a star: the rarity line under it already says Astral.
+        private static readonly Regex AstralStar = new Regex(@"<color=#C01E20>=</color>\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         public static string Clean(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
+            text = AstralStar.Replace(text, "");
             text = Divider.Replace(text, "\n");
             text = OpeningTarget.Replace(text, m => m.Groups[1].Value + m.Groups[2].Value + "<sprite name=\"" + LineTarget + "\">");
             text = Nobr.Replace(text, m => Sprite.Replace(m.Groups[1].Value, s => DecorStart + s.Groups[1].Value + IconEnd));
