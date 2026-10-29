@@ -1,5 +1,10 @@
 # Changelog
 
+## V0.0.4
+
+- The Warped Oculus now says it is looking left. It said "looking right", though it affects the units to its left.
+- An Oculus's facing is now in its details (Backspace), after its description, instead of on its cell.
+
 ## V0.0.3
 
 - We now properly read curse modifiers.
