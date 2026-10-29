@@ -607,7 +607,6 @@ namespace DiceVoders.Module.Screens
             parts.AddRange(UnitStates(unit).FindAll(s => s != Strings.EncBlocked));
             try { if (unit.MaxCharge > 0) parts.Add(Strings.EncCharge(unit.Charge, unit.MaxCharge)); }
             catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's charge failed: " + e.Message); }
-            parts.Add(Facing(unit));
             parts.RemoveAll(string.IsNullOrEmpty);
             return string.Join(", ", parts);
         }
@@ -671,6 +670,10 @@ namespace DiceVoders.Module.Screens
             var (description, rarity, keywords) = EncounterState.Tooltip(unit, EncounterState.Tile(x, y));
             string name = EncounterState.Name(unit);
             yield return description != null ? name + ": " + description : name;
+            // The direction the description's "looking at" means, fixed per unit: it lives here, not
+            // on the cell's line.
+            string facing = Facing(unit);
+            if (facing != null) yield return facing;
             if (rarity != null) yield return rarity;
             string lit = Highlighted();
             if (lit != null) yield return lit;
