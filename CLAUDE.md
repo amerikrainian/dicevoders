@@ -389,9 +389,12 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     Uncommon 13%, Rare 6%, Legendary 0%"). Seen live in the shop, with the choices' keywords (Comet:
     Base Dice, Mult; Shooter: Repeat; the spells carry none).
   - The Oculus (and Warped Oculus) score "in the direction its looking at", drawn only as the
-    sprite's facing: a unit with an `OculusTask`/`WarpedOculusTask` in `OnScoreTaskList` reads its
-    `OculusDirection` last, "looking right" (`EncounterScreen.Facing`; N is a row up, E a column
-    right, per `GridModel.GetCoordsInDirection`). Selection previews (`PreviewController.RunPreview`)
+    sprite's facing: a unit with an `OculusTask` in `OnScoreTaskList` reads its `OculusDirection`
+    last, "looking right" (`EncounterScreen.Facing`; N is a row up, E a column right, per
+    `GridModel.GetCoordsInDirection`; every unit's is E from its constructor and nothing in the game
+    changes it). The `WarpedOculusTask` ignores the field and always passes W: the Warped Oculus reads
+    "looking left", as its sprite (`OculusLeftPlus`) faces. Seen live: each affected exactly the units
+    on its side. Selection previews (`PreviewController.RunPreview`)
     draw nothing in this game: the whole scene diffed with a target hovered for Give Shield,
     Sacrifice Unit, Swap or Move (both picks), placing a unit; no unit has a `PreviewTaskList`.
   - Blocked (Xenn's "Sol & Luna": each turn 2 random artifacts with an Arrow trigger, drawn as a sun

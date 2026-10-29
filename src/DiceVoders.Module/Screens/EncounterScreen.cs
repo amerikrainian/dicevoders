@@ -628,21 +628,26 @@ namespace DiceVoders.Module.Screens
             return states;
         }
 
-        /// <summary>"looking right": the direction a unit scores in (the Oculus's "Score all units in the
-        /// direction its looking at", <see cref="EntityModel.OculusDirection"/>, drawn only as the
-        /// sprite's facing), for a unit whose scoring uses it; null for the rest (every unit has one).
-        /// N is a row up (<see cref="GridModel.GetCoordsInDirection"/>), E a column right.</summary>
+        /// <summary>"looking right": the direction a unit scores in ("Score all units in the direction its
+        /// looking at", drawn only as the sprite's facing), for a unit whose scoring uses one; null for
+        /// the rest. The Oculus's task reads <see cref="EntityModel.OculusDirection"/> (E unless changed:
+        /// every unit has one); the Warped Oculus's always passes W, and its sprite faces left. N is a
+        /// row up (<see cref="GridModel.GetCoordsInDirection"/>), E a column right.</summary>
         internal static string Facing(EntityModel unit)
         {
             try
             {
-                bool looks = false;
+                Direction? looks = null;
                 if (unit.OnScoreTaskList != null)
                     foreach (var task in unit.OnScoreTaskList)
-                        if (task != null && (task.TryCast<OculusTask>() != null || task.TryCast<WarpedOculusTask>() != null)) { looks = true; break; }
-                if (!looks) return null;
+                    {
+                        if (task == null) continue;
+                        if (task.TryCast<OculusTask>() != null) { looks = unit.OculusDirection; break; }
+                        if (task.TryCast<WarpedOculusTask>() != null) { looks = Direction.W; break; }
+                    }
+                if (looks == null) return null;
                 string dir;
-                switch (unit.OculusDirection)
+                switch (looks.Value)
                 {
                     case Direction.N: dir = Strings.EncDirUp; break;
                     case Direction.S: dir = Strings.EncDirDown; break;
