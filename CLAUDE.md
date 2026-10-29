@@ -77,7 +77,7 @@ closed; Core/Module: `dotnet build src/DiceVoders.Module/DiceVoders.Module.cspro
 waits for the dev server). Tests: `dotnet test src/DiceVoders.Tests/DiceVoders.Tests.csproj`
 (Core + Contracts, no game). After adding a string: `DVO_WRITE_LANG_TEMPLATE=1` on that test run
 regenerates `lang/en.txt`; every other lang file needs the key too.
-The version lives in `Directory.Build.props` alone (0.0.3). Release: `build_release.ps1` (the game-folder zip
+The version lives in `Directory.Build.props` alone (0.0.4). Release: `build_release.ps1` (the game-folder zip
 `releases\DiceVoders-v<version>.zip`: BepInEx, the four mod dlls and `lang\` under
 `BepInEx\plugins\DiceVoders`, `prism.dll`, a BepInEx.cfg with the console off; no patcher),
 `build-installer.ps1` (the Rust installer in `installer\`, `releases\DiceVodersInstaller.exe`;
