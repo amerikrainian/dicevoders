@@ -367,7 +367,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     placing does, the game's mark under its `Selectionhighlight`: `LevelUpObject` "Level Up!" for the same
     artifact, else `SwapObject`'s `ReplaceObject` caption "Replace", drawn only on the hovered slot but
     read on all; an empty slot draws an arrow and says nothing; one artifact per column); focus goes to the
-    first on the selection's start; Escape is the game's Cancel. Landings: the shop's first choice
+    first on the selection's start; a chained one (Swap or Move: what, then where) leaves focus on the board where the
+    pick was made, said again (it jumped to the first target, and players put units in the wrong cell); Escape is the game's Cancel. Landings: the shop's first choice
     as it opens, the first die (silent) at a new turn; the strip's nodes `QuietVanish`. Readouts
     checked by reflection over the module (`Invoke` on `EncounterScreen.ChoiceText`...) with a tip
     up; buying, placing, Proceed not exercised.

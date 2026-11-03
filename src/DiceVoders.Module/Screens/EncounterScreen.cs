@@ -178,13 +178,19 @@ namespace DiceVoders.Module.Screens
             else if (selecting)
             {
                 // A selection chained on the last (Swap or Move: what, then where) keeps the game
-                // selecting with other targets: focus on none of them goes to the first.
+                // selecting with other targets. Focus on the board stays where the pick was made (the
+                // picked unit's cell, said again: no longer a target): landing on the first target
+                // moved it away unnoticed, and the next Enter put the unit in the wrong cell. Focus
+                // elsewhere goes to the first target.
                 string targets = TargetsKey();
                 if (targets != _targets)
                 {
                     _targets = targets;
                     var first = FirstTarget();
-                    if (first != null && !FocusOnTarget()) { _pendingLanding = first; _pendingSpeak = true; }
+                    string focus = FocusedKey();
+                    if (first == null || FocusOnTarget()) { }
+                    else if (FocusedColumn().HasValue && focus != null) { _pendingLanding = ControlId.Structural(focus); _pendingSpeak = true; }
+                    else { _pendingLanding = first; _pendingSpeak = true; }
                 }
             }
             else if (!selecting && phase != _phase && EncounterEvents.Settled)
