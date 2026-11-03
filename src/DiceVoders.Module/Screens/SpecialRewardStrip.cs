@@ -20,7 +20,8 @@ namespace DiceVoders.Module.Screens
     /// the pilot's loot (<c>PilotDraftScreen</c>, "You Receive": Budge, Chrono and Heart, all received
     /// by Proceed, <see cref="SpecialRewardPanel.OnPressReceiveAllButton"/>, so they read as text;
     /// under the Scarcity run mod each is a button that receives it alone), the legendary
-    /// draft (<c>LegendaryDraftScreen</c>: three artifacts, skip for money, proceed), the overseer's
+    /// draft (<c>LegendaryDraftScreen</c>: three artifacts, skip for money, proceed; a Chrono reroll on
+    /// the abilities row under it, <see cref="EncounterScreen"/>'s), the overseer's
     /// choice (<c>OverseerLevelupScreen</c>). An artifact reads as on the board ("The Tutorial, LV.
     /// 2"), Backspace its tooltip; a button by its hover tooltip's title, Backspace the tooltip; one
     /// with neither, the game's "Proceed". Every button is the game's click; an artifact's in the
@@ -38,6 +39,44 @@ namespace DiceVoders.Module.Screens
 
         /// <summary>The reward screen shown, or null.</summary>
         public static GameObject Shown() => Shown(Panel());
+
+        /// <summary>The legendary draft's artifacts by name while it shows ("Universe", "Last Train",
+        /// "Shimmer"), else null.</summary>
+        public static List<string> DraftNames()
+        {
+            var panel = Panel();
+            var screen = Shown(panel);
+            if (screen == null || screen.Pointer != panel.LegendaryDraftScreen.Pointer) return null;
+            var names = new List<string>();
+            try
+            {
+                foreach (var view in panel.ArtifactViews)
+                {
+                    if (view == null || !view.gameObject.activeInHierarchy) continue;
+                    var model = Model(view);
+                    string name = model != null ? Encounter.Encounter.ArtifactName(model) : null;
+                    if (name != null) names.Add(name);
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("SpecialRewardStrip: reading the draft failed: " + e.Message); }
+            return names;
+        }
+
+        /// <summary>The panel's title ("Choose One") while it shows, else null.</summary>
+        public static string Title()
+        {
+            var panel = Panel();
+            return panel != null ? GameText.Of(panel.TitleText) : null;
+        }
+
+        /// <summary>Whether the legendary draft shows its reroll crossed out (the game refuses Chrono
+        /// there: a run with <c>ShuffledAndStrongerPilots</c> and the Sandbox's perk reroll off).</summary>
+        public static bool RerollCrossedOut()
+        {
+            var panel = Panel();
+            try { return panel != null && panel.CrossedOutRerollObject != null && panel.CrossedOutRerollObject.activeInHierarchy; }
+            catch (Exception e) { CoreLog.Warning("SpecialRewardStrip: reading the crossed out reroll failed: " + e.Message); return false; }
+        }
 
         /// <summary>The id of the shown screen's first item.</summary>
         public static ControlId FirstId(GameObject screen) => Id(screen, 0);

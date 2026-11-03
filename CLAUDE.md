@@ -525,7 +525,12 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     a button receiving that one alone; seen live; their tooltips are filled only by
     `LocalizeStringEvent`s, which a hidden one leaves on the prefab's placeholder, "4D-принтер", so
     they read from the events' `GetLocalizedString`: `Keywords.Tooltip(.., localized: true)`), `LegendaryDraftScreen` (three artifacts =
-    `OnPressArtifactSelect`, `OnPressSkipForMoney`, `OnContinuePressed`), `OverseerLevelupScreen`. An
+    `OnPressArtifactSelect`, `OnPressSkipForMoney`, `OnContinuePressed`; under it the abilities knob's row, as
+    under the shop: a Chrono reroll, `OnPressRerollButton` in `Phase.LegendaryDraft`, refused, and drawn
+    `RerollButton/CrossedOut`, read "disabled", in a `ShuffledAndStrongerPilots` run without the Sandbox's
+    `AllowPerkReroll`; R or Enter on it says the new draft, "Choose One: Growth Serum, Ectoplasm, Asteroid
+    Belt", which the events do not hold; the game shows the knob over the level up and loot too, left
+    out there), `OverseerLevelupScreen`. An
     artifact reads as on the board, Backspace its tooltip (`ArtifactDetails(model, view)`); a button
     by its hover tooltip's title (`ButtonView.Tooltip`, `Keywords.Tooltip`), else caption, else
     "Proceed". A legendary pick (`OnPressArtifactSelect`) takes the artifact at once. Seen live: the

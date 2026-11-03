@@ -358,14 +358,22 @@ namespace DiceVoders.Module.Screens
         private static void BuildStrip(GraphBuilder b)
         {
             var phase = EncounterState.Phase;
-            if (SpecialRewardStrip.Shown() != null) SpecialRewardStrip.Build(b, BoardStop);
+            // A pilot's rewards. The legendary draft takes a Chrono reroll (the game's R and Reroll
+            // button, refused where it draws the button crossed out): the knob under it. The game
+            // shows the knob over the level up and the loot too, where a reroll has nothing to act on.
+            if (SpecialRewardStrip.Shown() != null)
+            {
+                SpecialRewardStrip.Build(b, BoardStop);
+                if (SpecialRewardStrip.DraftNames() != null) BuildAbilities(b);
+            }
             else if (phase == Phase.Player) { BuildDice(b); BuildAbilities(b); }
             else if (phase == Phase.Draft) { BuildShop(b); BuildAbilities(b); }
             else if (phase == Phase.FinalBossDraft) BuildStarDraft(b);
         }
 
-        // The game's buttons under the dice and the shop (the abilities knob), a row below theirs: the
-        // Reroll button ("Reroll Button, Chrono 2": R's reroll), the Budge button ("Budge Button,
+        // The game's buttons under the dice, the shop and a pilot's rewards (the abilities knob), a row
+        // below theirs: the Reroll button ("Reroll Button, Chrono 2": R's reroll; disabled while the
+        // legendary draft draws it crossed out), the Budge button ("Budge Button,
         // Budge 6, disabled"; "undo" while a budge can be undone, Enter then Q's undo;
         // budging is A and S), the
         // Mini-Dice ("Mini-Dice, 5"). Each with its tooltip on Backspace. Keys that act on a die or an
@@ -379,7 +387,8 @@ namespace DiceVoders.Module.Screens
             if (reroll == null && budge == null && mini == null) return;
             b.StartRow(BoardStop);
             if (reroll != null)
-                b.AddItem(ControlId.Structural("enc:ability:reroll"), Ability(reroll.gameObject, reroll.Tooltip, () => Chrono(), EncounterKeys.Reroll));
+                b.AddItem(ControlId.Structural("enc:ability:reroll"), Ability(reroll.gameObject, reroll.Tooltip, () => Chrono(), EncounterKeys.Reroll,
+                    () => !SpecialRewardStrip.RerollCrossedOut()));
             // Disabled while there is no budge to undo (the game's click then only shows the dice's
             // arrows to a mouse); the Budge left read then, "undo" while it does something.
             if (budge != null)

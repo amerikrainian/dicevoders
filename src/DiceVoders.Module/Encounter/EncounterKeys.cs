@@ -187,7 +187,8 @@ namespace DiceVoders.Module.Encounter
         /// <summary>Escape in a target choice: the game's Cancel, which drops it.</summary>
         public static void CancelSelection() => Run("cancel", k => k.OnCancel(Context()));
 
-        // R: reroll the dice that are not frozen with Chrono; the roll is said by the events. With no
+        // R: reroll with Chrono (the dice not frozen, the shop, a pilot's legendary draft); the roll
+        // and the shop are said by the events, the draft here. With no
         // Chrono left, says so (the game ignores the key); refused otherwise, says that.
         internal static void Reroll()
         {
@@ -197,12 +198,32 @@ namespace DiceVoders.Module.Encounter
                 return;
             }
             int before = Encounter.Int(EncounterValue.ChronoToken) ?? 0;
+            var draft = Screens.SpecialRewardStrip.DraftNames();
             if (!Run("reroll", k => k.OnReroll(Context()))) return;
-            // Refused (a tip up, the wrong phase): nothing spent.
+            // Refused (a tip up, the wrong phase, a crossed out draft reroll): nothing spent.
             Later.Frames(10, () =>
             {
                 if ((Encounter.Int(EncounterValue.ChronoToken) ?? 0) == before) Speech.Say(Strings.EncCantReroll, interrupt: true);
+                else if (draft != null) SayDraft(draft, 0);
             }, "reroll");
+        }
+
+        // A pilot's legendary draft rerolled: its new artifacts under its title ("Choose One: Universe,
+        // Last Train, Shimmer") once they differ from the old (they slide out and back in), two
+        // seconds at most. The events say only the Chrono spent: the draft is not in their snapshot.
+        private static void SayDraft(List<string> before, int waited)
+        {
+            Later.Frames(6, () =>
+            {
+                var now = Screens.SpecialRewardStrip.DraftNames();
+                if (now == null) return;
+                bool changed = now.Count > 0 && string.Join("|", now) != string.Join("|", before);
+                if (!changed && waited < 20) { SayDraft(before, waited + 1); return; }
+                if (now.Count == 0) return;
+                string title = Screens.SpecialRewardStrip.Title();
+                string items = string.Join(", ", now);
+                Speech.Say(title != null ? title + ": " + items : items);
+            }, "draft reroll");
         }
 
         // Q: the game's cancel (undoes a budge, leaves a choice); dice it changes are said and taken
