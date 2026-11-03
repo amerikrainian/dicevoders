@@ -340,6 +340,20 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     `SoundName.P_Typing`, its one caller); the floating popups (`FloatingUpText` Level Up/attack up,
     `FloatingScoreText`, `FloatingIcon`) are covered by the steps; `P_ChaosDialogue` is never played. The old one-line summary ("column 3: 20, column 5:
     10, 30/100 attack", `AttackGainedLastTurn` once the shop opens) stays for a turn no step said.
+    The mod setting "Summarize each turn's scoring" (store key `scoring_summary`, off by default;
+    asked for by a player, ahicks: a turn can say hundreds of lines) says none of the steps and keeps
+    the baseline from before the launch; as the board's total shows, one line
+    (`EncounterDiff.TurnSummary`): every column's attack over both passes by position, zeros kept,
+    the Mult (the board's, else the model's: the board draws none for a Mult held from before the
+    launch) and the total, then the Mini-Dice scored and the combos they landed in per pass, by the
+    game's labels (`PairTextObjects`: Pair, Triple!, Quadruple!, Quintuple! for 5 and up): "0, 0, 0,
+    30, 0, 90, Mult 2.5 = 300, 11 Mini-Dice as 2 Pair". The game's pair and triple conditions
+    (`IsDuringPairOfDiceCondition`...) test the column task's Amount, the dice of that face in the
+    tray, in both passes: Mini-Dice landing together are a pair for triggers too (Monocle and Shamby
+    lower it to one base die, never in the Mini-Dice pass). The shop's settled snapshot then says the
+    turn's net changes once, the scoring line without its columns ("1,035/6,000 attack"), the Mini-Dice
+    spent unsaid. Seen live: with and without a Mult, Mini-Dice pairs and a triple, a last turn into
+    the result screen; turned off, the steps as before.
     The result screen settles too: the last turn's total is said before it. Also said: target
     reached, a heart lost, "shop", a new turn ("3 Turns, rolled 2, 4, 6"), a reroll; and every other
     settled change: a new target (its round's resets unsaid), attack, units destroyed/added/moved

@@ -76,6 +76,9 @@ namespace DiceVoders.Module.Screens
                 () => settings.SpeakPositions, v => settings.SpeakPositions = v));
             b.AddItem(ControlId.Structural("modsettings:focus"), Toggle(() => Strings.ModFocusOnLaunch,
                 () => settings.FocusModeOnLaunch, v => settings.FocusModeOnLaunch = v));
+            b.AddItem(ControlId.Structural("modsettings:summary"), Toggle(() => Strings.ModScoringSummary,
+                () => settings.Store.GetBool(Encounter.EncounterEvents.SummaryKey, false),
+                v => settings.Store.SetBool(Encounter.EncounterEvents.SummaryKey, v)));
             b.PopContext();
         }
 

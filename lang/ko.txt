@@ -109,6 +109,8 @@ enc.rolled=굴림 {0}
 enc.column_attack={0}열: {1}
 enc.dice_count={0} {1}
 enc.turn_score=턴: {0}, {1}, {2}
+enc.turn_summary={0}, {1} = {2}
+enc.mini_summary={0} ({1})
 enc.affects=영향: {0}
 enc.looking=방향: {0}
 enc.dir_up=위
@@ -191,6 +193,7 @@ mod.key_help=모든 키
 mod.close=닫기
 mod.speak_positions=목록 위치 읽기
 mod.focus_on_launch=시작 시 키보드 탐색 켜기
+mod.scoring_summary=턴마다 점수 요약
 mod.key_category={0} 키
 mod.category.global=전역
 mod.category.ui=탐색

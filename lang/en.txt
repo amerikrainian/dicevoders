@@ -111,6 +111,8 @@ enc.rolled=rolled {0}
 enc.column_attack=column {0}: {1}
 enc.dice_count={0} {1}
 enc.turn_score=turn: {0}, {1}, {2}
+enc.turn_summary={0}, {1} = {2}
+enc.mini_summary={0} as {1}
 enc.affects=affects: {0}
 enc.looking=looking {0}
 enc.dir_up=up
@@ -193,6 +195,7 @@ mod.key_help=All keys
 mod.close=Close
 mod.speak_positions=Speak list positions
 mod.focus_on_launch=Keyboard navigation on at launch
+mod.scoring_summary=Summarize each turn's scoring
 mod.key_category={0} keys
 mod.category.global=Global
 mod.category.ui=Navigation

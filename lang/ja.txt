@@ -109,6 +109,8 @@ enc.rolled=出目 {0}
 enc.column_attack={0}列: {1}
 enc.dice_count={0} {1}
 enc.turn_score=ターン: {0}、{1}、{2}
+enc.turn_summary={0}、{1} = {2}
+enc.mini_summary={0}（{1}）
 enc.affects=対象: {0}
 enc.looking=向き: {0}
 enc.dir_up=上
@@ -191,6 +193,7 @@ mod.key_help=すべてのキー
 mod.close=閉じる
 mod.speak_positions=リスト内の位置を読み上げる
 mod.focus_on_launch=起動時にキーボードナビゲーションをオン
+mod.scoring_summary=各ターンの得点を要約する
 mod.key_category={0} キー
 mod.category.global=グローバル
 mod.category.ui=ナビゲーション

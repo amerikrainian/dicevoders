@@ -109,6 +109,8 @@ enc.rolled=saiu {0}
 enc.column_attack=coluna {0}: {1}
 enc.dice_count={0} {1}
 enc.turn_score=turno: {0}, {1}, {2}
+enc.turn_summary={0}, {1} = {2}
+enc.mini_summary={0} com {1}
 enc.affects=afeta: {0}
 enc.looking=olha: {0}
 enc.dir_up=cima
@@ -191,6 +193,7 @@ mod.key_help=Todas as teclas
 mod.close=Fechar
 mod.speak_positions=Falar posições nas listas
 mod.focus_on_launch=Navegação por teclado ativada ao iniciar
+mod.scoring_summary=Resumir a pontuação de cada turno
 mod.key_category=Teclas: {0}
 mod.category.global=globais
 mod.category.ui=navegação

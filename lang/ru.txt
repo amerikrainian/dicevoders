@@ -109,6 +109,8 @@ enc.rolled=выпало {0}
 enc.column_attack=столбец {0}: {1}
 enc.dice_count={0} {1}
 enc.turn_score=ход: {0}, {1}, {2}
+enc.turn_summary={0}, {1} = {2}
+enc.mini_summary={0}: {1}
 enc.affects=влияет на: {0}
 enc.looking=смотрит: {0}
 enc.dir_up=вверх
@@ -191,6 +193,7 @@ mod.key_help=Все клавиши
 mod.close=Закрыть
 mod.speak_positions=Озвучивать позиции в списках
 mod.focus_on_launch=Клавиатурная навигация при запуске
+mod.scoring_summary=Кратко озвучивать подсчёт очков за ход
 mod.key_category={0}: клавиши
 mod.category.global=общие
 mod.category.ui=навигация

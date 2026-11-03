@@ -177,6 +177,12 @@ namespace DiceVoders.Core.Strings
             // The scoring board's sum once a turn's attack is multiplied; {0} = the attack, {1} = the
             // Mult ("Mult 2.0"), {2} = what the turn adds.
             D("enc.turn_score", "turn: {0}, {1}, {2}"),
+            // The scoring summary setting's line for a turn; {0} = every column's attack by position,
+            // comma-separated ("10, 0, 0, 35, 0, 0"), {1} = the Mult ("Mult 2"), {2} = what the turn adds.
+            D("enc.turn_summary", "{0}, {1} = {2}"),
+            // After it, the Mini-Dice scored and their combos; {0} = the dice ("9 Mini-Dice"), {1} = the
+            // combos by the game's labels ("2 Pair, 1 Triple!").
+            D("enc.mini_summary", "{0} as {1}"),
             // What the game lights on the board for the hovered item; {0} = the units, tiles and
             // artifacts, comma-separated.
             D("enc.affects", "affects: {0}"),
@@ -286,6 +292,8 @@ namespace DiceVoders.Core.Strings
             D("mod.close", "Close"),
             D("mod.speak_positions", "Speak list positions"),
             D("mod.focus_on_launch", "Keyboard navigation on at launch"),
+            // The setting saying each turn's scoring as one line instead of column by column.
+            D("mod.scoring_summary", "Summarize each turn's scoring"),
             // {0} = the key category, one of the three names below.
             D("mod.key_category", "{0} keys"),
             // The key categories of the "All keys" list: live everywhere, on the focused screen, in a run.
@@ -544,6 +552,8 @@ namespace DiceVoders.Core.Strings
         public static string EncColumnAttack(int column, string attack) => F("enc.column_attack", column, attack);
         public static string EncDiceCount(int count, string dice) => F("enc.dice_count", count, dice);
         public static string EncTurnScore(string attack, string mult, string total) => F("enc.turn_score", attack, mult, total);
+        public static string EncTurnSummary(string columns, string mult, string total) => F("enc.turn_summary", columns, mult, total);
+        public static string EncMiniSummary(string dice, string combos) => F("enc.mini_summary", dice, combos);
         public static string EncAffects(string what) => F("enc.affects", what);
         public static string EncLooking(string direction) => F("enc.looking", direction);
         public static string EncDirUp => Get("enc.dir_up");
@@ -616,6 +626,7 @@ namespace DiceVoders.Core.Strings
         public static string ModClose => Get("mod.close");
         public static string ModSpeakPositions => Get("mod.speak_positions");
         public static string ModFocusOnLaunch => Get("mod.focus_on_launch");
+        public static string ModScoringSummary => Get("mod.scoring_summary");
         public static string ModKeyCategory(string category)
         {
             string name = "mod.category." + (category ?? "").ToLowerInvariant();

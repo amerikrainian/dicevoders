@@ -109,6 +109,8 @@ enc.rolled=obtenu {0}
 enc.column_attack=colonne {0} : {1}
 enc.dice_count={0} {1}
 enc.turn_score=tour : {0}, {1}, {2}
+enc.turn_summary={0}, {1} = {2}
+enc.mini_summary={0} dont {1}
 enc.affects=affecte : {0}
 enc.looking=regard : {0}
 enc.dir_up=haut
@@ -191,6 +193,7 @@ mod.key_help=Toutes les touches
 mod.close=Fermer
 mod.speak_positions=Annoncer les positions dans les listes
 mod.focus_on_launch=Navigation au clavier activée au lancement
+mod.scoring_summary=Résumer le score de chaque tour
 mod.key_category=Touches {0}
 mod.category.global=globales
 mod.category.ui=de navigation

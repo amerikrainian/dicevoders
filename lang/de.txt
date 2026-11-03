@@ -109,6 +109,8 @@ enc.rolled=gewürfelt {0}
 enc.column_attack=Spalte {0}: {1}
 enc.dice_count={0} {1}
 enc.turn_score=Zug: {0}, {1}, {2}
+enc.turn_summary={0}, {1} = {2}
+enc.mini_summary={0} mit {1}
 enc.affects=betrifft: {0}
 enc.looking=Blick: {0}
 enc.dir_up=oben
@@ -191,6 +193,7 @@ mod.key_help=Alle Tasten
 mod.close=Schließen
 mod.speak_positions=Listenpositionen ansagen
 mod.focus_on_launch=Tastaturnavigation beim Start aktiv
+mod.scoring_summary=Wertung jedes Zugs zusammenfassen
 mod.key_category={0}-Tasten
 mod.category.global=Global
 mod.category.ui=Navigations

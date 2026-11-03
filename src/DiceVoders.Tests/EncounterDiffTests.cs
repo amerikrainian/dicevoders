@@ -38,6 +38,47 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void With_the_turn_summarized_the_scoring_line_leaves_the_columns_out()
+        {
+            var now = Snap("Draft", total: 30, turns: 3);
+            now.ColumnAttack[2] = "20";
+            now.ColumnAttack[4] = "10";
+            Assert.Equal(new[] { "30/100 attack", "Shop" },
+                EncounterDiff.Lines(Snap("Player", dice: new[] { 3, 3, 5 }), now, columns: false));
+        }
+
+        [Fact]
+        public void A_summarized_turn_s_mini_dice_spent_go_unsaid()
+        {
+            var prev = WithMiniDice(Snap("Player", dice: new[] { 3, 3, 5 }), 10);
+            var now = WithMiniDice(Snap("Draft", total: 30, turns: 3), 0);
+            Assert.Equal(new[] { "30/100 attack", "Shop" }, EncounterDiff.Lines(prev, now, columns: false));
+        }
+
+        [Fact]
+        public void The_turn_summary_keeps_every_column_by_position()
+        {
+            Assert.Equal("10, 0, 0, 35, 0, 0, Mult 2 = 90",
+                EncounterDiff.TurnSummary(new[] { "10", "0", null, "35", "0", "0" }, "Mult 2", "90", 0, "Mini-Dice", null));
+        }
+
+        [Fact]
+        public void The_turn_summary_adds_the_mini_dice_and_their_combos()
+        {
+            var combos = new List<KeyValuePair<string, int>>
+            {
+                new KeyValuePair<string, int>("Pair", 2),
+                new KeyValuePair<string, int>("Triple!", 1),
+                new KeyValuePair<string, int>("Quadruple!", 0),
+            };
+            var columns = new[] { "0", "20", "0", "35", "0", "0" };
+            Assert.Equal("0, 20, 0, 35, 0, 0, Mult 1 = 55, 9 Mini-Dice as 2 Pair, 1 Triple!",
+                EncounterDiff.TurnSummary(columns, "Mult 1", "55", 9, "Mini-Dice", combos));
+            Assert.Equal("0, 20, 0, 35, 0, 0, Mult 1 = 55, 3 Mini-Dice",
+                EncounterDiff.TurnSummary(columns, "Mult 1", "55", 3, "Mini-Dice", new List<KeyValuePair<string, int>>()));
+        }
+
+        [Fact]
         public void Passing_the_target_says_it_was_reached()
         {
             var lines = EncounterDiff.Lines(Snap("Player", total: 90), Snap("Draft", total: 120));

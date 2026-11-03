@@ -25,6 +25,21 @@ namespace DiceVoders.Module.Encounter
     {
         private const int SettleFrames = 3;
 
+        /// <summary>The scoring summary setting's key in the host's store.</summary>
+        public const string SummaryKey = "scoring_summary";
+
+        /// <summary>Whether each turn's scoring is said as one line (<see cref="EncounterDiff.TurnSummary"/>)
+        /// instead of column by column; the rest of what the turn changed is said once, as the shop
+        /// settles. Off by default.</summary>
+        public static bool Summary
+        {
+            get
+            {
+                try { return ModuleMain.Host?.Settings?.Store.GetBool(SummaryKey, false) == true; }
+                catch (Exception e) { CoreLog.Warning("EncounterEvents: reading the summary setting failed: " + e.Message); return false; }
+            }
+        }
+
         /// <summary>Every line said in the current encounter, oldest first.</summary>
         public static readonly List<string> Log = new List<string>();
 
@@ -59,7 +74,7 @@ namespace DiceVoders.Module.Encounter
 
             var now = Take();
             if (now == null) return;
-            if (_last != null) Say(EncounterDiff.Lines(_last, now));
+            if (_last != null) Say(EncounterDiff.Lines(_last, now, columns: !Summary));
             else
             {
                 // A new encounter (a run begun, a turn rewound, a run loaded) met on the player's turn:
@@ -79,7 +94,15 @@ namespace DiceVoders.Module.Encounter
 
         private static void TurnBoard()
         {
-            if (Encounter.Phase != Phase.Scoring) { _turnSaid = false; return; }
+            var phase = Encounter.Phase;
+            if (phase != Phase.Scoring)
+            {
+                _turnSaid = false;
+                // A summarized turn whose board never showed its total: its columns at least, as the
+                // turn ends.
+                if (_summary.Open && phase != Phase.Player) SaySummary(null, null);
+                return;
+            }
             if (_turnSaid) return;
             try
             {
@@ -92,11 +115,72 @@ namespace DiceVoders.Module.Encounter
                 string mult = Encounter.WholeMult(GameText.Of(board.CurrentMultText)?.TrimStart('X', 'x').Trim());
                 string attack = GameText.Of(board.CurrentAttackScoreText);
                 string sum = GameText.Of(total);
-                if (string.IsNullOrEmpty(mult) || attack == null || sum == null) return;
                 string label = GameLoc.Get("GlobalMult_Keyword") ?? "Mult";
+                // Summarized: the Mult always. The board draws it only once it rises in the scoring
+                // (a Mult held from before the launch is not drawn, though the total is multiplied by
+                // it): else the model's, which the total was just multiplied by.
+                if (_summary.Open)
+                {
+                    if (string.IsNullOrEmpty(mult)) mult = Encounter.Mult();
+                    SaySummary(Core.Strings.Strings.EncFigure(label, string.IsNullOrEmpty(mult) ? "1" : mult), sum);
+                    return;
+                }
+                if (string.IsNullOrEmpty(mult) || attack == null || sum == null) return;
                 Say(new List<string> { Core.Strings.Strings.EncTurnScore(attack, Core.Strings.Strings.EncFigure(label, mult), sum) });
             }
             catch (Exception e) { CoreLog.Warning("EncounterEvents: reading the scoring board failed: " + e.Message); }
+        }
+
+        // The summarized turn, gathered as its columns score (ColumnSteps): each column's attack over
+        // every pass, the Mini-Dice scored, and the combos they landed in, by the game's label, in
+        // order of size (a pass's column with several Mini-Dice: "Pair" for 2, "Quintuple!" for 5
+        // and up). Opened by the turn's first column, closed as the line is said.
+        private sealed class TurnTally
+        {
+            public bool Open;
+            public BigDouble[] Columns = new BigDouble[0];
+            public int MiniDice;
+            public readonly List<KeyValuePair<string, int>> Combos = new List<KeyValuePair<string, int>>();
+            private readonly List<int> _sizes = new List<int>();
+
+            public void Start(int columns)
+            {
+                Open = true;
+                Columns = new BigDouble[columns];
+                for (int x = 0; x < columns; x++) Columns[x] = new BigDouble(0);
+                MiniDice = 0;
+                Combos.Clear();
+                _sizes.Clear();
+            }
+
+            public void AddCombo(int dice, string label)
+            {
+                if (string.IsNullOrEmpty(label)) return;
+                int i = Combos.FindIndex(c => c.Key == label);
+                if (i >= 0) { Combos[i] = new KeyValuePair<string, int>(label, Combos[i].Value + 1); return; }
+                int at = _sizes.FindIndex(size => size > dice);
+                if (at < 0) at = Combos.Count;
+                Combos.Insert(at, new KeyValuePair<string, int>(label, 1));
+                _sizes.Insert(at, dice);
+            }
+        }
+
+        private static readonly TurnTally _summary = new TurnTally();
+
+        // mult ("Mult 2") and total: the board's; both null when it never showed them.
+        private static void SaySummary(string mult, string total)
+        {
+            _summary.Open = false;
+            try
+            {
+                var columns = new List<string>();
+                foreach (var c in _summary.Columns) columns.Add(c.ToDouble() > 0 ? c.ToString() : "0");
+                string line = mult != null && total != null
+                    ? EncounterDiff.TurnSummary(columns, mult, total, _summary.MiniDice, GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice", _summary.Combos)
+                    : string.Join(", ", columns);
+                Say(new List<string> { line });
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterEvents: saying the turn's summary failed: " + e.Message); }
         }
 
         private static void Say(List<string> lines)
@@ -127,6 +211,14 @@ namespace DiceVoders.Module.Encounter
                 {
                     if (__instance.__1__state != 0 || _last == null || !Live(__instance.__4__this)) return;
                     __state = true;
+                    // Summarized: nothing said in the scoring, and the baseline kept from before it, so
+                    // the shop's settled snapshot says what the whole turn changed, once.
+                    if (Summary && Encounter.Phase == Phase.Scoring)
+                    {
+                        if (!_summary.Open) _summary.Start(Encounter.Columns);
+                        _stepStart = ColumnSums(Encounter.Model, true);
+                        return;
+                    }
                     var now = Take();
                     if (now == null) return;
                     Say(EncounterDiff.Lines(_last, now));
@@ -152,6 +244,7 @@ namespace DiceVoders.Module.Encounter
                     if (__result || _column < 0 || _last == null || _stepStart == null) return;
                     int column = _column;
                     _column = -1;
+                    if (_summary.Open) { Tally(column); return; }
                     var now = Take();
                     var end = ColumnSums(Encounter.Model, true);
                     if (now == null || end == null) return;
@@ -168,6 +261,25 @@ namespace DiceVoders.Module.Encounter
                 }
                 catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's end failed: " + e.Message); }
             }
+        }
+
+        // A summarized turn's column: the attack every column gained in it, and a Mini-Dice pass's
+        // dice and combo.
+        private static void Tally(int column)
+        {
+            var end = ColumnSums(Encounter.Model, true);
+            if (end == null) return;
+            for (int x = 0; x < end.Length && x < _summary.Columns.Length; x++)
+            {
+                var gain = x < _stepStart.Length ? end[x] - _stepStart[x] : end[x];
+                if (gain.ToDouble() > 0) _summary.Columns[x] = _summary.Columns[x] + gain;
+            }
+            if (_columnMini)
+            {
+                _summary.MiniDice += _columnDice;
+                if (_columnDice >= 2) _summary.AddCombo(_columnDice, Combo(column - 1, _columnDice));
+            }
+            CoreLog.Info("EncounterEvents: summarizing column " + column + ", " + _columnDice + (_columnMini ? " mini" : "") + " dice");
         }
 
         // The label the game draws over a column scored with several dice (GridColumn.PairTextObjects:

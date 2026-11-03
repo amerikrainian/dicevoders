@@ -109,6 +109,8 @@ enc.rolled=atıldı {0}
 enc.column_attack=sütun {0}: {1}
 enc.dice_count={0} {1}
 enc.turn_score=tur: {0}, {1}, {2}
+enc.turn_summary={0}, {1} = {2}
+enc.mini_summary={0}: {1}
 enc.affects=etkiler: {0}
 enc.looking=bakış: {0}
 enc.dir_up=yukarı
@@ -191,6 +193,7 @@ mod.key_help=Tüm tuşlar
 mod.close=Kapat
 mod.speak_positions=Liste konumlarını söyle
 mod.focus_on_launch=Başlangıçta klavye gezinmesi açık
+mod.scoring_summary=Her turun puanlamasını özetle
 mod.key_category={0} tuşları
 mod.category.global=Genel
 mod.category.ui=Gezinme

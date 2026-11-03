@@ -30,7 +30,9 @@ namespace DiceVoders.Core.Encounter
     {
         public const string PlayerPhase = "Player", DraftPhase = "Draft", ScoringPhase = "Scoring";
 
-        public static List<string> Lines(EncounterSnapshot prev, EncounterSnapshot now)
+        /// <param name="columns">false: the turn's scoring line leaves its columns out ("30/100
+        /// attack"), the turn summary (<see cref="TurnSummary"/>) having said them.</param>
+        public static List<string> Lines(EncounterSnapshot prev, EncounterSnapshot now, bool columns = true)
         {
             var lines = new List<string>();
             if (prev == null || now == null) return lines;
@@ -44,7 +46,7 @@ namespace DiceVoders.Core.Encounter
             if (scored)
             {
                 var parts = new List<string>();
-                for (int i = 0; i < now.ColumnAttack.Count; i++)
+                for (int i = 0; columns && i < now.ColumnAttack.Count; i++)
                 {
                     string attack = now.ColumnAttack[i];
                     if (!string.IsNullOrEmpty(attack) && attack != "0") parts.Add(S.EncColumnAttack(i + 1, attack));
@@ -80,9 +82,10 @@ namespace DiceVoders.Core.Encounter
                 var before = prev.Tokens.Find(t => t.Key == token.Key);
                 if (before == null || before.Value == token.Value) continue;
                 // A new round's fresh Cash is no news; nor the Mini-Dice spent as they are rolled in the
-                // scoring, where each one's column is said (Step).
+                // scoring, where each one's column is said (Step), or the summary counts them (a
+                // summarized turn's baseline is from before the launch).
                 if (newTarget && token.Key == "cash") continue;
-                if (token.Key == "minidice" && token.Value < before.Value && now.Phase == ScoringPhase) continue;
+                if (token.Key == "minidice" && token.Value < before.Value && (now.Phase == ScoringPhase || wasPlayer && !isPlayer)) continue;
                 lines.Add(S.EncFigure(token.Label, token.Value.ToString()));
             }
             // "Shop rarity, +5 %", as the shop draws it; a new round's reset unsaid.
@@ -140,6 +143,28 @@ namespace DiceVoders.Core.Encounter
             if (!any && rest.Count == 0) return rest;
             rest.Insert(0, string.Join(", ", parts));
             return rest;
+        }
+
+        /// <summary>
+        /// The turn summed up in one line, the scoring summary setting's in place of the column by
+        /// column lines: every column's attack by position, zeros kept ("10, 0, 0, 35, 0, 0"), the
+        /// Mult and what the turn adds ("Mult 2 = 90"), then the Mini-Dice scored and the combos they
+        /// landed in, by the game's labels in the order given ("9 Mini-Dice as 2 Pair, 1 Triple!";
+        /// none, left out; no combo, the count alone).
+        /// </summary>
+        public static string TurnSummary(IList<string> columns, string mult, string total, int miniDice, string miniLabel,
+            IList<KeyValuePair<string, int>> combos)
+        {
+            var figures = new List<string>();
+            foreach (var c in columns) figures.Add(string.IsNullOrEmpty(c) ? "0" : c);
+            string line = S.EncTurnSummary(string.Join(", ", figures), mult, total);
+            if (miniDice <= 0) return line;
+            string dice = S.EncDiceCount(miniDice, miniLabel);
+            var parts = new List<string>();
+            if (combos != null)
+                foreach (var combo in combos)
+                    if (combo.Value > 0 && !string.IsNullOrEmpty(combo.Key)) parts.Add(S.EncDiceCount(combo.Value, combo.Key));
+            return line + ", " + (parts.Count > 0 ? S.EncMiniSummary(dice, string.Join(", ", parts)) : dice);
         }
 
         /// <summary>The turn as it stands ("3 Turns, rolled 3, 6, 6"), for an encounter met mid-turn (a
