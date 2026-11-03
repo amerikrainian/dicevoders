@@ -180,6 +180,8 @@ namespace DiceVoders.Core.Strings
             // The scoring summary setting's line for a turn; {0} = every column's attack by position,
             // comma-separated ("10, 0, 0, 35, 0, 0"), {1} = the Mult ("Mult 2"), {2} = what the turn adds.
             D("enc.turn_summary", "{0}, {1} = {2}"),
+            // The same when the turn left the Mult as it was; {0} = the columns, {1} = what the turn adds.
+            D("enc.turn_summary_plain", "{0} = {1}"),
             // After it, the Mini-Dice scored and their combos; {0} = the dice ("9 Mini-Dice"), {1} = the
             // combos by the game's labels ("2 Pair, 1 Triple!").
             D("enc.mini_summary", "{0} as {1}"),
@@ -553,6 +555,7 @@ namespace DiceVoders.Core.Strings
         public static string EncDiceCount(int count, string dice) => F("enc.dice_count", count, dice);
         public static string EncTurnScore(string attack, string mult, string total) => F("enc.turn_score", attack, mult, total);
         public static string EncTurnSummary(string columns, string mult, string total) => F("enc.turn_summary", columns, mult, total);
+        public static string EncTurnSummaryPlain(string columns, string total) => F("enc.turn_summary_plain", columns, total);
         public static string EncMiniSummary(string dice, string combos) => F("enc.mini_summary", dice, combos);
         public static string EncAffects(string what) => F("enc.affects", what);
         public static string EncLooking(string direction) => F("enc.looking", direction);

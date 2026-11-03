@@ -110,6 +110,7 @@ enc.column_attack={0}열: {1}
 enc.dice_count={0} {1}
 enc.turn_score=턴: {0}, {1}, {2}
 enc.turn_summary={0}, {1} = {2}
+enc.turn_summary_plain={0} = {1}
 enc.mini_summary={0} ({1})
 enc.affects=영향: {0}
 enc.looking=방향: {0}

@@ -92,12 +92,17 @@ namespace DiceVoders.Module.Encounter
         // with a Mult: without one the total is the columns' attack, already said.
         private static bool _turnSaid;
 
+        // The Mult as the player's turn last stood: the turn's Mult is news only if the scoring changed
+        // it (a Mult held from before the launch was there all turn).
+        private static double _multBefore = 1;
+
         private static void TurnBoard()
         {
             var phase = Encounter.Phase;
             if (phase != Phase.Scoring)
             {
                 _turnSaid = false;
+                if (phase == Phase.Player) _multBefore = ModelMult() ?? 1;
                 // A summarized turn whose board never showed its total: its columns at least, as the
                 // turn ends.
                 if (_summary.Open && phase != Phase.Player) SaySummary(null, null);
@@ -116,16 +121,19 @@ namespace DiceVoders.Module.Encounter
                 string attack = GameText.Of(board.CurrentAttackScoreText);
                 string sum = GameText.Of(total);
                 string label = GameLoc.Get("GlobalMult_Keyword") ?? "Mult";
-                // Summarized: the Mult always. The board draws it only once it rises in the scoring
-                // (a Mult held from before the launch is not drawn, though the total is multiplied by
-                // it): else the model's, which the total was just multiplied by.
+                // The Mult only when the scoring changed it; then the board's, else the model's (the
+                // board draws it only once it rises: the total is multiplied by the model's).
+                double? now = ModelMult();
+                bool changed = now.HasValue && Math.Abs(now.Value - _multBefore) > 1e-9;
+                if (changed && string.IsNullOrEmpty(mult)) mult = Encounter.Mult();
+                CoreLog.Info("EncounterEvents: turn total " + sum + ", Mult " + _multBefore + " -> " + now + (changed ? ", said" : ", unchanged"));
                 if (_summary.Open)
                 {
-                    if (string.IsNullOrEmpty(mult)) mult = Encounter.Mult();
-                    SaySummary(Core.Strings.Strings.EncFigure(label, string.IsNullOrEmpty(mult) ? "1" : mult), sum);
+                    SaySummary(changed && !string.IsNullOrEmpty(mult) ? Core.Strings.Strings.EncFigure(label, mult) : null, sum ?? "");
                     return;
                 }
-                if (string.IsNullOrEmpty(mult) || attack == null || sum == null) return;
+                // Column by column, the total is news only with a Mult the scoring changed.
+                if (!changed || string.IsNullOrEmpty(mult) || attack == null || sum == null) return;
                 Say(new List<string> { Core.Strings.Strings.EncTurnScore(attack, Core.Strings.Strings.EncFigure(label, mult), sum) });
             }
             catch (Exception e) { CoreLog.Warning("EncounterEvents: reading the scoring board failed: " + e.Message); }
@@ -167,7 +175,14 @@ namespace DiceVoders.Module.Encounter
 
         private static readonly TurnTally _summary = new TurnTally();
 
-        // mult ("Mult 2") and total: the board's; both null when it never showed them.
+        private static double? ModelMult()
+        {
+            try { return Encounter.Model?.GetBigDoubleValue(EncounterValue.GlobalMult).ToDouble(); }
+            catch (Exception e) { CoreLog.Warning("EncounterEvents: reading the Mult failed: " + e.Message); return null; }
+        }
+
+        // mult ("Mult 2"): null when the scoring left it as it was; total: the board's, null (with
+        // mult) when it never showed it.
         private static void SaySummary(string mult, string total)
         {
             _summary.Open = false;
@@ -175,7 +190,7 @@ namespace DiceVoders.Module.Encounter
             {
                 var columns = new List<string>();
                 foreach (var c in _summary.Columns) columns.Add(c.ToDouble() > 0 ? c.ToString() : "0");
-                string line = mult != null && total != null
+                string line = total != null
                     ? EncounterDiff.TurnSummary(columns, mult, total, _summary.MiniDice, GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice", _summary.Combos)
                     : string.Join(", ", columns);
                 Say(new List<string> { line });

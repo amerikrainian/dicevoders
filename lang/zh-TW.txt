@@ -110,6 +110,7 @@ enc.column_attack=第{0}欄: {1}
 enc.dice_count={0} {1}
 enc.turn_score=回合：{0}，{1}，{2}
 enc.turn_summary={0}，{1} = {2}
+enc.turn_summary_plain={0} = {1}
 enc.mini_summary={0}（{1}）
 enc.affects=影響：{0}
 enc.looking=朝向：{0}

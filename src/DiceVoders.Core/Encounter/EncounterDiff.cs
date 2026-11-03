@@ -148,7 +148,8 @@ namespace DiceVoders.Core.Encounter
         /// <summary>
         /// The turn summed up in one line, the scoring summary setting's in place of the column by
         /// column lines: every column's attack by position, zeros kept ("10, 0, 0, 35, 0, 0"), the
-        /// Mult and what the turn adds ("Mult 2 = 90"), then the Mini-Dice scored and the combos they
+        /// Mult when the turn changed it (null: left out) and what the turn adds ("Mult 2 = 90",
+        /// "= 45"), then the Mini-Dice scored and the combos they
         /// landed in, by the game's labels in the order given ("9 Mini-Dice as 2 Pair, 1 Triple!";
         /// none, left out; no combo, the count alone).
         /// </summary>
@@ -157,7 +158,9 @@ namespace DiceVoders.Core.Encounter
         {
             var figures = new List<string>();
             foreach (var c in columns) figures.Add(string.IsNullOrEmpty(c) ? "0" : c);
-            string line = S.EncTurnSummary(string.Join(", ", figures), mult, total);
+            string line = string.IsNullOrEmpty(mult)
+                ? S.EncTurnSummaryPlain(string.Join(", ", figures), total)
+                : S.EncTurnSummary(string.Join(", ", figures), mult, total);
             if (miniDice <= 0) return line;
             string dice = S.EncDiceCount(miniDice, miniLabel);
             var parts = new List<string>();

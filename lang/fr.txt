@@ -110,6 +110,7 @@ enc.column_attack=colonne {0} : {1}
 enc.dice_count={0} {1}
 enc.turn_score=tour : {0}, {1}, {2}
 enc.turn_summary={0}, {1} = {2}
+enc.turn_summary_plain={0} = {1}
 enc.mini_summary={0} dont {1}
 enc.affects=affecte : {0}
 enc.looking=regard : {0}

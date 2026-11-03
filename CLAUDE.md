@@ -332,7 +332,9 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     (`EncounterView.CurrentScoreBoard`, `StellarVisScoreBoard`: the turn's attack counting up, "X 2.0"
     beside it once there is Mult, then `CombineAndScore` writes CurrentScore times GlobalMult to
     `CenterTotalScoreText` and shows it), polled each frame of the scoring and said as the total
-    shows, only with a Mult: "turn: 210, Mult 2.5, 525". The shop's settled snapshot then says the
+    shows, only when the scoring changed the Mult (asked for: an unchanged Mult is no news; the model's
+    GlobalMult as the player's turn last stood against it as the total shows; the board draws none for
+    a Mult held from before the launch): "turn: 210, Mult 2.5, 525". The shop's settled snapshot then says the
     end of the turn, "1,220/500 attack", "Shop". Mult reads as the board prints it
     (`BigNumber.FormatBigDouble(value, "F1", null)`, its zero fraction dropped: `Encounter.Mult`,
     `WholeMult`): `BigDouble.ToString()` rounds to a whole number, so 2.5 read "3". No barks: the
@@ -344,8 +346,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     asked for by a player, ahicks: a turn can say hundreds of lines) says none of the steps and keeps
     the baseline from before the launch; as the board's total shows, one line
     (`EncounterDiff.TurnSummary`): every column's attack over both passes by position, zeros kept,
-    the Mult (the board's, else the model's: the board draws none for a Mult held from before the
-    launch) and the total, then the Mini-Dice scored and the combos they landed in per pass, by the
+    the Mult only when the scoring changed it (the board's, else the model's), and the total ("10, 0,
+    0, 35, 0, 0 = 45" when it did not), then the Mini-Dice scored and the combos they landed in per pass, by the
     game's labels (`PairTextObjects`: Pair, Triple!, Quadruple!, Quintuple! for 5 and up): "0, 0, 0,
     30, 0, 90, Mult 2.5 = 300, 11 Mini-Dice as 2 Pair". The game's pair and triple conditions
     (`IsDuringPairOfDiceCondition`...) test the column task's Amount, the dice of that face in the

@@ -63,6 +63,13 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void A_turn_that_left_the_mult_alone_goes_straight_to_its_total()
+        {
+            Assert.Equal("10, 0, 0, 35, 0, 0 = 45",
+                EncounterDiff.TurnSummary(new[] { "10", "0", "0", "35", "0", "0" }, null, "45", 0, "Mini-Dice", null));
+        }
+
+        [Fact]
         public void The_turn_summary_adds_the_mini_dice_and_their_combos()
         {
             var combos = new List<KeyValuePair<string, int>>
