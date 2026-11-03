@@ -332,7 +332,9 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     for two dice and a Rift, seen live. Monocle (a lone base die counts as a pair) and Broken Lens (a
     pair as a triple) change only the game's pair and triple conditions, not the label: not said,
     as drawn; seen live, Monocle's lone die firing 4D Printer with no label. The labels were never
-    seen shown, in the player's turn or polled through a scoring); a base die's column that changed
+    seen shown, in the player's turn or polled through a scoring. A Rift face, the game's 7 drawn as the
+    Chrono swirl, reads as the artifact's title, `Shamby_Arti_Title`, the game having no word of its
+    own: "Chrono Rift, cracked", "rolled 2, 3, Chrono Rift"); a base die's column that changed
     nothing is silent, a mini-die's always said, "Mini-Dice, column 5: 0", "3 Mini-Dice, column 1:
     0"; the Mini-Dice count spent in the scoring unsaid). Then the scoring board under the grid
     (`EncounterView.CurrentScoreBoard`, `StellarVisScoreBoard`: the turn's attack counting up, "X 2.0"

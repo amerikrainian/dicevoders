@@ -435,6 +435,10 @@ namespace DiceVoders.Module.Encounter
             return null;
         }
 
+        /// <summary>What a Chrono Rift face reads as: the artifact's title ("Chrono Rift"), the game
+        /// having no word of its own for the face (its description says "a Rift face").</summary>
+        public static string RiftName() => GameLoc.Get("Shamby_Arti_Title");
+
         /// <summary>The Chrono Rift faces in the tray (Chrono Rift: each counts as an extra die in
         /// every column with dice, in the label the game draws and its pair conditions).</summary>
         public static int RiftFaces()

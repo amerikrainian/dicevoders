@@ -56,6 +56,14 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void A_chrono_rift_face_reads_as_the_rift()
+        {
+            var turn = Snap("Player", turns: 3, dice: new[] { 2, 2, 7 });
+            turn.RiftLabel = "Chrono Rift";
+            Assert.Equal(new[] { "3 Turns, rolled 2, 2, Chrono Rift" }, EncounterDiff.Lines(Snap("Draft", turns: 3), turn));
+        }
+
+        [Fact]
         public void The_turn_summary_keeps_every_column_by_position()
         {
             Assert.Equal("10, 0, 0, 35, 0, 0, Mult 2 = 90",

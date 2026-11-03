@@ -372,6 +372,7 @@ namespace DiceVoders.Module.Encounter
                     MultText = Encounter.Mult(),
                     MultLabel = GameLoc.Get("GlobalMult_Keyword") ?? "Mult",
                     CloudLabel = GameLoc.Get("Cloudy_TooltipTitle") ?? "Cloudy",
+                    RiftLabel = Encounter.RiftName(),
                 };
                 foreach (var die in Encounter.Dice()) (Encounter.IsKraken(die) ? s.Kraken : s.Dice).Add(die.isRolling ? 0 : die.Value);
                 var pilotDie = Encounter.PilotDie();

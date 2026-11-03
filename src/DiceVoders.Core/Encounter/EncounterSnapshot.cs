@@ -37,6 +37,9 @@ namespace DiceVoders.Core.Encounter
         public List<int> Dice = new List<int>();
         /// <summary>The Kraken dice faces (The Core's, drawn apart in the tray), in its order; 0 for one rolling.</summary>
         public List<int> Kraken = new List<int>();
+        /// <summary>What a Chrono Rift face (a die showing <see cref="EncounterDiff.RiftFace"/>) reads as:
+        /// the artifact's title, "Chrono Rift"; null, the number.</summary>
+        public string RiftLabel;
         /// <summary>A pilot's own die (Kaia's, on the pilot panel), its face; 0 for none or rolling.</summary>
         public int PilotDie;
         /// <summary>What Tippy covers, as said ("Tippy: right tiles"); null outside Tippy's fight.</summary>

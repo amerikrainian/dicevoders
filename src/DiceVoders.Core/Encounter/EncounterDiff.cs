@@ -30,6 +30,9 @@ namespace DiceVoders.Core.Encounter
     {
         public const string PlayerPhase = "Player", DraftPhase = "Draft", ScoringPhase = "Scoring";
 
+        /// <summary>The face a die shows for a Chrono Rift (the game's 7, drawn as the Chrono swirl).</summary>
+        public const int RiftFace = 7;
+
         /// <param name="columns">false: the turn's scoring line leaves its columns out ("30/100
         /// attack"), the turn summary (<see cref="TurnSummary"/>) having said them.</param>
         public static List<string> Lines(EncounterSnapshot prev, EncounterSnapshot now, bool columns = true)
@@ -290,8 +293,9 @@ namespace DiceVoders.Core.Encounter
         // "rolled 3, 3, 5", a Kraken die and a pilot's die after: "rolled 3, 3, 5, Kraken 4, pilot die 3".
         private static string Rolled(EncounterSnapshot s)
         {
-            string faces = string.Join(", ", s.Dice);
-            foreach (int face in s.Kraken) faces += ", " + S.EncFigure(S.EncKrakenDie, face.ToString());
+            string Face(int face) => face == RiftFace && !string.IsNullOrEmpty(s.RiftLabel) ? s.RiftLabel : face.ToString();
+            string faces = string.Join(", ", s.Dice.ConvertAll(Face));
+            foreach (int face in s.Kraken) faces += ", " + S.EncFigure(S.EncKrakenDie, Face(face));
             if (s.PilotDie > 0) faces += ", " + S.EncFigure(S.EncPilotDie, s.PilotDie.ToString());
             return S.EncRolled(faces);
         }

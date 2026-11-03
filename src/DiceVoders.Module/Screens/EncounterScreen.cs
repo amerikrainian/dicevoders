@@ -806,7 +806,10 @@ namespace DiceVoders.Module.Screens
             var parts = new List<string>();
             try
             {
-                parts.Add(die.isRolling ? Strings.EncRolling : die.Value.ToString());
+                // A Chrono Rift face is the game's 7, drawn as the Chrono swirl.
+                parts.Add(die.isRolling ? Strings.EncRolling
+                    : die.Value == Core.Encounter.EncounterDiff.RiftFace ? EncounterState.RiftName() ?? die.Value.ToString()
+                    : die.Value.ToString());
                 if (die.IsDangerDice) parts.Add(Strings.EncPilotDie);
                 else if (EncounterState.IsKraken(die)) parts.Add(Strings.EncKrakenDie);
                 if (die.IsPermaFrozen) parts.Add(Strings.EncPermafrozen);
