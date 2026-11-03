@@ -292,16 +292,41 @@ namespace DiceVoders.Module.Screens
             for (int y = 0; y < EncounterState.Rows; y++)
                 for (int x = 0; x < EncounterState.Columns; x++)
                     if (EncounterState.TargetAt(x, y) != null) sb.Append('t').Append(x).Append(',').Append(y);
+            foreach (int slot in SlotTargets()) sb.Append('p').Append(slot);
             return sb.ToString();
         }
 
-        // Whether the focus is on a cell or header the selection takes.
+        // Whether the focus is on a cell, header or perk slot the selection takes.
         private static bool FocusOnTarget()
         {
             var tile = FocusedTile();
             if (tile.HasValue) return EncounterState.TargetAt(tile.Value.X, tile.Value.Y) != null;
             var column = FocusedColumn();
-            return column.HasValue && EncounterState.SlotTarget(column.Value) != null;
+            if (column.HasValue) return EncounterState.SlotTarget(column.Value) != null;
+            int? slot = FocusedSlot();
+            return slot.HasValue && EncounterState.SlotTarget(slot.Value) != null;
+        }
+
+        /// <summary>The artifact slot outside the columns the focus is on (the status's starter perk,
+        /// perks), or null.</summary>
+        internal static int? FocusedSlot()
+        {
+            string id = FocusedKey();
+            return id != null && id.StartsWith("enc:artifact:") ? int.Parse(id.Substring("enc:artifact:".Length)) : (int?)null;
+        }
+
+        internal static ControlId SlotId(int slot) => ControlId.Structural("enc:artifact:" + slot);
+
+        /// <summary>The slots outside the columns the running selection takes (a perk bought: the
+        /// perk slots it may go in), in slot order: the status's perk row.</summary>
+        internal static List<int> SlotTargets()
+        {
+            var slots = new List<int>();
+            int count = EncounterState.View?.ArtifactViewObjects?.Count ?? 0;
+            if (!EncounterState.Selecting) return slots;
+            for (int slot = EncounterState.Columns; slot < count; slot++)
+                if (EncounterState.SlotTarget(slot) != null) slots.Add(slot);
+            return slots;
         }
 
         // The first cell or header the running selection takes, reading order (headers, then the
@@ -313,7 +338,8 @@ namespace DiceVoders.Module.Screens
             for (int y = EncounterState.Rows - 1; y >= 0; y--)
                 for (int x = 0; x < EncounterState.Columns; x++)
                     if (EncounterState.TargetAt(x, y) != null) return TileId(x, y);
-            return null;
+            var slots = SlotTargets();
+            return slots.Count > 0 ? SlotId(slots[0]) : null;
         }
 
         private void SayActionTip()
@@ -998,10 +1024,16 @@ namespace DiceVoders.Module.Screens
             int slots = model?.ArtifactSlots?.Count ?? 0;
             var perks = new List<int>();
             var alone = new List<int>();
-            for (int slot = EncounterState.Columns; slot < slots; slot++)
+            // A selection's empty perk slots join the row in their place (a perk bought: where it goes).
+            var targets = SlotTargets();
+            for (int slot = EncounterState.Columns; slot < Math.Max(slots, targets.Count > 0 ? targets[targets.Count - 1] + 1 : 0); slot++)
             {
                 var artifact = EncounterState.Artifact(slot);
-                if (artifact == null) continue;
+                if (artifact == null)
+                {
+                    if (targets.Contains(slot)) perks.Add(slot);
+                    continue;
+                }
                 if (EncounterState.PilotName(artifact) != null || artifact.ArtifactType == ArtifactType.Starter) alone.Add(slot);
                 else perks.Add(slot);
             }
@@ -1021,16 +1053,32 @@ namespace DiceVoders.Module.Screens
             b.PopContext();
         }
 
-        // An artifact in a slot outside the columns, read live from the slot.
+        // An artifact in a slot outside the columns, read live from the slot. While a selection takes
+        // the slot (a perk bought), it leads as a column header does, with the game's mark for what
+        // placing does ("Replace", "Level Up!") or "target", an empty one "target, empty"; Enter
+        // places there (the game's click on the slot).
         private static NodeVtable SlotArtifact(int s) => new NodeVtable
         {
             ControlType = ControlTypes.Text,
-            Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(() => ArtifactLabel(EncounterState.Artifact(s))) },
+            Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(() => SlotLabel(s)) },
             SearchText = () => EncounterState.ArtifactName(EncounterState.Artifact(s)),
-            OnFocus = () => { var view = EncounterState.ArtifactView(EncounterState.Artifact(s)); if (view != null) EncounterState.Hover(view); },
+            OnFocus = () =>
+            {
+                var view = EncounterState.SlotTarget(s) ?? (AViewItem)EncounterState.ArtifactView(EncounterState.Artifact(s));
+                if (view != null) EncounterState.Hover(view);
+            },
+            OnActivate = () => { var target = EncounterState.SlotTarget(s); if (target != null) EncounterState.Click(target); },
             Details = () => ArtifactDetails(EncounterState.Artifact(s), highlighted: true),
             OnSecondary = () => SayDetails(ArtifactDetails(EncounterState.Artifact(s), highlighted: true)),
         };
+
+        private static string SlotLabel(int s)
+        {
+            var parts = new List<string>();
+            if (EncounterState.SlotTarget(s) != null) parts.Add(EncounterState.SlotMark(s) ?? Strings.EncTarget);
+            parts.Add(ArtifactLabel(EncounterState.Artifact(s)) ?? Strings.EncEmpty);
+            return string.Join(", ", parts);
+        }
 
         private static readonly System.Text.RegularExpressions.Regex Range =
             new System.Text.RegularExpressions.Regex(@"\s*[(（][^)）]*[)）]\s*$");

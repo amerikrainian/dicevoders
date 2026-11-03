@@ -384,8 +384,13 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     first 6 the columns'), pass `IsSatisfied` read "target" first and take Enter (a targeted column slot says instead what
     placing does, the game's mark under its `Selectionhighlight`: `LevelUpObject` "Level Up!" for the same
     artifact, else `SwapObject`'s `ReplaceObject` caption "Replace", drawn only on the hovered slot but
-    read on all; an empty slot draws an arrow and says nothing; one artifact per column); focus goes to the
-    first on the selection's start; a chained one (Swap or Move: what, then where) leaves focus on the board where the
+    read on all; an empty slot draws an arrow and says nothing; one artifact per column). A perk bought
+    waits for a perk slot (`PowerView1..3`, `ArtifactViewObjects[6..8]`): the status's Perks row then
+    holds the slots it takes, in slot order, filled ones with the mark ("Perks, Replace, Monocle"),
+    empty ones "target, empty", Enter the game's click on the slot; period and comma step them after
+    the grid (they had no node, and a perk could not be placed; seen live: Broken Lens into the empty
+    third slot). Focus goes to the
+    first on the selection's start (headers, grid, then perk slots); a chained one (Swap or Move: what, then where) leaves focus on the board where the
     pick was made, said again (it jumped to the first target, and players put units in the wrong cell); Escape is the game's Cancel. Landings: the shop's first choice
     as it opens, the first die (silent) at a new turn; the strip's nodes `QuietVanish`. Readouts
     checked by reflection over the module (`Invoke` on `EncounterScreen.ChoiceText`...) with a tip

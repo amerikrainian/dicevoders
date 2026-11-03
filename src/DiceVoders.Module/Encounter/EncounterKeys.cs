@@ -321,7 +321,8 @@ namespace DiceVoders.Module.Encounter
         // ---- stepping ----
 
         // The board's places in reading order: the headers, then the cells top row first. While the
-        // game waits on a target, the headers and cells that take it; otherwise the cells with a unit.
+        // game waits on a target, the headers and cells that take it, then the perk slots that do (in
+        // the status); otherwise the cells with a unit.
         private static List<ControlId> Members()
         {
             var members = new List<ControlId>();
@@ -333,6 +334,8 @@ namespace DiceVoders.Module.Encounter
                 for (int x = 0; x < Encounter.Columns; x++)
                     if (selecting ? Encounter.TargetAt(x, y) != null : Encounter.At(x, y) != null)
                         members.Add(EncounterScreen.TileId(x, y));
+            if (selecting)
+                foreach (int slot in EncounterScreen.SlotTargets()) members.Add(EncounterScreen.SlotId(slot));
             return members;
         }
 
@@ -341,6 +344,8 @@ namespace DiceVoders.Module.Encounter
         {
             var tile = EncounterScreen.FocusedTile();
             if (tile.HasValue) return Encounter.Columns + (Encounter.Rows - 1 - tile.Value.Y) * Encounter.Columns + tile.Value.X;
+            int? slot = EncounterScreen.FocusedSlot();
+            if (slot.HasValue) return SlotPlace(slot.Value);
             return EncounterScreen.FocusedColumn() ?? -1;
         }
 
@@ -348,9 +353,13 @@ namespace DiceVoders.Module.Encounter
         {
             string key = id.StructuralKey as string;
             if (key.StartsWith("enc:col:")) return int.Parse(key.Substring("enc:col:".Length));
+            if (key.StartsWith("enc:artifact:")) return SlotPlace(int.Parse(key.Substring("enc:artifact:".Length)));
             var parts = key.Substring("enc:tile:".Length).Split(',');
             return Encounter.Columns + (Encounter.Rows - 1 - int.Parse(parts[1])) * Encounter.Columns + int.Parse(parts[0]);
         }
+
+        // A slot outside the columns, after the whole grid.
+        private static int SlotPlace(int slot) => Encounter.Columns * (Encounter.Rows + 1) + slot;
 
         // Period and comma: the next or previous member after the focus, wrapping; from off the board,
         // the first or the last. "nothing" when there is none.
