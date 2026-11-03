@@ -59,7 +59,9 @@ guildrun's, retargeted in `gamelib.py` (app id, folder, `GAME_ASSEMBLY_PREFIXES`
 `disasm.py Type.Method --calls` (with `uv run --with capstone`), `dump_game.py`, `dump_diff.py`,
 `check_members.py`, and `dev.py` (`launch`, `kill`, `reload`, `nav`, `input ui.down`,
 `speech --tail N`, `log --grep X`, `gui`, `eval file.cs`, `typeinfo`, `actions`, `module`,
-`screenshot`). `dev.py screenshot` timed out with the game in the background. `stage.py` stages
+`screenshot`). `dev.py screenshot [OUT.png]` captures the window from outside (PrintWindow,
+DPI aware: works in the background, full size); the server's `/screenshot` (`ScreenCapture`) never
+writes its file, in front or not. `stage.py` stages
 encounter scenarios through the game's hidden `DebugController` (in the encounter scene, inactive;
 `SetupDebug` then `CloseDebug` fills it without its canvas): `state`, `skip` (Skip Round: the next
 target, a pilot's rewards included), `pilot NAME [--index I]` (`EncounterModel.PilotOrder`, then

@@ -16,7 +16,8 @@
   wait EXPR [--timeout MS]    poll a C# bool expression on the main thread until true
   typeinfo NAME               a type's interop members (properties, methods)
   actions                     the registered input actions and their keys
-  screenshot [OUT.png]        capture the game view (copies the temp file when OUT is given)
+  screenshot [OUT.png]        capture the game window from outside (PrintWindow: works in the background;
+                              the game's ScreenCapture never writes its file); default the temp folder
   click [X Y]                 an OS-level click at Unity screen coordinates (default: window centre);
                               for prompts the mod does not cover yet (the synthetic mouse is preferred)
 
@@ -25,7 +26,6 @@ Environment: DVO_DEV_URL or DVO_DEV_PORT override the server address.
 from __future__ import annotations
 
 import argparse
-import shutil
 import subprocess
 import sys
 import time
@@ -95,6 +95,70 @@ def cmd_click(args: argparse.Namespace) -> int:
     time.sleep(0.06)
     user32.mouse_event(0x0004, 0, 0, 0, 0)
     print(f"clicked at client {pt.x},{pt.y}")
+    return 0
+
+
+def cmd_screenshot(args: argparse.Namespace) -> int:
+    """The game window's client area as a PNG, through PrintWindow (PW_CLIENTONLY |
+    PW_RENDERFULLCONTENT, which renders a DirectX window even when it is behind others). The
+    process is made DPI aware first: otherwise the size comes back scaled and the capture cropped."""
+    import ctypes
+    import struct
+    import tempfile
+    import zlib
+    from ctypes import wintypes
+
+    user32, gdi32 = ctypes.windll.user32, ctypes.windll.gdi32
+    user32.SetProcessDPIAware()
+    hwnd = user32.FindWindowW(None, "DiceVaders")
+    if not hwnd:
+        print("[error] no DiceVaders window")
+        return 1
+    rect = wintypes.RECT()
+    user32.GetClientRect(hwnd, ctypes.byref(rect))
+    w, h = rect.right - rect.left, rect.bottom - rect.top
+    screen_dc = user32.GetDC(None)
+    dc = gdi32.CreateCompatibleDC(screen_dc)
+    bmp = gdi32.CreateCompatibleBitmap(screen_dc, w, h)
+    old = gdi32.SelectObject(dc, bmp)
+    try:
+        if not user32.PrintWindow(hwnd, dc, 3):
+            print("[error] PrintWindow failed")
+            return 1
+
+        class BITMAPINFOHEADER(ctypes.Structure):
+            _fields_ = [("biSize", wintypes.DWORD), ("biWidth", wintypes.LONG), ("biHeight", wintypes.LONG),
+                        ("biPlanes", wintypes.WORD), ("biBitCount", wintypes.WORD), ("biCompression", wintypes.DWORD),
+                        ("biSizeImage", wintypes.DWORD), ("biXPelsPerMeter", wintypes.LONG),
+                        ("biYPelsPerMeter", wintypes.LONG), ("biClrUsed", wintypes.DWORD), ("biClrImportant", wintypes.DWORD)]
+
+        header = BITMAPINFOHEADER(ctypes.sizeof(BITMAPINFOHEADER), w, -h, 1, 32, 0, 0, 0, 0, 0, 0)  # top-down BGRA
+        buf = ctypes.create_string_buffer(w * h * 4)
+        gdi32.SelectObject(dc, old)
+        if gdi32.GetDIBits(dc, bmp, 0, h, buf, ctypes.byref(header), 0) != h:
+            print("[error] GetDIBits failed")
+            return 1
+    finally:
+        gdi32.DeleteObject(bmp)
+        gdi32.DeleteDC(dc)
+        user32.ReleaseDC(None, screen_dc)
+
+    raw = buf.raw
+    rows = bytearray()
+    for y in range(h):
+        row = raw[y * w * 4:(y + 1) * w * 4]
+        rgb = bytearray(w * 3)
+        rgb[0::3], rgb[1::3], rgb[2::3] = row[2::4], row[1::4], row[0::4]
+        rows += b"\x00" + rgb
+
+    def chunk(kind: bytes, data: bytes) -> bytes:
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
+
+    png = (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+           + chunk(b"IDAT", zlib.compress(bytes(rows), 6)) + chunk(b"IEND", b""))
+    out = Path(args.out) if args.out else Path(tempfile.gettempdir()) / "dicevaders_shot.png"
+    out.write_bytes(png)
+    print(f"{out} ({w}x{h})")
     return 0
 
 
@@ -171,13 +235,7 @@ def main() -> int:
         print(call("/typeinfo", query={"name": args.name}).rstrip())
         return 0
     if args.cmd == "screenshot":
-        path = call("/screenshot").strip()
-        if args.out:
-            shutil.copyfile(path, args.out)
-            print(args.out)
-        else:
-            print(path)
-        return 0
+        return cmd_screenshot(args)
     return 2
 
 
