@@ -38,7 +38,9 @@ player, so every catch logs, and nothing caches game state.
   elsewhere it reads as its word unless its own word follows (Charge's title). ShopToken reads Cash
   (`ShopToken_TooltipTitle`); the scoring line's Target reads "When scored" (quoted in the guide's
   `Guide_Scoring_1`), with a colon when it opens a line; Arrow (trigger condition, then effect:
-  `Guide_Triggers_2`) and React keep their names, as the game's explanations quote them. A run of
+  `Guide_Triggers_2`) and React keep their names, as the game's explanations quote them; after a word
+  the Arrow takes a comma, a pause between condition and effect (asked for by a player: "After you score a
+  pair in this column, Arrow Build a random tile"). A run of
   one icon is a count ("Spend 2 Charge").
 - **BepInEx**: the vendored 6.0.0-be.788 boots the game as is (Cpp2IL reads v39; one warning,
   "Class::Init signatures have been exhausted, using a substitute!", harmless so far). StarVaders'

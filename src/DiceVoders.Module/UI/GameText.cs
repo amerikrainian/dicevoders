@@ -29,8 +29,10 @@ namespace DiceVoders.Module.UI
         // condition and its effect (Guide_Triggers_2), and React keep their names, which the game's
         // own explanations quote ('everything after the "Arrow"'). A run of one icon is a count
         // ("Spend <Charge><Charge>" is "2 Charge"). Icons are marked while the tags between them and
-        // their words are stripped.
-        private const char IconStart = '\u0001', IconEnd = '\u0002', DecorStart = '\u0003';
+        // their words are stripped. The Arrow takes a comma before it after a word ("When you score,
+        // Arrow Get +1 Budge"): a pause between the condition and the effect, as the drawn arrow is a
+        // visual break (asked for by a player); none after punctuation or at a line's start.
+        private const char IconStart = '\u0001', IconEnd = '\u0002', DecorStart = '\u0003', ArrowMark = '\u0004';
         private const string LineTarget = "Target:";
         private static readonly Regex Nobr = new Regex(@"<nobr>(.*?)</nobr>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
         private static readonly Regex OpeningTarget = new Regex(@"(^|\n)((?:\s|<[^>]*>)*)<sprite[^>]*?name=""?Target""?[^>]*>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -38,7 +40,8 @@ namespace DiceVoders.Module.UI
         private static readonly Regex IconRun = new Regex(@"\u0001([^\u0002]+)\u0002(?:\s*\u0001\1\u0002)+", RegexOptions.Compiled);
         private static readonly Regex IconThenWord = new Regex(@"\u0001([^\u0002]+)\u0002\s*(?=(\p{L}[\p{L}\-]*))", RegexOptions.Compiled);
         private static readonly Regex Icon = new Regex(@"\u0001([^\u0002]+)\u0002", RegexOptions.Compiled);
-        private static readonly Regex SpaceBeforeStop = new Regex(@"\s+([.,])", RegexOptions.Compiled);
+        private static readonly Regex CommaBeforeArrow = new Regex(@"(?<=[^\s.,:;!?(\-–—，：。；！？、])[ \t]*\u0004", RegexOptions.Compiled);
+        private static readonly Regex SpaceBeforeStop =new Regex(@"\s+([.,])", RegexOptions.Compiled);
         private static readonly Regex Quoted = new Regex(@"[""“”«»「」„]\s*([^""“”«»「」„]+?)\s*[""“”«»「」„]", RegexOptions.Compiled);
         private static readonly Regex PaddedQuote = new Regex(@"""\s+([^""]*?)\s+""", RegexOptions.Compiled);
 
@@ -64,7 +67,9 @@ namespace DiceVoders.Module.UI
             text = text.Replace(DecorStart, IconStart);
             text = IconRun.Replace(text, m => " " + Count(m.Value) + " " + IconWord(m.Groups[1].Value) + " ");
             text = IconThenWord.Replace(text, m => SameWord(IconWord(m.Groups[1].Value), m.Groups[2].Value) || SameWord(m.Groups[1].Value, m.Groups[2].Value) ? "" : m.Value);
-            text = Icon.Replace(text, m => " " + IconWord(m.Groups[1].Value) + " ");
+            text = Icon.Replace(text, m => " " + (m.Groups[1].Value == "Arrow" ? ArrowMark.ToString() : "") + IconWord(m.Groups[1].Value) + " ");
+            text = CommaBeforeArrow.Replace(text, ", ");
+            text = text.Replace(ArrowMark.ToString(), "");
             text = PaddedQuote.Replace(text, "\"$1\"");
             text = TextUtil.StripRichText(text);
             return SpaceBeforeStop.Replace(text, "$1");
