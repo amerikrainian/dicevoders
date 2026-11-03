@@ -358,14 +358,10 @@ namespace DiceVoders.Module.Screens
         private static void BuildStrip(GraphBuilder b)
         {
             var phase = EncounterState.Phase;
-            // A pilot's rewards. The legendary draft takes a Chrono reroll (the game's R and Reroll
-            // button, refused where it draws the button crossed out): the knob under it. The game
-            // shows the knob over the level up and the loot too, where a reroll has nothing to act on.
-            if (SpecialRewardStrip.Shown() != null)
-            {
-                SpecialRewardStrip.Build(b, BoardStop);
-                if (SpecialRewardStrip.DraftNames() != null) BuildAbilities(b);
-            }
+            // A pilot's rewards, with the knob under them wherever the game shows it (the level up,
+            // the loot, the legendary draft): the draft takes a Chrono reroll (the game's R and
+            // Reroll button, refused where it draws the button crossed out).
+            if (SpecialRewardStrip.Shown() != null) { SpecialRewardStrip.Build(b, BoardStop); BuildAbilities(b); }
             else if (phase == Phase.Player) { BuildDice(b); BuildAbilities(b); }
             else if (phase == Phase.Draft) { BuildShop(b); BuildAbilities(b); }
             else if (phase == Phase.FinalBossDraft) BuildStarDraft(b);

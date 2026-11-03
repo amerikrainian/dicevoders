@@ -529,8 +529,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     under the shop: a Chrono reroll, `OnPressRerollButton` in `Phase.LegendaryDraft`, refused, and drawn
     `RerollButton/CrossedOut`, read "disabled", in a `ShuffledAndStrongerPilots` run without the Sandbox's
     `AllowPerkReroll`; R or Enter on it says the new draft, "Choose One: Growth Serum, Ectoplasm, Asteroid
-    Belt", which the events do not hold; the game shows the knob over the level up and loot too, left
-    out there), `OverseerLevelupScreen`. An
+    Belt", which the events do not hold; the row shows wherever the game shows the knob, the level up
+    and loot included), `OverseerLevelupScreen`. An
     artifact reads as on the board, Backspace its tooltip (`ArtifactDetails(model, view)`); a button
     by its hover tooltip's title (`ButtonView.Tooltip`, `Keywords.Tooltip`), else caption, else
     "Proceed". A legendary pick (`OnPressArtifactSelect`) takes the artifact at once. Seen live: the
