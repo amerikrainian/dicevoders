@@ -199,8 +199,8 @@ namespace DiceVoders.Module.Screens
         }
 
         // The commander panel (Frame, shown once a commander is chosen): "The Captain, LV. 2"; the
-        // starting perk as the board reads it, Backspace its tooltip; the unique artifacts as drawn,
-        // three rows top to bottom of left and right: an unlocked one by name (Backspace its tooltip),
+        // starting perk as the board reads it, Backspace its tooltip; the unique artifacts one after
+        // another, in the drawn order (top to bottom, left to right): an unlocked one by name (Backspace its tooltip),
         // a locked one by its tooltip's condition ("Defeat 4 pilots with this commander to level up
         // and unlock this! (2/4)"), Backspace its title ("Locked LV.3 Unique"); Enter is the game's
         // click (an unlockable one's reveal).
@@ -225,16 +225,10 @@ namespace DiceVoders.Module.Screens
                 else if (unlocked != null && unlocked.activeInHierarchy && view != null && Model(view) != null)
                     slots.Add((view.transform, ArtifactNode(view, true), "cs:unique:" + i));
             }
-            // Rows by height, top first; left to right within one.
+            // One list, Up and Down through it, in the drawn order: by height, top first; left to
+            // right within one. (Rows of the drawn grid made it a grid to walk.)
             slots.Sort((l, r) => Math.Abs(l.At.position.y - r.At.position.y) > 5f ? r.At.position.y.CompareTo(l.At.position.y) : l.At.position.x.CompareTo(r.At.position.x));
-            int k = 0;
-            while (k < slots.Count)
-            {
-                float y = slots[k].At.position.y;
-                b.StartRow("cs:uniques");
-                while (k < slots.Count && Math.Abs(slots[k].At.position.y - y) <= 5f) { b.AddItem(ControlId.Structural(slots[k].Id), slots[k].Node); k++; }
-                b.EndRow();
-            }
+            foreach (var slot in slots) b.AddItem(ControlId.Structural(slot.Id), slot.Node);
         }
 
         // The Overseer's frame (OverseerFrame, shown while the Overseer is chosen): the two commanders

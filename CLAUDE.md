@@ -165,7 +165,7 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     key prompt: the mod's "Random commander"); the chosen commander's panel (`Frame`): "The Captain, LV. 2"
     (`CommanderText`, `LevelTextObject` or `LevelTextObjectChinese`), the starting perk
     (`CommanderArtifactView`, as on the board, Backspace with keywords), the unique artifacts as
-    drawn, rows by height top first, left to right (index i: `LockedArtifactItems[i]` shown = locked,
+    one vertical list (no rows: asked for), in the drawn order, by height top first, left to right (index i: `LockedArtifactItems[i]` shown = locked,
     by its `Tooltip` condition "Defeat 4 pilots with this commander to level up and unlock this!
     (2/4)" (the slot draws a bare lock), Backspace its title "Locked LV.3 Unique", Enter its click; else `UnlockedArtifactViews[i]` by name,
     "Monocle", Backspace its tooltip with the game's unlock text, as `SetArtifacts` sets it
