@@ -53,7 +53,7 @@ namespace DiceVoders.Module.Screens
         }
     }
 
-    /// <summary>The mod's settings: each a toggle; Enter flips it and speaks the new state. Values live
+    /// <summary>The mod's settings: each a toggle; Enter flips it (its value announcement says the new state). Values live
     /// in the host's settings store (the BepInEx config), so they survive reloads and restarts.</summary>
     public sealed class ModSettingsScreen : Screen
     {
@@ -93,12 +93,8 @@ namespace DiceVoders.Module.Screens
                     new NodeAnnouncement(() => get() ? Strings.StateOn : Strings.StateOff, live: true, kind: AnnouncementKinds.Value),
                 },
                 SearchText = label,
-                OnActivate = () =>
-                {
-                    bool next = !get();
-                    set(next);
-                    Core.Speech.Say(next ? Strings.StateOn : Strings.StateOff, interrupt: true);
-                },
+                // The new state is said by the value announcement (live), not here as well.
+                OnActivate = () => set(!get()),
             };
         }
 
