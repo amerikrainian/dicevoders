@@ -1,5 +1,16 @@
 # Changelog
 
+## V0.0.5
+
+- New, hopefully less verbose scoring mode, is available to try in mod settings.
+- The end of a turn no longer repeats a Mult that the turn left unchanged.
+- After picking a unit to swap or move, focus now stays on that unit's cell.
+- The Reroll button now shows under a pilot's rewards, and rerolling the legendary draft says the new choices.
+- In effect descriptions, the trigger arrow now has a comma before it, so the condition and the effect are easier to tell apart.
+- A Chrono Rift face on a die is now read as "Chrono Rift".
+- On the commander select, a commander's unique artifacts are now one list.
+- Toggles in the mod's settings no longer say their new state twice.
+
 ## V0.0.4
 
 - The Warped Oculus now says it is looking left. It said "looking right", though it affects the units to its left.
