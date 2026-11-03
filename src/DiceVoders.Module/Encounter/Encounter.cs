@@ -435,6 +435,26 @@ namespace DiceVoders.Module.Encounter
             return null;
         }
 
+        /// <summary>The Chrono Rift faces in the tray (Chrono Rift: each counts as an extra die in
+        /// every column with dice, in the label the game draws and its pair conditions).</summary>
+        public static int RiftFaces()
+        {
+            try { return Controller?.DicePanel?.GetAmountOfChronoDiceNotRolling() ?? 0; }
+            catch (Exception e) { CoreLog.Warning("Encounter: counting the Rift faces failed: " + e.Message); return 0; }
+        }
+
+        /// <summary>A column's combo label (one of <see cref="GridColumn.PairTextObjects"/>: "Pair",
+        /// "Triple!"...) as its localized string: its text is filled by a LocalizeStringEvent only
+        /// while drawn, so a hidden one holds the prefab's.</summary>
+        public static string ComboText(GameObject label)
+        {
+            var tmp = label != null ? label.GetComponentInChildren<TMPro.TMP_Text>(true) : null;
+            if (tmp == null) return null;
+            var ev = tmp.GetComponent<UnityEngine.Localization.Components.LocalizeStringEvent>();
+            string text = ev != null && ev.StringReference != null && !ev.StringReference.IsEmpty ? ev.StringReference.GetLocalizedString() : tmp.text;
+            return GameText.Clean(text);
+        }
+
         /// <summary>The knob's button of that name ("ChronoButton", "BudgeButton"), when shown.</summary>
         public static ButtonView AbilityButton(string name)
         {

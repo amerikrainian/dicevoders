@@ -211,7 +211,7 @@ namespace DiceVoders.Module.Encounter
         // (the mini-dice through a second ScoreDiceTask), whose coroutine is hooked. As a column
         // starts, what came before it is said; as it ends, the column with the attack it gained and
         // what its units set off. The end of the turn is then the shop's settled snapshot.
-        private static int _column = -1, _columnDice;
+        private static int _column = -1, _columnDice, _columnRift;
         private static bool _columnMini;
         private static BigDouble[] _stepStart;
 
@@ -255,6 +255,9 @@ namespace DiceVoders.Module.Encounter
                         _column = __instance._i_5__2;
                         _columnMini = __instance._isMini_5__3;
                         _columnDice = DiceCount(__instance.__4__this);
+                        // The Chrono Rift faces in the tray count as dice in every column with dice,
+                        // for the base dice only (as the game's label and its pair conditions count).
+                        _columnRift = _columnMini ? 0 : Encounter.RiftFaces();
                     }
                     if (__result || _column < 0 || _last == null || _stepStart == null) return;
                     int column = _column;
@@ -271,7 +274,7 @@ namespace DiceVoders.Module.Encounter
                     }
                     string mini = _columnMini ? GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice" : null;
                     CoreLog.Info("EncounterEvents: column " + column + " scored with " + _columnDice + (_columnMini ? " mini" : "") + " dice, gains [" + string.Join(" ", gains.ConvertAll(g => g ?? "-")) + "]");
-                    Say(EncounterDiff.Step(_last, now, column, _columnDice, gains, mini, Combo(column - 1, _columnDice)));
+                    Say(EncounterDiff.Step(_last, now, column, _columnDice, gains, mini, Combo(column - 1, _columnDice + _columnRift)));
                     _last = now;
                 }
                 catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's end failed: " + e.Message); }
@@ -298,8 +301,9 @@ namespace DiceVoders.Module.Encounter
         }
 
         // The label the game draws over a column scored with several dice (GridColumn.PairTextObjects:
-        // "Pair", "Triple!", ... for 2, 3, ... dice), its localized string: the texts are filled by
-        // LocalizeStringEvents only while drawn, so a hidden one holds the prefab's.
+        // "Pair", "Triple!", ... for 2, 3, ... dice, a Chrono Rift face counting as one), its
+        // localized string (Encounter.ComboText). Monocle and Broken Lens change what the game's pair
+        // and triple triggers count, not the label: as drawn.
         private static string Combo(int x, int dice)
         {
             if (dice < 2) return null;
@@ -307,11 +311,7 @@ namespace DiceVoders.Module.Encounter
             {
                 var labels = Encounter.Column(x)?.PairTextObjects;
                 if (labels == null || dice - 2 >= labels.Count) return null;
-                var tmp = labels[dice - 2]?.GetComponentInChildren<TMPro.TMP_Text>(true);
-                if (tmp == null) return null;
-                var ev = tmp.GetComponent<UnityEngine.Localization.Components.LocalizeStringEvent>();
-                string text = ev != null && ev.StringReference != null && !ev.StringReference.IsEmpty ? ev.StringReference.GetLocalizedString() : tmp.text;
-                return GameText.Clean(text);
+                return Encounter.ComboText(labels[dice - 2]);
             }
             catch (Exception e) { CoreLog.Warning("EncounterEvents: reading column " + (x + 1) + "'s combo label failed: " + e.Message); return null; }
         }

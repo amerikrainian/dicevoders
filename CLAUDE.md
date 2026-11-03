@@ -326,7 +326,13 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     4: 80", then what it set off: "4D Printer level 2", "new tile at 5, 1", "Mult 2"; the gain is
     the column units' `AttackGainedThisTurn` summed, end less start; with several dice the label
     the game draws over the column joins it, "column 2: 140, Pair" (`GridColumn.PairTextObjects[dice -
-    2]`, its `LocalizeStringEvent`'s string: hidden, the text is the prefab's); a base die's column that changed
+    2]`, its `LocalizeStringEvent`'s string: hidden, the text is the prefab's; the game picks it in
+    `GridColumn.SetPreviewDice` from the base dice plus the Chrono Rift faces in the tray, a die showing
+    7, `DicePanel.GetAmountOfChronoDiceNotRolling`, so the base pass adds them: "column 2: 0, Triple!"
+    for two dice and a Rift, seen live. Monocle (a lone base die counts as a pair) and Broken Lens (a
+    pair as a triple) change only the game's pair and triple conditions, not the label: not said,
+    as drawn; seen live, Monocle's lone die firing 4D Printer with no label. The labels were never
+    seen shown, in the player's turn or polled through a scoring); a base die's column that changed
     nothing is silent, a mini-die's always said, "Mini-Dice, column 5: 0", "3 Mini-Dice, column 1:
     0"; the Mini-Dice count spent in the scoring unsaid). Then the scoring board under the grid
     (`EncounterView.CurrentScoreBoard`, `StellarVisScoreBoard`: the turn's attack counting up, "X 2.0"
