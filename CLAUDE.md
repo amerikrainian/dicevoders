@@ -198,7 +198,19 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     third, throwaway profile (P-3) with `LoggerDataSO.CommanderPilotsDefeated[Mothership]` set to 4 and
     `IsTutorialComplete`. The challenges and Launch! seen live too. On that fresh profile the game marks
     no commander icon selected (`IsSelected`, `SelectedObject` off on all) though `CurrentCommander` is
-    set and its panel shows: read as the game draws it. Not seen: the missions' commander images.
+    set and its panel shows: read as the game draws it. The mission's commander slots (`MissionImages`,
+    one per commander the mission needs, slot i the i-th of `CommanderPilotMaxDifficultyVictory[the
+    mission's chapter]`): a slot with its `MissionCheckBoxes` mark shown names its commander, matched
+    by the portrait (`CommanderSpriteMapping._square`), appended to the mission line, "Win CH1 with any
+    commander, The Captain"; unfilled slots (question mark, cross) unsaid, the count being in the
+    text. Seen live on a fresh profile: CH1 won, CH2 with none, and one CH2 winner staged in memory
+    (`CommanderPilotMaxDifficultyVictory[Chapter2]` plus `SetupMissionPanel`, then removed). The panel
+    read is whichever kind shows (`TutorialCompletePanel`, `MissionPanel`, `Chapter6MissionPanel`,
+    `EndOfContentPanel`, `NoNewMissionThisVersion`, `UnlockAllMissionPanel`: "Unlocked all", "There are
+    no missions... enjoy!"); CH6's two missions add "completed" while their `CheckMark` child shows
+    (`CH6MissionCheckBoxes`; a cross unsaid). Staged: `CurrentMaxUnlockedDifficulty` 6 plus a
+    `Chapter6` winner, then `SetupMissionPanel`; restoring needs `MissionPanel` switched back on and
+    the CH6 panel off by hand (the game never re-shows the first), `EndOfContentReached` as it was.
   - `CompendiumScreen` (`CompendiumController`, CompendiumSceneAdditive over the main menu, from its
     Compendium icon, `GlossaryIcon`, which reads "Compendium, 12%": an edge icon is its tooltip's
     name with its caption; layer 10, exclusive; up while `Canvas` shows), named by `Pages/Title`.

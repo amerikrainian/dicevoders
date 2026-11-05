@@ -105,16 +105,27 @@ namespace DiceVoders.Module.Screens
                 b.PopContext();
             }
 
-            // The mission panel (the tutorial's "Mission Complete!", later the chapter's): its lines,
-            // then its buttons.
-            var panel = c.TutorialCompletePanel != null && c.TutorialCompletePanel.activeInHierarchy ? c.TutorialCompletePanel.transform
-                : c.MissionPanel != null && c.MissionPanel.activeInHierarchy ? c.MissionPanel.transform : null;
+            // The mission panel, whichever of its kinds shows (the tutorial's "Mission Complete!", a
+            // chapter's mission, CH6's two missions, the game finished, the demo's end, Unlock All's
+            // "There are no missions... enjoy!"): its lines, then its buttons.
+            Transform panel = null;
+            foreach (var kind in new[] { c.TutorialCompletePanel, c.MissionPanel, c.Chapter6MissionPanel, c.EndOfContentPanel, c.NoNewMissionThisVersion, c.UnlockAllMissionPanel })
+                if (panel == null && kind != null && kind.activeInHierarchy) panel = kind.transform;
             if (panel != null)
             {
                 var lines = ViewNodes.Prose(panel);
+                var done = CheckedLines(panel);
+                // Proxies are fresh objects per cast: compared by native pointer.
+                string mission = c.MissionPanel != null && panel.Pointer == c.MissionPanel.transform.Pointer ? GameText.Of(c.MissionDesc) : null;
                 for (int i = 0; i < lines.Count; i++)
                 {
                     string line = lines[i];
+                    if (mission != null && line == mission)
+                    {
+                        var winners = MissionWinners(c);
+                        if (winners.Count > 0) line += ", " + string.Join(", ", winners);
+                    }
+                    if (done.Contains(line)) line += ", " + Strings.StateCompleted;
                     b.AddItem(ControlId.Structural("cs:panel:" + i), GameNodes.Text(() => line));
                 }
                 foreach (var item in panel.GetComponentsInChildren<AViewItem>(false))
@@ -162,6 +173,63 @@ namespace DiceVoders.Module.Screens
             }
             if (back != null)
                 b.AddItem(ControlId.Structural("cs:back"), ViewNodes.Button(back, () => GameLoc.Get("Back_Misc") ?? "Back"));
+        }
+
+        // CH6's missions ("Complete CHAPTER 6.") each carry a check mark or a red cross (their
+        // CheckMark and Cross children): the texts whose check mark shows. A cross is unsaid, as an
+        // unfilled commander slot is.
+        private static HashSet<string> CheckedLines(Transform panel)
+        {
+            var done = new HashSet<string>();
+            try
+            {
+                foreach (var tmp in panel.GetComponentsInChildren<TMPro.TMP_Text>(false))
+                {
+                    var mark = tmp.transform.Find("CheckMark");
+                    if (mark == null || !mark.gameObject.activeInHierarchy) continue;
+                    string text = GameText.Of(tmp);
+                    if (text != null) done.Add(text);
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading the missions' check marks failed: " + e.Message); }
+            return done;
+        }
+
+        // The mission's commanders ("Win CH2 with 2 commanders" over one slot each, MissionImages): a
+        // slot with its check mark shown holds the portrait of a commander who won the mission's
+        // chapter (the game's CommanderSpriteMapping._square), named here by matching that portrait;
+        // an unfilled slot (a question mark, a cross) is left out, the count being in the mission.
+        private static List<string> MissionWinners(CharacterSelectionController c)
+        {
+            var names = new List<string>();
+            try
+            {
+                var images = c.MissionImages;
+                var checks = c.MissionCheckBoxes;
+                if (images == null || checks == null) return names;
+                var data = c._commanderDataSO;
+                for (int i = 0; i < images.Count && i < checks.Count; i++)
+                {
+                    var image = images[i];
+                    if (image == null || !image.gameObject.activeInHierarchy || checks[i] == null || !checks[i].activeInHierarchy) continue;
+                    var sprite = image.sprite;
+                    string name = null;
+                    if (sprite != null && data != null)
+                        foreach (CommanderName commander in Enum.GetValues(typeof(CommanderName)))
+                        {
+                            CommanderSpriteMapping mapping = null;
+                            try { mapping = data.GetCommanderData(commander); }
+                            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: no portrait data for " + commander + ": " + e.Message); }
+                            if (mapping == null || mapping._square == null || mapping._square.Pointer != sprite.Pointer) continue;
+                            name = GameLoc.Get(commander + "_Misc") ?? commander.ToString();
+                            break;
+                        }
+                    if (name != null) names.Add(name);
+                    else CoreLog.Warning("CharacterSelectScreen: no commander for the mission portrait " + (sprite != null ? sprite.name : "null"));
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading the mission's commanders failed: " + e.Message); }
+            return names;
         }
 
         // The modifier line (RunModIconHolder, filled by SetDifficultyToIndex and SetChallenge): one
