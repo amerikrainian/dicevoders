@@ -152,12 +152,21 @@ moment after a key that opens a screen, or the next is lost while it arrives).
   - `CharacterSelectScreen` (`CharacterSelectionController`, CharacterSelectionScene: the hub, where the
     unlocks show), one stop as drawn: Select Challenge (`OnPressDifficultyPanelButton`, a toggle of
     the chapter panel `DifficultyPanel`; "expanded"/"collapsed" from `IsDifficultyPanelActive`; while
-    shut its label adds the chosen chapter drawn above it, `PanelBG/Image/Text (TMP)`); open, the
+    shut its label adds the chosen chapter drawn above it, `PanelBG/Image/Text (TMP)`); the
+    modifier line (`RunModIconHolder`, `PanelBG/ModifierLine`, drawn open or shut; filled by
+    `SetDifficultyToIndex`/`SetChallenge`) as a row under "Modifiers" (the mod's; the game has no
+    heading): each `RunModIcon` by its tooltip's title, Backspace the tooltip ("CH4 - Post-Apoc",
+    "Locked Artifact Slots", "Cursed Shop Items", "The United Pilots"; a challenge: "Challenge",
+    "Impossible Mods", its own; the dailies add the day's), the icons carrying their words only in
+    their hidden tooltips (replaced ones are destroyed at the frame's end); open, the
     chapters as a row (`DifficultyNodes` by `_index`, "CH1 - First Contact" = `<DifficultyName>_Title`
     of `DifficultyNames[_index]`, locked = `IsLocked`, completed = a shown `CompletedObjects`,
     selected = `IsSelected`, Enter = its click) and the chosen chapter's `DifficultyPanelFlavor` and
     `Chapter1TutObject` lines (its headings, repeating the name, and its arrows, the row's
-    neighbours, left out), the challenges once unlocked (`ChallengeNodes`, a row: `<ChallengeName>_Title`,
+    neighbours, left out), "New Mechanic: Locked Artifact Slots" (`NewModObject`'s texts outside
+    `PanelRunModIcon`, Backspace that icon's tooltip) or a daily's "Daily Mods (Resets in 12h 27m)"
+    (`DailyRunModsText`; its `DailyRunModIcons` read only when not on the modifier line, which holds
+    them: hidden ones keep prefab placeholders), the challenges once unlocked (`ChallengeNodes`, a row: `<ChallengeName>_Title`,
     locked, completed, selected = `IsSelected`, Backspace `_Desc` and the `Mod` rules, Enter its
     click); the mission panel (`TutorialCompletePanel`, else `MissionPanel`: "Current
     Mission", "Win CH1 with any commander") as prose then its buttons ("New Chapter Unlocked!" =

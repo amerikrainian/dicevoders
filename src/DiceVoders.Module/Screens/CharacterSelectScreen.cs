@@ -68,6 +68,9 @@ namespace DiceVoders.Module.Screens
                 };
                 b.AddItem(ControlId.Structural("cs:challenge"), vt);
             }
+            // The run's modifiers, the icon line at the panel's top (ModifierLine, drawn open or shut):
+            // the chosen chapter's or challenge's icon, then each modifier in play.
+            BuildModifiers(b, c);
             var nodes = new List<DifficultyNode>();
             if (c.DifficultyNodes != null)
                 foreach (var node in c.DifficultyNodes)
@@ -85,6 +88,7 @@ namespace DiceVoders.Module.Screens
                 var text = tmp;
                 b.AddItem(ControlId.Structural("cs:chapterline:" + tmp.gameObject.name), GameNodes.Text(() => GameText.Of(text)));
             }
+            BuildNewMechanic(b, c);
             // The challenges (once unlocked, on the chapter panel's map): a row, by name ("Strange
             // World"), locked, completed, selected as chosen; Backspace its description and rules.
             var challenges = new List<DifficultyNode>();
@@ -158,6 +162,127 @@ namespace DiceVoders.Module.Screens
             }
             if (back != null)
                 b.AddItem(ControlId.Structural("cs:back"), ViewNodes.Button(back, () => GameLoc.Get("Back_Misc") ?? "Back"));
+        }
+
+        // The modifier line (RunModIconHolder, filled by SetDifficultyToIndex and SetChallenge): one
+        // RunModIcon each, an image whose name and rules are only in its hover tooltip. A row under
+        // "Modifiers", in the drawn order; each by its tooltip's title, Backspace the tooltip. The
+        // replaced icons are destroyed at the frame's end: a build in that frame reads them too, the
+        // next does not.
+        private static void BuildModifiers(GraphBuilder b, CharacterSelectionController c)
+        {
+            var icons = new List<RunModIcon>();
+            try
+            {
+                var holder = c.RunModIconHolder;
+                if (holder == null || !holder.gameObject.activeInHierarchy) return;
+                for (int i = 0; i < holder.childCount; i++)
+                {
+                    var icon = holder.GetChild(i).GetComponent<RunModIcon>();
+                    if (icon != null && icon.gameObject.activeInHierarchy) icons.Add(icon);
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading the modifier line failed: " + e.Message); return; }
+            if (icons.Count == 0) return;
+            b.PushContext(Strings.Get("cs.modifiers"));
+            b.StartRow("cs:modifiers");
+            for (int i = 0; i < icons.Count; i++) b.AddItem(ControlId.Structural("cs:modifier:" + i), ModifierNode(icons[i]));
+            b.EndRow();
+            b.PopContext();
+        }
+
+        // The chapter panel's line under the description: "New Mechanic: Locked Artifact Slots"
+        // (NewModObject: its caption, the modifier's name and its icon, PanelRunModIcon), Backspace the
+        // icon's tooltip; or, for a daily challenge, its "Daily Mods (Resets in 12h 27m)" and the day's
+        // modifiers as a row (DailyRunModIcons shown: the hidden ones hold the prefab's placeholders).
+        private static void BuildNewMechanic(GraphBuilder b, CharacterSelectionController c)
+        {
+            try
+            {
+                if (c.NewModObject != null && c.NewModObject.activeInHierarchy)
+                {
+                    var icon = c.PanelRunModIcon;
+                    var parts = new List<TMPro.TMP_Text>();
+                    foreach (var tmp in c.NewModObject.GetComponentsInChildren<TMPro.TMP_Text>(false))
+                        if (icon == null || !tmp.transform.IsChildOf(icon.transform)) parts.Add(tmp);
+                    Func<string> label = () =>
+                    {
+                        var words = new List<string>();
+                        foreach (var tmp in parts)
+                        {
+                            string text = tmp != null && tmp.gameObject.activeInHierarchy ? GameText.Of(tmp) : null;
+                            if (text != null) words.Add(text);
+                        }
+                        return string.Join(" ", words);
+                    };
+                    Func<IEnumerable<string>> details = () => icon != null ? (IEnumerable<string>)ModifierDetails(icon) : Array.Empty<string>();
+                    b.AddItem(ControlId.Structural("cs:newmechanic"), new NodeVtable
+                    {
+                        ControlType = ControlTypes.Text,
+                        Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                        SearchText = label,
+                        Details = details,
+                        OnSecondary = () => SayDetails(details()),
+                    });
+                }
+                if (c.DailyRunModsObject != null && c.DailyRunModsObject.activeInHierarchy)
+                {
+                    var text = c.DailyRunModsText;
+                    if (text != null && text.gameObject.activeInHierarchy)
+                        b.AddItem(ControlId.Structural("cs:dailymods"), GameNodes.Text(() => GameText.Of(text)));
+                    // The modifier line holds the day's modifiers too: those already read there are
+                    // left out here.
+                    var onLine = new HashSet<string>();
+                    var holder = c.RunModIconHolder;
+                    if (holder != null && holder.gameObject.activeInHierarchy)
+                        for (int i = 0; i < holder.childCount; i++)
+                        {
+                            var shown = holder.GetChild(i).GetComponent<RunModIcon>();
+                            string title = shown != null && shown.Tooltip != null ? GameText.Of(shown.Tooltip.TitleText) : null;
+                            if (title != null) onLine.Add(title);
+                        }
+                    var icons = new List<RunModIcon>();
+                    if (c.DailyRunModIcons != null)
+                        foreach (var icon in c.DailyRunModIcons)
+                        {
+                            if (icon == null || !icon.gameObject.activeInHierarchy) continue;
+                            string title = icon.Tooltip != null ? GameText.Of(icon.Tooltip.TitleText) : null;
+                            if (title == null || !onLine.Contains(title)) icons.Add(icon);
+                        }
+                    if (icons.Count > 0)
+                    {
+                        b.StartRow("cs:dailymodicons");
+                        for (int i = 0; i < icons.Count; i++) b.AddItem(ControlId.Structural("cs:dailymod:" + i), ModifierNode(icons[i]));
+                        b.EndRow();
+                    }
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading the new mechanic failed: " + e.Message); }
+        }
+
+        private static NodeVtable ModifierNode(RunModIcon icon)
+        {
+            Func<string> label = () =>
+            {
+                try { return icon.Tooltip != null ? GameText.Of(icon.Tooltip.TitleText) : null; }
+                catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading a modifier failed: " + e.Message); return null; }
+            };
+            Func<IEnumerable<string>> details = () => ModifierDetails(icon);
+            return new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                SearchText = label,
+                OnFocus = () => ViewNodes.Hover(icon),
+                Details = details,
+                OnSecondary = () => SayDetails(details()),
+            };
+        }
+
+        private static List<string> ModifierDetails(RunModIcon icon)
+        {
+            try { return icon != null && icon.Tooltip != null ? Keywords.Tooltip(icon.Tooltip.gameObject) : new List<string>(); }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading a modifier's tooltip failed: " + e.Message); return new List<string>(); }
         }
 
         private static NodeVtable Challenge(DifficultyNode node)

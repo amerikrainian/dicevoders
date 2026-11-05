@@ -24,6 +24,7 @@ state.locked=locked
 state.completed=completed
 cs.random=Random commander
 cs.challenges=Challenges
+cs.modifiers=Modifiers
 state.selected=selected
 state.on=on
 state.off=off

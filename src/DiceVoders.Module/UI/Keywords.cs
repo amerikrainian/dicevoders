@@ -159,6 +159,8 @@ namespace DiceVoders.Module.UI
                     foreach (var part in raw.Split('\n'))
                     {
                         string line = GameText.Clean(RarityFigures(part))?.Trim();
+                        // A bullet ("- <indent=3%>Start with 2 ..."): the list's layout, not a word.
+                        if (line != null && line.StartsWith("- ")) line = line.Substring(2).TrimStart();
                         if (!string.IsNullOrEmpty(line) && !GameText.IsMissing(line) && System.Linq.Enumerable.Any(line, char.IsLetterOrDigit)) desc.Add(line);
                     }
                 if (desc.Count == 0) { if (title != null) lines.Add(title); }

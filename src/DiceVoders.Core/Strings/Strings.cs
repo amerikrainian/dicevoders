@@ -51,6 +51,7 @@ namespace DiceVoders.Core.Strings
             D("state.completed", "completed"),
             D("cs.random", "Random commander"),
             D("cs.challenges", "Challenges"),
+            D("cs.modifiers", "Modifiers"),
             D("state.selected", "selected"),
             D("state.on", "on"),
             D("state.off", "off"),

@@ -22,6 +22,7 @@ state.locked=잠김
 state.completed=완료
 cs.random=무작위 사령관
 cs.challenges=도전
+cs.modifiers=수정자
 state.selected=선택됨
 state.on=켜짐
 state.off=꺼짐

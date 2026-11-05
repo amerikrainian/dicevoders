@@ -22,6 +22,7 @@ state.locked=bloqueado
 state.completed=concluído
 cs.random=Comandante aleatório
 cs.challenges=Desafios
+cs.modifiers=Modificadores
 state.selected=selecionado
 state.on=ligado
 state.off=desligado
