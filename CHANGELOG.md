@@ -1,5 +1,14 @@
 # Changelog
 
+## V0.0.6
+
+- On the commander select, the chapter's or challenge's modifiers are now read.
+- The chapter panel now reads its "New Mechanic" line and, for daily challenges, when the daily mods reset.
+- The current mission now names the commanders you have already won its chapter with.
+- Chapter 6's missions now say which are completed.
+- The mission area is now read on every profile.
+- Descriptions no longer start with a stray dash where the game draws a bullet.
+
 ## V0.0.5
 
 - New, hopefully less verbose scoring mode, is available to try in mod settings.
