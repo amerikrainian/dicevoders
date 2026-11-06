@@ -393,7 +393,7 @@ namespace DiceVoders.Module.Screens
 
         // The commander panel (Frame, shown once a commander is chosen): "The Captain, LV. 2"; the
         // starting perk as the board reads it, Backspace its tooltip; the unique artifacts one after
-        // another, in the drawn order (top to bottom, left to right): an unlocked one by name (Backspace its tooltip),
+        // another, in unlock order (LV.2 to LV.7): an unlocked one by name (Backspace its tooltip),
         // a locked one by its tooltip's condition ("Defeat 4 pilots with this commander to level up
         // and unlock this! (2/4)"), Backspace its title ("Locked LV.3 Unique"); Enter is the game's
         // click (an unlockable one's reveal).
@@ -404,7 +404,11 @@ namespace DiceVoders.Module.Screens
             var starting = c.CommanderArtifactView;
             if (starting != null && starting.gameObject.activeInHierarchy && Model(starting) != null)
                 b.AddItem(ControlId.Structural("cs:starting"), ArtifactNode(starting, false));
-            var slots = new List<(Transform At, NodeVtable Node, string Id)>();
+            // One list, Up and Down through it (rows of the drawn grid made it a grid to walk), in the
+            // game's order: slot i unlocks at level i + 2 (LockedArtifactItemView.Initialize). The
+            // drawing is two columns of three around the portrait, filled bottom up, left then right
+            // (0 bottom left, 1 bottom right, ... 5 top right): read top first it went LV.6, LV.7,
+            // LV.4, LV.5, LV.2, LV.3.
             for (int i = 0; i < (c.LockedArtifactItems?.Count ?? 0); i++)
             {
                 var locked = c.LockedArtifactItems[i];
@@ -413,15 +417,11 @@ namespace DiceVoders.Module.Screens
                 if (locked != null && locked.gameObject.activeInHierarchy)
                 {
                     taken.Add(locked.Pointer);
-                    slots.Add((locked.transform, LockedNode(locked, unlocked, view), "cs:unique:" + i));
+                    b.AddItem(ControlId.Structural("cs:unique:" + i), LockedNode(locked, unlocked, view));
                 }
                 else if (unlocked != null && unlocked.activeInHierarchy && view != null && Model(view) != null)
-                    slots.Add((view.transform, ArtifactNode(view, true), "cs:unique:" + i));
+                    b.AddItem(ControlId.Structural("cs:unique:" + i), ArtifactNode(view, true));
             }
-            // One list, Up and Down through it, in the drawn order: by height, top first; left to
-            // right within one. (Rows of the drawn grid made it a grid to walk.)
-            slots.Sort((l, r) => Math.Abs(l.At.position.y - r.At.position.y) > 5f ? r.At.position.y.CompareTo(l.At.position.y) : l.At.position.x.CompareTo(r.At.position.x));
-            foreach (var slot in slots) b.AddItem(ControlId.Structural(slot.Id), slot.Node);
         }
 
         // The Overseer's frame (OverseerFrame, shown while the Overseer is chosen): the two commanders
