@@ -1,5 +1,12 @@
 # Changelog
 
+## V0.0.7
+
+- Units with negative strength are now properly handled. Beyond me why they wouldn't just put a - and have a separate flag.
+- A unit destroyed by its own scoring, such as Puppet, now counts in its column's attack.
+- The Oculus issue is finally put to rest.
+- On the commander select, the unique artifacts should now be in the order they unlock.
+
 ## V0.0.6
 
 - On the commander select, the chapter's or challenge's modifiers are now read.
