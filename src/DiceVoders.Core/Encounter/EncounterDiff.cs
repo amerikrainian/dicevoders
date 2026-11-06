@@ -202,8 +202,10 @@ namespace DiceVoders.Core.Encounter
             foreach (var (was, u) in stayed)
                 if (was.X != u.X || was.Y != u.Y) lines.Add(S.EncMoved(u.Name, Place(u.X, u.Y)));
 
-            // Strength: one line when every unit that stayed changed by the same amount.
-            var changed = stayed.FindAll(p => p.Was.Strength != p.Is.Strength);
+            // Strength: one line when every unit that stayed changed by the same amount (the
+            // unsigned figure, as the game adds to it: a negative unit's grows too). The text also
+            // counts: a sign turned with the figure kept is a change of 0, never alike.
+            var changed = stayed.FindAll(p => p.Was.Strength != p.Is.Strength || p.Was.StrengthText != p.Is.StrengthText);
             double first = changed.Count > 0 ? changed[0].Is.Strength - changed[0].Was.Strength : 0;
             if (changed.Count > 1 && changed.Count == stayed.Count
                 && changed.TrueForAll(p => Math.Abs((p.Is.Strength - p.Was.Strength) - first) < 1e-9))

@@ -648,13 +648,13 @@ namespace DiceVoders.Module.Screens
             return string.Join(", ", parts);
         }
 
-        /// <summary>A unit's named states, charge apart: negative, Shielded, Shock.</summary>
+        /// <summary>A unit's named states, charge apart: Shielded, Shock. (Negative strength is the
+        /// figure's sign, as the game prints it: "-10 strength".)</summary>
         internal static List<string> UnitStates(EntityModel unit)
         {
             var states = new List<string>();
             try
             {
-                if (unit.IsNegative) states.Add(Strings.EncNegative);
                 if (unit.IsShielded) states.Add(GameLoc.Get("Shielded_Keyword") ?? "Shielded");
                 if (unit.IsShocked) states.Add(GameLoc.Get("Shock_Keyword") ?? "Shock");
                 if (unit.IsBlocked) states.Add(Strings.EncBlocked);

@@ -197,12 +197,17 @@ namespace DiceVoders.Module.Encounter
             return GameLoc.Get(entity.EntityName + "_Entity_Title") ?? entity.EntityName.ToString();
         }
 
-        /// <summary>The unit's strength now, as the game prints it.</summary>
+        /// <summary>The unit's strength now, as the game prints it: "-10" for a unit with negative
+        /// strength (Coral, Puppet: <see cref="EntityModel.IsNegative"/>, the value itself kept
+        /// positive; the tooltip writes "-" before it, the figure drawn red).</summary>
         public static string Strength(EntityModel entity)
         {
-            try { return entity?.GetCurrentValue(Model).ToString(); }
+            try { return entity == null ? null : Strength(entity, entity.GetCurrentValue(Model)); }
             catch (Exception e) { CoreLog.Warning("Encounter: reading a unit's strength failed: " + e.Message); return null; }
         }
+
+        /// <summary>A strength already read (<see cref="EntityModel.GetCurrentValue"/>) as the game prints it.</summary>
+        public static string Strength(EntityModel entity, BigDouble value) => (entity.IsNegative ? "-" : "") + value.ToString();
 
         /// <summary>The unit's tooltip as the game fills it on hover (<see cref="EntityTooltip.UpdateTooltip"/>,
         /// run here on the tile's own tooltip: the hidden one holds prefab placeholder text until then):

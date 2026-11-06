@@ -143,7 +143,6 @@ namespace DiceVoders.Core.Strings
             D("enc.empty", "empty"),
             D("enc.nothing", "nothing"),
             D("enc.honey", "honey"),
-            D("enc.negative", "negative"),
             // A unit's charges; {0} = left, {1} = the most it holds.
             D("enc.charge", "charge {0}/{1}"),
             D("enc.rolling", "rolling"),
@@ -534,7 +533,6 @@ namespace DiceVoders.Core.Strings
         public static string EncNothing => Get("enc.nothing");
         public static string EncEmpty => Get("enc.empty");
         public static string EncHoney => Get("enc.honey");
-        public static string EncNegative => Get("enc.negative");
         public static string EncCharge(int left, int max) => F("enc.charge", left, max);
         public static string EncRolling => Get("enc.rolling");
         public static string EncFrozen => Get("enc.frozen");

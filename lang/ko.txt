@@ -89,7 +89,6 @@ enc.strength=힘 {0}
 enc.empty=비어 있음
 enc.nothing=없음
 enc.honey=꿀
-enc.negative=음수
 enc.charge=충전 {0}/{1}
 enc.rolling=굴러가는 중
 enc.frozen=얼림

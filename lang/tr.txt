@@ -89,7 +89,6 @@ enc.strength={0} güç
 enc.empty=boş
 enc.nothing=hiçbir şey
 enc.honey=bal
-enc.negative=negatif
 enc.charge=yük {0}/{1}
 enc.rolling=dönüyor
 enc.frozen=donmuş

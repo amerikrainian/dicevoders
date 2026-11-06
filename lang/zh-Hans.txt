@@ -89,7 +89,6 @@ enc.strength=力量 {0}
 enc.empty=空
 enc.nothing=无
 enc.honey=蜂蜜
-enc.negative=负面
 enc.charge=充能 {0}/{1}
 enc.rolling=滚动中
 enc.frozen=已冻结

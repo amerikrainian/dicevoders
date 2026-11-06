@@ -89,7 +89,6 @@ enc.strength={0} de force
 enc.empty=vide
 enc.nothing=rien
 enc.honey=miel
-enc.negative=négatif
 enc.charge=charge {0}/{1}
 enc.rolling=en train de rouler
 enc.frozen=gelé

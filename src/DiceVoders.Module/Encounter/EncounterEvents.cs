@@ -189,7 +189,7 @@ namespace DiceVoders.Module.Encounter
             try
             {
                 var columns = new List<string>();
-                foreach (var c in _summary.Columns) columns.Add(c.ToDouble() > 0 ? c.ToString() : "0");
+                foreach (var c in _summary.Columns) columns.Add(c.ToDouble() != 0 ? c.ToString() : "0");
                 string line = total != null
                     ? EncounterDiff.TurnSummary(columns, mult, total, _summary.MiniDice, GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice", _summary.Combos)
                     : string.Join(", ", columns);
@@ -214,6 +214,9 @@ namespace DiceVoders.Module.Encounter
         private static int _column = -1, _columnDice, _columnRift;
         private static bool _columnMini;
         private static BigDouble[] _stepStart;
+        // Each unit's column as the step started: a unit that destroys itself as it scores (Puppet:
+        // "Lose 1 Budge and destroy this") leaves the grid with its gain still on its model.
+        private static readonly Dictionary<string, int> _stepPlaces = new Dictionary<string, int>();
 
         [HarmonyPatch(typeof(ScoreColumnTask._Execute_d__1), nameof(ScoreColumnTask._Execute_d__1.MoveNext))]
         internal static class ColumnSteps
@@ -231,14 +234,14 @@ namespace DiceVoders.Module.Encounter
                     if (Summary && Encounter.Phase == Phase.Scoring)
                     {
                         if (!_summary.Open) _summary.Start(Encounter.Columns);
-                        _stepStart = ColumnSums(Encounter.Model, true);
+                        _stepStart = ColumnSums(Encounter.Model, true, _stepPlaces, record: true);
                         return;
                     }
                     var now = Take();
                     if (now == null) return;
                     Say(EncounterDiff.Lines(_last, now));
                     _last = now;
-                    _stepStart = ColumnSums(Encounter.Model, true);
+                    _stepStart = ColumnSums(Encounter.Model, true, _stepPlaces, record: true);
                 }
                 catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's start failed: " + e.Message); }
             }
@@ -264,13 +267,13 @@ namespace DiceVoders.Module.Encounter
                     _column = -1;
                     if (_summary.Open) { Tally(column); return; }
                     var now = Take();
-                    var end = ColumnSums(Encounter.Model, true);
+                    var end = ColumnSums(Encounter.Model, true, _stepPlaces);
                     if (now == null || end == null) return;
                     var gains = new List<string>();
                     for (int x = 0; x < end.Length; x++)
                     {
                         var gain = x < _stepStart.Length ? end[x] - _stepStart[x] : end[x];
-                        gains.Add(gain.ToDouble() > 0 ? gain.ToString() : null);
+                        gains.Add(gain.ToDouble() != 0 ? gain.ToString() : null);
                     }
                     string mini = _columnMini ? GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice" : null;
                     CoreLog.Info("EncounterEvents: column " + column + " scored with " + _columnDice + (_columnMini ? " mini" : "") + " dice, gains [" + string.Join(" ", gains.ConvertAll(g => g ?? "-")) + "]");
@@ -285,12 +288,12 @@ namespace DiceVoders.Module.Encounter
         // dice and combo.
         private static void Tally(int column)
         {
-            var end = ColumnSums(Encounter.Model, true);
+            var end = ColumnSums(Encounter.Model, true, _stepPlaces);
             if (end == null) return;
             for (int x = 0; x < end.Length && x < _summary.Columns.Length; x++)
             {
                 var gain = x < _stepStart.Length ? end[x] - _stepStart[x] : end[x];
-                if (gain.ToDouble() > 0) _summary.Columns[x] = _summary.Columns[x] + gain;
+                if (gain.ToDouble() != 0) _summary.Columns[x] = _summary.Columns[x] + gain;
             }
             if (_columnMini)
             {
@@ -459,7 +462,7 @@ namespace DiceVoders.Module.Encounter
                     X = c.x,
                     Y = c.y,
                     Strength = strength.ToDouble(),
-                    StrengthText = strength.ToString(),
+                    StrengthText = Encounter.Strength(unit, strength),
                     States = Screens.EncounterScreen.UnitStates(unit),
                     Charge = unit.Charge,
                     MaxCharge = unit.MaxCharge,
@@ -474,23 +477,35 @@ namespace DiceVoders.Module.Encounter
         {
             var sums = ColumnSums(model, Encounter.Phase == Phase.Scoring);
             if (sums == null) return;
-            foreach (var sum in sums) into.Add(sum.ToDouble() > 0 ? sum.ToString() : "0");
+            foreach (var sum in sums) into.Add(sum.ToDouble() != 0 ? sum.ToString() : "0");
         }
 
-        private static BigDouble[] ColumnSums(EncounterModel model, bool thisTurn)
+        // Each column's units' attack gained, summed (negative units' gains are negative). With
+        // places, a unit gone from the grid since they were taken counts in the column it stood in
+        // (its model stays in ModelItemDict, the gain on it); record retakes them.
+        private static BigDouble[] ColumnSums(EncounterModel model, bool thisTurn, Dictionary<string, int> places = null, bool record = false)
         {
             if (model == null) return null;
             int columns = Encounter.Columns;
             var sums = new BigDouble[columns];
             var any = new bool[columns];
+            if (record) places?.Clear();
             foreach (var kv in model.ModelItemDict)
             {
                 var unit = kv.Value?.TryCast<EntityModel>();
-                if (unit == null || !model.GridModel.IsEntityOnGrid(unit.EntityID)) continue;
-                int x = model.GridModel.GetEntityCoord(unit.EntityID, false).x;
+                if (unit == null) continue;
+                var id = unit.EntityID;
+                string key = id.EntityName + "#" + id.Number;
+                int x;
+                if (model.GridModel.IsEntityOnGrid(id))
+                {
+                    x = model.GridModel.GetEntityCoord(id, false).x;
+                    if (record && places != null) places[key] = x;
+                }
+                else if (record || places == null || !places.TryGetValue(key, out x)) continue;
                 if (x < 0 || x >= columns) continue;
                 var gained = thisTurn ? unit.GetAttackGainedThisTurn() : unit.GetAttackGainedLastTurn();
-                if (gained.ToDouble() <= 0) continue;
+                if (gained.ToDouble() == 0) continue;
                 sums[x] = any[x] ? sums[x] + gained : gained;
                 any[x] = true;
             }

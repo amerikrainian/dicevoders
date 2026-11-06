@@ -349,6 +349,42 @@ namespace DiceVoders.Tests
             Assert.Equal(new[] { "Migo at 2, 1: 25 strength" }, EncounterDiff.Lines(prev, now));
         }
 
+        // A unit with negative strength (Coral, Puppet): the figure unsigned, the text as the game prints it.
+        private static UnitSnap Negative(string id, string name, int x, int y, double strength) => new UnitSnap
+        {
+            Id = id, Name = name, X = x, Y = y, Strength = strength, StrengthText = "-" + strength, States = new List<string>(),
+        };
+
+        [Fact]
+        public void A_negative_unit_says_its_strength_signed()
+        {
+            var prev = Snap("Draft");
+            var now = Snap("Draft");
+            prev.Units.Add(Negative("Coral#1", "Coral", 0, 0, 10)); prev.Units.Add(Unit("Migo#2", "Migo", 2, 0, 10));
+            now.Units.Add(Negative("Coral#1", "Coral", 0, 0, 15)); now.Units.Add(Unit("Migo#2", "Migo", 2, 0, 10));
+            Assert.Equal(new[] { "Coral at 1, 1: -15 strength" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void A_negative_unit_growing_with_the_rest_is_still_alike()
+        {
+            var prev = Snap("Draft");
+            var now = Snap("Draft");
+            prev.Units.Add(Negative("Coral#1", "Coral", 0, 0, 10)); prev.Units.Add(Unit("Migo#2", "Migo", 2, 0, 10));
+            now.Units.Add(Negative("Coral#1", "Coral", 0, 0, 15)); now.Units.Add(Unit("Migo#2", "Migo", 2, 0, 15));
+            Assert.Equal(new[] { "all units +5 strength" }, EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void A_sign_turned_is_said()
+        {
+            var prev = Snap("Draft");
+            var now = Snap("Draft");
+            prev.Units.Add(Negative("Coral#1", "Coral", 0, 0, 10)); prev.Units.Add(Unit("Migo#2", "Migo", 2, 0, 10));
+            now.Units.Add(Unit("Coral#1", "Coral", 0, 0, 10)); now.Units.Add(Unit("Migo#2", "Migo", 2, 0, 10));
+            Assert.Equal(new[] { "Coral at 1, 1: 10 strength" }, EncounterDiff.Lines(prev, now));
+        }
+
         [Fact]
         public void States_gained_and_lost_are_said()
         {

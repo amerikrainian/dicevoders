@@ -293,7 +293,10 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     `DicePanel.GetAllDicePower`, keyed by the 1-based column; the column artifact is
     `ArtifactSlots[x]`, the first 6 slots being the columns', `GetColumnArtifacts`), the 6x3 grid
     top row first ("2, 1, Migo, 10 strength": tiles "x, y" 1-based, row 1 at the bottom; the
-    model's y 0 IS the bottom, each `GridColumn`'s layout being reversed), then a strict strip:
+    model's y 0 IS the bottom, each `GridColumn`'s layout being reversed; Coral and Puppet, the
+    boss fights' "Has negative STR" units, "Coral, -10 strength": `EntityModel.IsNegative`, the value
+    kept positive, the tooltip printing "-" before it in red; the stats overlay's STR view draws it
+    unsigned, the same red as every unit, and is signed too), then a strict strip:
     in `Phase.Player` the dice in `DiceVisualOrder` ("3, frozen"; a Kraken die, The Core's, `_index` 3 and
     up as the game counts and draws them: "4, Kraken", the roll "rolled 5, 6, 6, Kraken 2") and Launch
     (`DicePanel/ProceedKnob/ProceedLine/LaunchPanel/LaunchButton`). Focus lands on the first die.
@@ -345,7 +348,9 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     is the start, `false` the end; `_i_5__2` the 1-based column, `_isMini_5__3`), live engine only,
     snapshot as each column starts (what came before is said) and ends (`EncounterDiff.Step`: "column
     4: 80", then what it set off: "4D Printer level 2", "new tile at 5, 1", "Mult 2"; the gain is
-    the column units' `AttackGainedThisTurn` summed, end less start; with several dice the label
+    the column units' `AttackGainedThisTurn` summed, end less start, negatives kept ("column 1: -10"),
+    a unit gone from the grid in the step (Puppet destroys itself as it scores; its model stays in
+    `ModelItemDict` with the gain) counted where it stood as the step began; with several dice the label
     the game draws over the column joins it, "column 2: 140, Pair" (`GridColumn.PairTextObjects[dice -
     2]`, its `LocalizeStringEvent`'s string: hidden, the text is the prefab's; the game picks it in
     `GridColumn.SetPreviewDice` from the base dice plus the Chrono Rift faces in the tray, a die showing

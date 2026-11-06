@@ -167,6 +167,10 @@ namespace DiceVoders.Module.Screens
                         if (tile == null || unit == null || tile.DetailObject == null || !tile.DetailObject.activeInHierarchy) continue;
                         var parts = new List<string> { Strings.EncCoord(x + 1, y + 1), Encounter.Encounter.Name(unit) };
                         Figure(parts, tile.AttackDetailText, null);
+                        // The strength view draws a negative unit's figure unsigned, the same red as
+                        // every other (SetAllUnitAttack passes GetCurrentValue): signed as the cell reads it.
+                        if (view == DetailType.AllUnitSTR && unit.IsNegative && parts.Count > 2 && !parts[2].StartsWith("-"))
+                            parts[2] = "-" + parts[2];
                         Figure(parts, tile.MultDetailText, MultWord());
                         Figure(parts, tile.ScoredDetailText, null);
                         if (parts.Count > 2) lines.Add(string.Join(", ", parts));

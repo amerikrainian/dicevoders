@@ -89,7 +89,6 @@ enc.strength=強さ {0}
 enc.empty=空
 enc.nothing=なし
 enc.honey=ハチミツ
-enc.negative=マイナス
 enc.charge=チャージ {0}/{1}
 enc.rolling=回転中
 enc.frozen=凍結

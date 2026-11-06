@@ -89,7 +89,6 @@ enc.strength={0} Stärke
 enc.empty=leer
 enc.nothing=nichts
 enc.honey=Honig
-enc.negative=negativ
 enc.charge=Ladung {0}/{1}
 enc.rolling=rollt
 enc.frozen=eingefroren

@@ -89,7 +89,6 @@ enc.strength={0} de força
 enc.empty=vazio
 enc.nothing=nada
 enc.honey=mel
-enc.negative=negativo
 enc.charge=carga {0}/{1}
 enc.rolling=rolando
 enc.frozen=congelado

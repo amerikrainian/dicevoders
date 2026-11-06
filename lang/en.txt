@@ -91,7 +91,6 @@ enc.strength={0} strength
 enc.empty=empty
 enc.nothing=nothing
 enc.honey=honey
-enc.negative=negative
 enc.charge=charge {0}/{1}
 enc.rolling=rolling
 enc.frozen=frozen

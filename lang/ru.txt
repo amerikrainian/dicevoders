@@ -89,7 +89,6 @@ enc.strength=сила {0}
 enc.empty=пусто
 enc.nothing=ничего
 enc.honey=мёд
-enc.negative=отрицательный
 enc.charge=заряд {0}/{1}
 enc.rolling=катится
 enc.frozen=заморожен

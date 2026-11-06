@@ -78,9 +78,11 @@ namespace DiceVoders.Core.Encounter
         public string Id;
         public string Name;
         public int X, Y;
+        /// <summary>The figure, unsigned: what "+5 strength" effects add to, a negative unit's too.</summary>
         public double Strength;
+        /// <summary>As the game prints it: "-10" for a unit with negative strength.</summary>
         public string StrengthText;
-        /// <summary>Its named states ("Shielded", "Shock", "negative"), charge apart.</summary>
+        /// <summary>Its named states ("Shielded", "Shock"), charge apart.</summary>
         public List<string> States = new List<string>();
         public int Charge, MaxCharge;
     }
