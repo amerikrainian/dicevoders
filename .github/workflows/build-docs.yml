@@ -16,13 +16,13 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install mdBook
         run: cargo install mdbook --version 0.5.2 --locked
       - name: Generate docs
         working-directory: ./docs_src
         run: mdbook build
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: ./docs_src/book
 
@@ -37,4 +37,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
