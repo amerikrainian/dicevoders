@@ -673,14 +673,7 @@ namespace DiceVoders.Module.Screens
         {
             try
             {
-                Direction? looks = null;
-                if (unit.OnScoreTaskList != null)
-                    foreach (var task in unit.OnScoreTaskList)
-                    {
-                        if (task == null) continue;
-                        if (task.TryCast<OculusTask>() != null) { looks = unit.OculusDirection; break; }
-                        if (task.TryCast<WarpedOculusTask>() != null) { looks = Direction.W; break; }
-                    }
+                var looks = ScoreDirection(unit);
                 if (looks == null) return null;
                 string dir;
                 switch (looks.Value)
@@ -700,6 +693,46 @@ namespace DiceVoders.Module.Screens
             catch (Exception e) { CoreLog.Warning("EncounterScreen: reading a unit's facing failed: " + e.Message); return null; }
         }
 
+        // The direction an Oculus (its OculusDirection) or a Warped Oculus (always W) scores in; null
+        // for every other unit.
+        private static Direction? ScoreDirection(EntityModel unit)
+        {
+            if (unit.OnScoreTaskList == null) return null;
+            foreach (var task in unit.OnScoreTaskList)
+            {
+                if (task == null) continue;
+                if (task.TryCast<OculusTask>() != null) return unit.OculusDirection;
+                if (task.TryCast<WarpedOculusTask>() != null) return Direction.W;
+            }
+            return null;
+        }
+
+        /// <summary>"affects: Shooter at 5, 1": the units an Oculus or Warped Oculus scores, from the
+        /// tiles its task scores (<see cref="GridModel.GetCoordsInDirection"/>, nearest first); null
+        /// for every other unit, which reads the game's highlight. The game's highlight swaps their
+        /// tags: UnitsToTheRight (the Oculus) lights the tiles to the left (W), UnitsToTheLeft (the
+        /// Warped Oculus) those to the right (E) (EncounterView.HighlightContextViews); seen live, the
+        /// Oculus at 4, 1 lit 2, 1 and 3, 1, the Shooter at 5, 1 being what it scores. "nothing" when
+        /// no unit stands there.</summary>
+        internal static string Aimed(EntityModel unit)
+        {
+            try
+            {
+                var looks = ScoreDirection(unit);
+                var model = EncounterState.Model;
+                if (looks == null || model == null || !model.GridModel.IsEntityOnGrid(unit.EntityID)) return null;
+                var from = model.GridModel.GetEntityCoord(unit.EntityID, false);
+                var parts = new List<string>();
+                foreach (var c in model.GridModel.GetCoordsInDirection(from, looks.Value))
+                {
+                    var other = EncounterState.At(c.x, c.y);
+                    if (other != null) parts.Add(Strings.EncUnitAt(EncounterState.Name(other), Strings.EncCoord(c.x + 1, c.y + 1)));
+                }
+                return Strings.EncAffects(parts.Count > 0 ? string.Join(", ", parts) : Strings.EncNothing);
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterScreen: reading what an Oculus scores failed: " + e.Message); return null; }
+        }
+
         private static IEnumerable<string> CellDetails(int x, int y)
         {
             var unit = EncounterState.At(x, y);
@@ -712,7 +745,8 @@ namespace DiceVoders.Module.Screens
             string facing = Facing(unit);
             if (facing != null) yield return facing;
             if (rarity != null) yield return rarity;
-            string lit = Highlighted();
+            // The Oculi read what they score: the game's highlight lights the wrong side for them.
+            string lit = Aimed(unit) ?? Highlighted();
             if (lit != null) yield return lit;
             foreach (var line in keywords) yield return line;
         }
