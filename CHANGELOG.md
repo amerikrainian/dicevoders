@@ -1,5 +1,11 @@
 # Changelog
 
+## V0.0.8
+
+- Fixed the final boss' bar. It reads properly and contains its explanation.
+- Spells in the shop now say "Spell", like units and artifacts say their kind.
+- When a shop slot is refilled, such as by Grimoire's spell after a purchase, only the new item is announced instead of the whole shop.
+
 ## V0.0.7
 
 - Units with negative strength are now properly handled. Beyond me why they wouldn't just put a - and have a separate flag.
