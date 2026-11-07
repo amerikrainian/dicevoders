@@ -865,7 +865,8 @@ namespace DiceVoders.Module.Screens
 
         // ---- the shop ----
 
-        // "Meteor, Artifact, 2 cash, frozen": the name, the kind, the price, then what stands out.
+        // "Meteor, Artifact, 2 cash, frozen": the name, the kind (Unit, Artifact, Spell), the price,
+        // then what stands out.
         // Enter buys it (the game's click; a unit, a tile or a swap then asks for its target on the
         // board); Backspace reads its tooltip.
         private static NodeVtable Choice(DraftChoice choice, bool first)
@@ -954,6 +955,9 @@ namespace DiceVoders.Module.Screens
             {
                 if (choice.DraftType == DraftType.Entity) parts.Add(GameLoc.Get("Unit_Misc"));
                 else if (choice.DraftType == DraftType.Artifact) parts.Add(GameLoc.Get("Artifact_Misc"));
+                // Everything else is a spell (Build Tile, Get +2 Budge, Swap or Move...): its tooltip's
+                // kind line says "Spell", as Grimoire's "Create a random different Spell" means.
+                else if (choice.DraftType != DraftType.None) parts.Add(GameLoc.Get("Spell_Misc"));
                 parts.Add(Strings.EncCost(choice.DraftCost));
                 if (choice.tempRarity != Rarity.Common) parts.Add(GameLoc.Get(choice.tempRarity + "_Misc") ?? choice.tempRarity.ToString());
                 if (choice.isCursed)

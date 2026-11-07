@@ -406,7 +406,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     4, plus 2,2); others read "no tile"; `GetBuildableCoords` is where Build Tile can add one. The
     shop (`Phase.Draft`) strip: `DraftPanel.DraftChoices` still `IsActive` ("Meteor, Artifact, 2
     cash[, Uncommon][, cursed][, frozen][, can't afford]": `tempRarity`, `isCursed`, `IsLocked`,
-    `CantBuyCostIcon`), then Proceed (`BG/ProceedButton`) and Skip remaining turns
+    `CantBuyCostIcon`; the kind is `Unit_Misc`, `Artifact_Misc`, else `Spell_Misc`: "Get +1 Chrono, Spell, 1
+    cash", as the tooltip's kind line has it), then Proceed (`BG/ProceedButton`) and Skip remaining turns
     (`SkipTurns/ProceedLine/SkipButton`, when shown, with the rarity drawn beside it: "+10% SHOP
     RARITY", "+25%" with 2 turns left, `DraftPanel.SkipTurnsRarityText` under `ProceedLine/Normal`, whose
     "TARGET REACHED!" is left out; after a target taken in the first turn the drawn "One-Turn KO!, +50%
