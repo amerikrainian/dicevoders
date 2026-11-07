@@ -21,8 +21,12 @@ namespace DiceVoders.Core.Encounter
         /// <summary>Blood Beast's Rage (-1 for any other commander), and the turns left in Beast Mode (0
         /// outside it).</summary>
         public int Rage = -1, BeastTurns;
-        /// <summary>The final boss's HP (its panic bar), -1 outside that fight.</summary>
+        /// <summary>The final boss's HP (<c>FinalBossHP</c>, -1 outside that fight): the Doom Bar's
+        /// empty part, <see cref="BossMaxHp"/> at the start.</summary>
         public int BossHp = -1;
+        /// <summary>The final boss's HP as the fight begins (<c>SetupFinalBossTask</c> sets 3; the bar,
+        /// <c>FinalBossPanel.SetPanicBar</c>, has the four states 0 to 3).</summary>
+        public const int BossMaxHp = 3;
         /// <summary>The star cards the final boss holds, by title.</summary>
         public List<string> StarCards = new List<string>();
         public double Total, Target;

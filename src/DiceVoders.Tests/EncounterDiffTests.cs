@@ -221,11 +221,11 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
-        public void The_final_boss_losing_hp_is_said()
+        public void The_final_boss_doom_bar_filling_is_said()
         {
             var prev = Snap("Draft"); prev.BossHp = 3;
             var now = Snap("Draft"); now.BossHp = 2;
-            Assert.Equal(new[] { "HP 2" }, EncounterDiff.Lines(prev, now));
+            Assert.Equal(new[] { "Doom 1/3" }, EncounterDiff.Lines(prev, now));
         }
 
         [Fact]

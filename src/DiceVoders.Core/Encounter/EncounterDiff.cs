@@ -67,7 +67,7 @@ namespace DiceVoders.Core.Encounter
             foreach (var card in now.StarCards)
                 if (!heldBefore.Remove(card)) lines.Add(S.EncArtifactAdded(card));
             if (now.BossHp >= 0 && prev.BossHp >= 0 && now.BossHp != prev.BossHp)
-                lines.Add(S.EncFigure(S.EncBossHp, now.BossHp.ToString()));
+                lines.Add(Doom(now.BossHp));
             // Blood Beast: Rage, and Beast Mode coming and going.
             if (now.Rage >= 0 && prev.Rage >= 0 && now.Rage != prev.Rage)
                 lines.Add(S.EncFigure(S.EncRage, now.Rage.ToString()));
@@ -288,6 +288,11 @@ namespace DiceVoders.Core.Encounter
         }
 
         // The offer lost items and gained none: something bought, not a reroll.
+        /// <summary>The final boss's Doom Bar as the game words it: each target passed is "+1 Doom", the
+        /// HP lost ("Doom 1/3" at HP 2).</summary>
+        public static string Doom(int hp) =>
+            S.EncDoom(Math.Max(0, EncounterSnapshot.BossMaxHp - hp), EncounterSnapshot.BossMaxHp);
+
         // The choices in the offer now that were not in it before (as a multiset, in the offer's
         // order); none after a purchase alone.
         private static List<string> Added(List<string> before, List<string> after)

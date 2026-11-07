@@ -499,10 +499,18 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     pilot Star, act 4 round 3): its draft (`Phase.FinalBossDraft`, `EncounterController.FinalBossDraft`:
     "Choose One" of three star cards, handicaps Star takes on) is the row under the board, each card
     its `CardTooltip` title, Backspace the tooltip, Enter its click; landed on as it shows. The
-    status stop adds "HP 3" (`FinalBossHP`, drawn only as `FinalBossPanel.PanicBarImage`; "HP" is the
-    mod's) and the held cards (`FinalBossPanel.StarCardViews`, filled ones); a taken card and HP
-    changes are said. Its target reads "Star" (the pilot panel keeps the last pilot's ability).
-    Seen live: reached with `stage.py skip` from act 1, Overclock taken.
+    status stop adds the Doom Bar, "Doom 0/3" (the game's "+1 Doom" each time the target is passed,
+    which resets the attack: 3 less `FinalBossHP`, which `SetupFinalBossTask` sets to 3; drawn only as
+    `FinalBossPanel.PanicBarImage`, `SetPanicBar`'s four states; "Doom" is the mod's word, the game's
+    from its explanation), its details the explanation the game hides behind the panel's "?"
+    (`StarTooltiptrigger`, a `ButtonView` whose `Tooltip` is read localized: "THE STAR - DOOM BAR: To
+    win, you must fill up the Doom Bar! ..."; the mod used to read the bar as "HP 3", unexplained), and
+    the held cards (`FinalBossPanel.StarCardViews`, filled ones); a taken card and Doom gained ("Doom
+    1/3") are said. Its target reads "Star" (the pilot panel keeps the last pilot's ability). Seen
+    live: reached with `stage.py skip` from act 1 (the Ultimate Earth challenge too: pilots Bud,
+    Tippy, RoboMin, Star; RoboMin's Glitch Bomb units already read), Overclock taken, a target passed
+    with `stage.py set TotalScore`. Do not `skip` from the final boss's draft: it skips the fight into
+    act 5 (no victory, no achievement, seen).
   - The abilities knob under the dice and the shop (`BottomPanel/AbilitiesKnob`, found from
     `EncounterController.BudgeIconImage`) is a row below theirs: "Reroll Button, Chrono 2" (Enter =
     R's reroll), "Budge Button, Budge 6, disabled" (no role word on the knob's parts: the game's titles say

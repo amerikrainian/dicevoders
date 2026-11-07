@@ -511,11 +511,28 @@ namespace DiceVoders.Module.Encounter
             return cards;
         }
 
-        /// <summary>The final boss's HP (drawn only as its panic bar), null outside that fight.</summary>
+        /// <summary>The final boss's HP (the Doom Bar's empty part, drawn only as the bar), null outside
+        /// that fight.</summary>
         public static int? BossHp()
         {
             try { return Model != null && Model.IsFinalBoss ? Int(EncounterValue.FinalBossHP) : null; }
             catch (Exception e) { CoreLog.Warning("Encounter: reading the final boss's HP failed: " + e.Message); return null; }
+        }
+
+        /// <summary>The Doom Bar's explanation, the hidden tooltip of the "?" on the final boss's panel
+        /// (<c>StarTooltiptrigger</c>'s <see cref="ButtonView.Tooltip"/>: "THE STAR - DOOM BAR: To win,
+        /// you must fill up the Doom Bar! ..."); null outside that fight.</summary>
+        public static GameObject DoomTooltip()
+        {
+            try
+            {
+                var panel = Controller?.FinalBossPanel;
+                if (panel == null || !panel.gameObject.activeInHierarchy) return null;
+                var trigger = panel.transform.Find("StarTooltiptrigger");
+                var button = trigger != null ? trigger.GetComponent<ButtonView>() : null;
+                return button != null ? button.Tooltip : null;
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: finding the Doom Bar's tooltip failed: " + e.Message); return null; }
         }
 
         /// <summary>Whether the tile shows a pilot's danger zone (Garu's Turret: the bottom tile of the

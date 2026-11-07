@@ -214,8 +214,9 @@ namespace DiceVoders.Core.Strings
             // Blood Beast's Rage ("Rage 2") and the mode it brings on, as its perk's text names them.
             D("enc.rage", "Rage"),
             D("enc.beast_mode", "Beast Mode"),
-            // The final boss's HP, drawn only as its panic bar ("HP 3").
-            D("enc.boss_hp", "HP"),
+            // The final boss's Doom Bar, drawn only as a bar: the game's "+1 Doom" each time the target
+            // is passed; {0} = the Doom gained, {1} = the bar's length ("Doom 1/3").
+            D("enc.doom", "Doom {0}/{1}"),
             // The shop phase opening after a turn.
             D("enc.shop", "Shop"),
             // A tile the grid does not have yet (the shop's Build Tile adds them).
@@ -576,7 +577,7 @@ namespace DiceVoders.Core.Strings
         public static string EncAreaButtons => Get("enc.area_buttons");
         public static string EncRage => Get("enc.rage");
         public static string EncBeastMode => Get("enc.beast_mode");
-        public static string EncBossHp => Get("enc.boss_hp");
+        public static string EncDoom(int doom, int max) => F("enc.doom", doom, max);
         public static string EncShop => Get("enc.shop");
         public static string EncNoTile => Get("enc.no_tile");
         public static string EncTarget => Get("enc.target");

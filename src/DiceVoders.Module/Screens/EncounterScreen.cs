@@ -1044,9 +1044,12 @@ namespace DiceVoders.Module.Screens
                 b.AddItem(ControlId.Structural("enc:tip"), Stat(() => { var tip = ActionTip(); return tip != null ? Tips.Text(tip) : null; }));
             b.AddItem(ControlId.Structural("enc:target"), Stat(TargetLine, TargetDetails));
             if (TippyLine() != null) b.AddItem(ControlId.Structural("enc:tippy"), Stat(TippyLine));
-            // The final boss: its HP (the panic bar) and the star cards it holds.
+            // The final boss: its Doom Bar ("Doom 0/3"; details, the bar's "?": what it is) and the star
+            // cards it holds.
             if (EncounterState.BossHp() != null)
-                b.AddItem(ControlId.Structural("enc:bosshp"), Stat(() => { var hp = EncounterState.BossHp(); return hp != null ? Strings.EncFigure(Strings.EncBossHp, hp.Value.ToString()) : null; }));
+                b.AddItem(ControlId.Structural("enc:bosshp"), Stat(
+                    () => { var hp = EncounterState.BossHp(); return hp != null ? Core.Encounter.EncounterDiff.Doom(hp.Value) : null; },
+                    () => Keywords.Tooltip(EncounterState.DoomTooltip(), localized: true)));
             var starCards = EncounterState.StarCards();
             for (int i = 0; i < starCards.Count; i++) b.AddItem(ControlId.Structural("enc:starcard:" + i), StarCard(starCards[i], clickable: false));
             b.AddItem(ControlId.Structural("enc:attack"), Stat(Attack, () => Keywords.Trigger(EncounterState.ScoreTrigger())));
