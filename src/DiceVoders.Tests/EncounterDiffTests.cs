@@ -450,6 +450,24 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void A_choice_filling_a_bought_slot_is_said_alone()
+        {
+            // Grimoire: the bought slot becomes a random spell; seen live as a purchase and the refill
+            // in one settled step, and as two.
+            var prev = Snap("Draft");
+            prev.Shop.AddRange(new[] { "Grimoire", "Shooter", "Swarmer" });
+            var refilled = Snap("Draft");
+            refilled.Shop.AddRange(new[] { "Get +1 Chrono", "Shooter", "Swarmer" });
+            Assert.Equal(new[] { "Shop: Get +1 Chrono" }, EncounterDiff.Lines(prev, refilled));
+            var bought = Snap("Draft");
+            bought.Shop.AddRange(new[] { "Get +1 Chrono", "Shooter" });
+            Assert.Empty(EncounterDiff.Lines(refilled, bought));
+            var again = Snap("Draft");
+            again.Shop.AddRange(new[] { "Get +1 Chrono", "Shooter", "Swap or Move" });
+            Assert.Equal(new[] { "Shop: Swap or Move" }, EncounterDiff.Lines(bought, again));
+        }
+
+        [Fact]
         public void The_offer_arriving_after_the_shop_opens_is_no_change()
         {
             var opened = Snap("Draft");

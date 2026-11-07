@@ -101,10 +101,14 @@ namespace DiceVoders.Core.Encounter
                 lines.Add(S.EncShop);
             // The offer arrives a moment after the shop opens: filled from empty is the opening, not
             // a change; a reroll empties the offer and refills it, compared with the last one shown.
+            // A purchase only removes. When part of the offer stays (Grimoire filling the bought slot
+            // with a spell, a reroll keeping the frozen choices), only the new choices are said.
             else if (now.Phase == DraftPhase && prev.Phase == DraftPhase && now.Shop.Count > 0
-                && (prev.Shop.Count > 0 ? prev.Shop : prev.LastOffer).Count > 0
-                && !Bought(prev.Shop.Count > 0 ? prev.Shop : prev.LastOffer, now.Shop))
-                lines.Add(S.EncShopItems(string.Join(", ", now.Shop)));
+                && (prev.Shop.Count > 0 ? prev.Shop : prev.LastOffer).Count > 0)
+            {
+                var added = Added(prev.Shop.Count > 0 ? prev.Shop : prev.LastOffer, now.Shop);
+                if (added.Count > 0) lines.Add(S.EncShopItems(string.Join(", ", added)));
+            }
 
             if (isPlayer && !now.DiceRolling)
             {
@@ -284,12 +288,15 @@ namespace DiceVoders.Core.Encounter
         }
 
         // The offer lost items and gained none: something bought, not a reroll.
-        private static bool Bought(List<string> before, List<string> after)
+        // The choices in the offer now that were not in it before (as a multiset, in the offer's
+        // order); none after a purchase alone.
+        private static List<string> Added(List<string> before, List<string> after)
         {
             var left = new List<string>(before);
+            var added = new List<string>();
             foreach (var item in after)
-                if (!left.Remove(item)) return false;
-            return true;
+                if (!left.Remove(item)) added.Add(item);
+            return added;
         }
 
         // "rolled 3, 3, 5", a Kraken die and a pilot's die after: "rolled 3, 3, 5, Kraken 4, pilot die 3".

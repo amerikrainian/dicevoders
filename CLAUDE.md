@@ -397,7 +397,9 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     artifacts added/removed/moved/levelled/XP (keyed `ArtifactID.Number`; a pilot's artifact left
     out: its arrival is the new target's line, "Noel, Hyperfreeze, Act 2-3"), new tiles, clouds, honey,
     tokens ("Chrono 4"), the shop's rarity ("Shop rarity, +5 %": `EncounterValue.ShopRarity`, titled
-    by its hover, whose key reads "% Shop Rarity"), Mult rising, the shop's offer rerolled (a purchase only removes), turns
+    by its hover, whose key reads "% Shop Rarity"), Mult rising, the shop's offer rerolled (a purchase only removes; when part of the offer stays,
+    Grimoire filling the bought slot with a spell or a reroll keeping frozen choices, only the new ones:
+    "Shop: Swap or Move"; seen live with Grimoire), turns
     left changing within a phase. The raw turn figures are logged beside what is said. Verified
     live: the refusals with a tip up, launches (Shooter's Repeat, a levelled artifact building a
     tile, mini-dice, the last turn into the result), a budge ("6, cracked, Budge 5"). Not exercised:
