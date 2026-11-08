@@ -16,7 +16,7 @@ namespace DiceVoders.Module.Screens
 {
     /// <summary>
     /// The encounter (<c>EncounterScene</c>), named by its target ("Defeat the P.O.G. (Pluto Outer
-    /// Guards)"). Two stops. The board: a header row, one per column ("column 3, Dice Power 2", then
+    /// Guards)"). Two stops. The board: a header row, one per column ("Dice Power 2", then
     /// its honey and the column's artifact), the grid top row first ("2, 1, Migo, 10 strength"), then
     /// a strip under the bottom row with what the phase puts there: in the player phase the dice in
     /// the tray's order ("3, frozen") and Launch; in the shop its choices ("Meteor, Artifact, 2 cash")
@@ -537,7 +537,7 @@ namespace DiceVoders.Module.Screens
             b.PopContext();
         }
 
-        // "column 3, Dice Power 2, honey, Twin Engines": the column and what bears on all of it.
+        // "Dice Power 2, honey, Twin Engines": what bears on all of the column ("column 3" when it has no artifact).
         private static NodeVtable Header(int x)
         {
             Func<string> label = () => HeaderText(x);
@@ -571,20 +571,22 @@ namespace DiceVoders.Module.Screens
         }
 
         /// <summary>The header's line; without <paramref name="column"/> its "column 3" is left out
-        /// (1 to 6 read the column the key names).</summary>
+        /// (1 to 6 read the column the key names). A column's artifact names it on the board, so its
+        /// "column 3" is said only with no artifact there, or while the header is a target.</summary>
         internal static string HeaderText(int x, bool column = true)
         {
             var parts = new List<string>();
+            bool target = EncounterState.SlotTarget(x) != null;
+            string artifact = ArtifactLabel(EncounterState.Artifact(x), blocked: false);
             // A target: the game's mark for what placing does ("Replace", "Level Up!"), else "target".
-            if (EncounterState.SlotTarget(x) != null) parts.Add(EncounterState.SlotMark(x) ?? Strings.EncTarget);
+            if (target) parts.Add(EncounterState.SlotMark(x) ?? Strings.EncTarget);
             // Blocked and trapped lead, as "target" does: what the column will do differently.
             if (EncounterState.Blocked(EncounterState.Artifact(x))) parts.Add(Strings.EncBlocked);
             if (EncounterState.Trapped(x)) parts.Add(Strings.EncTrapped);
-            if (column) parts.Add(Strings.EncColumn(x + 1));
+            if (column && (artifact == null || target)) parts.Add(Strings.EncColumn(x + 1));
             int power = EncounterState.DicePower(x);
             if (power > 0) parts.Add(Strings.EncFigure(GameLoc.Get("DicePower_Misc") ?? "Dice Power", power.ToString()));
             if (EncounterState.Honey(x)) parts.Add(Strings.EncHoney);
-            string artifact = ArtifactLabel(EncounterState.Artifact(x), blocked: false);
             if (artifact != null) parts.Add(artifact);
             return string.Join(", ", parts);
         }

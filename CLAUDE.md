@@ -289,7 +289,7 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     rarity line is a missing key, skipped); pilot names exist only as images. `GameText.Of` and
     `GameLoc.Get` drop Unity's "No translation found for '...'" (the game builds keys that do not
     exist), logging each once. The final boss's `FinalBossPanel` is not read yet.
-    The board: a header row ("column 3, Dice Power 2[, honey][, artifact]": power from
+    The board: a header row ("Dice Power 2[, honey][, artifact]", led by "column 3" with no artifact there or while it is a target: power from
     `DicePanel.GetAllDicePower`, keyed by the 1-based column; the column artifact is
     `ArtifactSlots[x]`, the first 6 slots being the columns', `GetColumnArtifacts`), the 6x3 grid
     top row first ("2, 1, Migo, 10 strength": tiles "x, y" 1-based, row 1 at the bottom; the
