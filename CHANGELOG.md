@@ -1,5 +1,10 @@
 # Changelog
 
+## V0.0.9
+
+- Alt+a now reads your artifacts.
+- Alt+h reports which columns have honey, where applicable.
+
 ## V0.0.8
 
 - Fixed the final boss' bar. It reads properly and contains its explanation.
