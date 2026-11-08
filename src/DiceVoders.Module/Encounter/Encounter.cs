@@ -265,6 +265,29 @@ namespace DiceVoders.Module.Encounter
             catch (Exception e) { CoreLog.Warning("Encounter: reading whether an artifact is blocked failed: " + e.Message); return false; }
         }
 
+        /// <summary>Whether the "artifact" is a slot's lock (the game has no flag for it, only these
+        /// definitions: "Locked Slot", "Perma Locked", "Locked (One-Turn KO)"...).</summary>
+        public static bool LockedSlot(ArtifactModel artifact)
+        {
+            if (artifact == null) return false;
+            switch (artifact.ArtifactName)
+            {
+                case StarVaders.ArtifactName.Locked:
+                case StarVaders.ArtifactName.Locked2:
+                case StarVaders.ArtifactName.Locked3:
+                case StarVaders.ArtifactName.PermaLocked1:
+                case StarVaders.ArtifactName.PermaLocked2:
+                case StarVaders.ArtifactName.PerkLocked1:
+                case StarVaders.ArtifactName.PerkLocked2:
+                case StarVaders.ArtifactName.PerkLocked3:
+                case StarVaders.ArtifactName.PerkLocked1Alt:
+                case StarVaders.ArtifactName.PerkLocked2Alt:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         /// <summary>"Meteor"; a pilot's ability leads with the pilot ("Roxy, Trailblazer").</summary>
         public static string ArtifactName(ArtifactModel artifact)
         {

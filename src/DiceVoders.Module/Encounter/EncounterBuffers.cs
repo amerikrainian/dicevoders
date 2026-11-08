@@ -50,13 +50,18 @@ namespace DiceVoders.Module.Encounter
             return lines;
         }
 
-        /// <summary>The artifacts' names alone ("Meteor", "4D Printer"), in the perks' order.</summary>
+        /// <summary>The artifacts' names alone ("Meteor", "4D Printer"), in the perks' order, locked
+        /// slots left out.</summary>
         public static List<string> ArtifactNames()
         {
             var names = new List<string>();
             try
             {
-                foreach (int slot in PerkSlots()) names.Add(Encounter.ArtifactName(Encounter.Artifact(slot)));
+                foreach (int slot in PerkSlots())
+                {
+                    var artifact = Encounter.Artifact(slot);
+                    if (!Encounter.LockedSlot(artifact)) names.Add(Encounter.ArtifactName(artifact));
+                }
             }
             catch (Exception e) { CoreLog.Warning("EncounterBuffers: reading the artifacts' names failed: " + e.Message); }
             return names;
