@@ -61,6 +61,7 @@ Live in an encounter and on the screens over it (the game menu, the result scree
 | Ctrl+D | Dice |
 | Ctrl+O | Target |
 | Ctrl+M | Mult |
+| Alt+A | Artifact names |
 
 ## The Encounter: Glances
 

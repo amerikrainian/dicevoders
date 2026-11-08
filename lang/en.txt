@@ -159,6 +159,7 @@ enc.speed=speed {0}
 bind.enc.budge_up=Budge up
 bind.enc.stats=Stats
 bind.enc.mult=Mult
+bind.enc.artifacts=Artifacts
 bind.enc.budge_down=Budge down
 bind.enc.freeze=Freeze
 bind.enc.reroll=Reroll

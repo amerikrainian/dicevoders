@@ -157,6 +157,7 @@ enc.speed=скорость {0}
 bind.enc.budge_up=Сдвинуть вверх
 bind.enc.stats=Статистика
 bind.enc.mult=Mult
+bind.enc.artifacts=Артефакты
 bind.enc.budge_down=Сдвинуть вниз
 bind.enc.freeze=Заморозить
 bind.enc.reroll=Перебросить

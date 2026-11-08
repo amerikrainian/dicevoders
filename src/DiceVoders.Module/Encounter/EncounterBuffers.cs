@@ -41,27 +41,49 @@ namespace DiceVoders.Module.Encounter
         public static IEnumerable<string> Perks()
         {
             var lines = new List<string>();
-            var model = Encounter.Model;
-            if (Encounter.Controller == null || model == null) return lines;
             try
             {
-                int slots = model.ArtifactSlots?.Count ?? 0;
-                var starters = new List<int>();
-                var perks = new List<int>();
-                for (int slot = 0; slot < slots; slot++)
-                {
-                    var artifact = Encounter.Artifact(slot);
-                    if (artifact == null) continue;
-                    if (slot < Encounter.Columns) { lines.Add(PerkLine(artifact, Strings.EncColumn(slot + 1))); continue; }
-                    if (Encounter.PilotName(artifact) != null) continue;
-                    if (artifact.ArtifactType == ArtifactType.Starter) starters.Add(slot);
-                    else perks.Add(slot);
-                }
-                foreach (int slot in starters) lines.Add(PerkLine(Encounter.Artifact(slot), null));
-                foreach (int slot in perks) lines.Add(PerkLine(Encounter.Artifact(slot), null));
+                foreach (int slot in PerkSlots())
+                    lines.Add(PerkLine(Encounter.Artifact(slot), slot < Encounter.Columns ? Strings.EncColumn(slot + 1) : null));
             }
             catch (Exception e) { CoreLog.Warning("EncounterBuffers: reading the perks failed: " + e.Message); }
             return lines;
+        }
+
+        /// <summary>The artifacts' names alone ("Meteor", "4D Printer"), in the perks' order.</summary>
+        public static List<string> ArtifactNames()
+        {
+            var names = new List<string>();
+            try
+            {
+                foreach (int slot in PerkSlots()) names.Add(Encounter.ArtifactName(Encounter.Artifact(slot)));
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterBuffers: reading the artifacts' names failed: " + e.Message); }
+            return names;
+        }
+
+        // The slots holding an artifact: the columns', the starter perk, then the others in slot
+        // order; a pilot's left out.
+        private static List<int> PerkSlots()
+        {
+            var columns = new List<int>();
+            var starters = new List<int>();
+            var perks = new List<int>();
+            var model = Encounter.Model;
+            if (Encounter.Controller == null || model == null) return columns;
+            int slots = model.ArtifactSlots?.Count ?? 0;
+            for (int slot = 0; slot < slots; slot++)
+            {
+                var artifact = Encounter.Artifact(slot);
+                if (artifact == null) continue;
+                if (slot < Encounter.Columns) { columns.Add(slot); continue; }
+                if (Encounter.PilotName(artifact) != null) continue;
+                if (artifact.ArtifactType == ArtifactType.Starter) starters.Add(slot);
+                else perks.Add(slot);
+            }
+            columns.AddRange(starters);
+            columns.AddRange(perks);
+            return columns;
         }
 
         // "column 4, Meteor, 0/10 XP: After you score a pair...": the artifact as the board reads it,

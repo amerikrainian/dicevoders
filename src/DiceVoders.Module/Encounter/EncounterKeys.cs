@@ -19,7 +19,7 @@ namespace DiceVoders.Module.Encounter
     /// one thing and are silent where there is nothing to read: C the focused tile's coordinates (a
     /// header's column); in the Run category (<see cref="RunKeys"/>: over the game menu, the result
     /// screen and the other overlays too) Ctrl+A the attack against the target ("30/100 attack"), Ctrl+T
-    /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target (and a pilot's ability), Ctrl+M Mult. 1 to
+    /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target (and a pilot's ability), Ctrl+M Mult, Alt+A the artifacts' names. 1 to
     /// 6 read that column whole (its header, then its cells top first), from anywhere in the encounter;
     /// Shift with them goes there (the same row from a cell, else the header). Period and comma step
     /// to the next and previous target while the game waits on one, else unit, in reading order. Alt+D
@@ -61,6 +61,7 @@ namespace DiceVoders.Module.Encounter
             InputManager.Register("enc.stats", "Stats", InputCategory.Game, Stats)
                 .AddBinding(new KeyboardBinding(KeyCode.S, ctrl: true));
             Read("enc.mult", "Mult", KeyCode.M, EncounterScreen.Mult, ctrl: true, category: InputCategory.Run);
+            Read("enc.artifacts", "Artifacts", KeyCode.A, ArtifactNames, alt: true, category: InputCategory.Run);
 
             InputManager.Register("enc.budge_up", "Budge up", InputCategory.Game, () => Budge(up: true))
                 .AddBinding(GameKey("Increment", KeyCode.S));
@@ -257,6 +258,10 @@ namespace DiceVoders.Module.Encounter
             return Join(parts.ToArray());
         }
 
+        // Alt+A: the artifacts' names; "nothing" when there are none.
+        private static string ArtifactNames() =>
+            Join(EncounterBuffers.ArtifactNames().ToArray()) ?? Strings.EncNothing;
+
         // Runs the action once the die has stopped rolling (a budge spins it), a few frames on at
         // least, giving up after a second or so.
         private static void AfterDie(Dice die, int waited, Action action)
@@ -269,7 +274,7 @@ namespace DiceVoders.Module.Encounter
         }
 
         // A read key: speaks its line, interrupting; nothing when the line is null.
-        private static void Read(string key, string label, KeyCode code, Func<string> line, bool ctrl = false,
+        private static void Read(string key, string label, KeyCode code, Func<string> line, bool ctrl = false, bool alt = false,
             InputCategory category = InputCategory.Game)
         {
             InputManager.Register(key, label, category, () =>
@@ -278,7 +283,7 @@ namespace DiceVoders.Module.Encounter
                 try { text = line(); }
                 catch (Exception e) { CoreLog.Warning("EncounterKeys: " + key + " failed: " + e.Message); }
                 if (!string.IsNullOrEmpty(text)) Speech.Say(text, interrupt: true);
-            }).AddBinding(new KeyboardBinding(code, ctrl: ctrl));
+            }).AddBinding(new KeyboardBinding(code, ctrl: ctrl, alt: alt));
         }
 
         private static string Join(params string[] parts)

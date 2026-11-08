@@ -157,6 +157,7 @@ enc.speed=velocidad {0}
 bind.enc.budge_up=Ajustar arriba
 bind.enc.stats=Estadísticas
 bind.enc.mult=Mult
+bind.enc.artifacts=Artefactos
 bind.enc.budge_down=Ajustar abajo
 bind.enc.freeze=Congelar
 bind.enc.reroll=Volver a tirar
