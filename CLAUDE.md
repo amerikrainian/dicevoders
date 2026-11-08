@@ -327,7 +327,7 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     the overlays over it: pause, result, victory, constellations, tips, guide, settings, confirm)
     Ctrl+A attack ("0/100 attack"), Ctrl+T turns and hearts, Ctrl+R tokens, Ctrl+D dice, Ctrl+O
     target (a pilot's ability after it: `PilotPanel.AbilityDescText`, "Roxy, Trailblazer, Act 1-3, Your
-    dice start cracked. ..."), Ctrl+M Mult, Alt+A the artifacts' names (`EncounterBuffers.ArtifactNames`, the perks buffer's order, names alone, a pilot's left out; asked for by a player). `/input` fires an action whether live or not: check liveness with
+    dice start cracked. ..."), Ctrl+M Mult, Alt+A the artifacts' names (`EncounterBuffers.ArtifactNames`, the perks buffer's order, names alone, a pilot's left out; asked for by a player), Alt+H the columns holding honey (`EncounterModel.HoneySlots`: "2, 5", "nothing" when none; asked for too). `/input` fires an action whether live or not: check liveness with
     `InputManager.IsLive` through `/eval` (by reflection: the module's assemblies are not referenced,
     and each reload loads a generation; take the last). The game's encounter keys
     (defaults, `EncounterInputHandler`'s PlayerInput): W/Space Click, Q Cancel, E Proceed

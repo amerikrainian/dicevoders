@@ -62,6 +62,7 @@ Live in an encounter and on the screens over it (the game menu, the result scree
 | Ctrl+O | Target |
 | Ctrl+M | Mult |
 | Alt+A | Artifact names |
+| Alt+H | Columns holding honey |
 
 ## The Encounter: Glances
 

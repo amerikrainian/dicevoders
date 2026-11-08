@@ -158,6 +158,7 @@ bind.enc.budge_up=Hochschieben
 bind.enc.stats=Statistiken
 bind.enc.mult=Mult
 bind.enc.artifacts=Artefakte
+bind.enc.honey=Honig
 bind.enc.budge_down=Runterschieben
 bind.enc.freeze=Einfrieren
 bind.enc.reroll=Neu würfeln

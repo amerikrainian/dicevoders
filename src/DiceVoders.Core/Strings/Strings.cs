@@ -257,6 +257,7 @@ namespace DiceVoders.Core.Strings
             D("bind.enc.stats", "Stats"),
             D("bind.enc.mult", "Mult"),
             D("bind.enc.artifacts", "Artifacts"),
+            D("bind.enc.honey", "Honey"),
             D("bind.enc.budge_down", "Budge down"),
             D("bind.enc.freeze", "Freeze"),
             D("bind.enc.reroll", "Reroll"),

@@ -158,6 +158,7 @@ bind.enc.budge_up=Ajustar arriba
 bind.enc.stats=Estadísticas
 bind.enc.mult=Mult
 bind.enc.artifacts=Artefactos
+bind.enc.honey=Miel
 bind.enc.budge_down=Ajustar abajo
 bind.enc.freeze=Congelar
 bind.enc.reroll=Volver a tirar

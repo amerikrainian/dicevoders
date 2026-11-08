@@ -19,7 +19,7 @@ namespace DiceVoders.Module.Encounter
     /// one thing and are silent where there is nothing to read: C the focused tile's coordinates (a
     /// header's column); in the Run category (<see cref="RunKeys"/>: over the game menu, the result
     /// screen and the other overlays too) Ctrl+A the attack against the target ("30/100 attack"), Ctrl+T
-    /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target (and a pilot's ability), Ctrl+M Mult, Alt+A the artifacts' names. 1 to
+    /// turns left and hearts, Ctrl+R the tokens, Ctrl+D the dice, Ctrl+O the target (and a pilot's ability), Ctrl+M Mult, Alt+A the artifacts' names, Alt+H the columns holding honey. 1 to
     /// 6 read that column whole (its header, then its cells top first), from anywhere in the encounter;
     /// Shift with them goes there (the same row from a cell, else the header). Period and comma step
     /// to the next and previous target while the game waits on one, else unit, in reading order. Alt+D
@@ -62,6 +62,7 @@ namespace DiceVoders.Module.Encounter
                 .AddBinding(new KeyboardBinding(KeyCode.S, ctrl: true));
             Read("enc.mult", "Mult", KeyCode.M, EncounterScreen.Mult, ctrl: true, category: InputCategory.Run);
             Read("enc.artifacts", "Artifacts", KeyCode.A, ArtifactNames, alt: true, category: InputCategory.Run);
+            Read("enc.honey", "Honey", KeyCode.H, HoneyColumns, alt: true, category: InputCategory.Run);
 
             InputManager.Register("enc.budge_up", "Budge up", InputCategory.Game, () => Budge(up: true))
                 .AddBinding(GameKey("Increment", KeyCode.S));
@@ -261,6 +262,16 @@ namespace DiceVoders.Module.Encounter
         // Alt+A: the artifacts' names; "nothing" when there are none.
         private static string ArtifactNames() =>
             Join(EncounterBuffers.ArtifactNames().ToArray()) ?? Strings.EncNothing;
+
+        // Alt+H: the columns still holding honey, "2, 5" (a die's face names its column); "nothing"
+        // when none does.
+        private static string HoneyColumns()
+        {
+            var columns = new List<string>();
+            for (int x = 0; x < Encounter.Columns; x++)
+                if (Encounter.Honey(x)) columns.Add((x + 1).ToString());
+            return Join(columns.ToArray()) ?? Strings.EncNothing;
+        }
 
         // Runs the action once the die has stopped rolling (a budge spins it), a few frames on at
         // least, giving up after a second or so.

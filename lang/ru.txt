@@ -158,6 +158,7 @@ bind.enc.budge_up=Сдвинуть вверх
 bind.enc.stats=Статистика
 bind.enc.mult=Mult
 bind.enc.artifacts=Артефакты
+bind.enc.honey=Мёд
 bind.enc.budge_down=Сдвинуть вниз
 bind.enc.freeze=Заморозить
 bind.enc.reroll=Перебросить
