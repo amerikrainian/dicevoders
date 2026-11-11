@@ -1060,6 +1060,7 @@ namespace DiceVoders.Module.Screens
             foreach (var token in TokenLines())
             {
                 var line = token;
+                if (line.Value() == null) continue;
                 b.AddItem(ControlId.Structural("enc:token:" + line.Key), Stat(line.Value, TokenKeyword(line.Key)));
             }
             b.AddItem(ControlId.Structural("enc:mult"), Stat(Mult, () => GameNodes.Lines(Keywords.Line(NestedTooltipName.GlobalMult))));
@@ -1266,10 +1267,15 @@ namespace DiceVoders.Module.Screens
         {
             new KeyValuePair<string, Func<string>>("budge", Budge),
             new KeyValuePair<string, Func<string>>("chrono", Chrono),
-            new KeyValuePair<string, Func<string>>("swap", () => Figure(Strings.EncSwap, EncounterValue.SwapToken)),
+            new KeyValuePair<string, Func<string>>("swap", Swap),
             new KeyValuePair<string, Func<string>>("minidice", () => Figure(GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice", EncounterValue.MiniDice)),
             new KeyValuePair<string, Func<string>>("cash", () => Figure(GameLoc.Get("ShopToken_TooltipTitle") ?? "Cash", EncounterValue.ShopToken)),
         };
+
+        // The Swap token: a value the game keeps (EncounterValue.SwapToken, between Chrono and Mini-Dice;
+        // its icon the controller's CommandPointIcon) but never draws, with no keyword or string of its
+        // own, always 0 so far: read only when something sets it.
+        private static string Swap() => EncounterState.Int(EncounterValue.SwapToken) is int n && n != 0 ? Strings.EncFigure(Strings.EncSwap, n.ToString()) : null;
 
         public static string Budge() => Figure(GameLoc.Get("Budge_Keyword") ?? "Budge", EncounterValue.BudgeToken);
         public static string Chrono() => Figure(GameLoc.Get("Chrono_Keyword") ?? "Chrono", EncounterValue.ChronoToken);

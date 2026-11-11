@@ -305,7 +305,9 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     artifact's runs `Tooltip.SetArtifactText` and leads with its title ("Meteor [9/10 XP]"). An
     artifact reads "Meteor, 9/10 XP" (", LV. 2" past level 1: `Level`, `CurrentXP`,
     `ArtifactModel.GetLevelXPRequirement`; a starter perk's XP is -1 and reads none). The status: an action tip while one shows, target
-    and act, "0/100 attack" (`TotalScore` over `TargetTributeScore`: the score panel's two), turns, hearts, Budge, Chrono, Swap, Mini-Dice, Cash, Mult, a pilot's artifact alone (drawn on the pilot panel), the
+    and act, "0/100 attack" (`TotalScore` over `TargetTributeScore`: the score panel's two), turns, hearts, Budge, Chrono, Swap (only when not 0: `EncounterValue.SwapToken`, which the game never
+    draws, no keyword or string, the controller's `CommandPointIcon`; always 0 so far; Ctrl+R alike; a
+    change still narrated), Mini-Dice, Cash, Mult, a pilot's artifact alone (drawn on the pilot panel), the
     starter perk alone (`ArtifactType.Starter`, drawn in the commander's frame,
     `BossPanel/NormalFrame/CommanderArtifactView`, above the perks), then the perks (the other
     non-column slots, `LegendaryRelics/RelicHolder (n)`) as a row under "Perks" (the compendium's
