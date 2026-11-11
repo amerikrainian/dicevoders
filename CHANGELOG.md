@@ -1,5 +1,10 @@
 # Changelog
 
+## V0.1.0
+
+- Buttons that Tippy blocks now explicitly state that they're blocked.
+- We now drop the swap line from ctrl+r readout.
+
 ## V0.0.9
 
 - Alt+a now reads your artifacts.
