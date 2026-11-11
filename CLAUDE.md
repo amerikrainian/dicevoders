@@ -488,7 +488,11 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     `TippyArea`: 0 left artifact slots, 1 right, 2 left tiles, 3 right, 4 the dice buttons, where the
     game itself refuses Budge): the status stop's "Tippy: left artifacts" after the target, said as
     it moves; tiles in a covered half lead with "blocked", empty ones too; its units and artifacts
-    are the game's blocked ones. Every pilot panel holds a `DangerDice`; only a pilot that rolls it
+    are the game's blocked ones. Over the buttons the game refuses Budge both ways (`Dice.CanBudgeUp`/
+    `CanBudgeDown`), the Budge button and its undo (`OnPressBudgeButton`) and the Chrono reroll
+    (`OnPressRerollButton`), not a freeze (`Dice.OnMoreInfo`): each die then leads with "blocked" (Ctrl+D
+    says it once, before the dice; a freeze's reply leaves it out), as do the knob's Reroll and Budge
+    buttons (`Encounter.TippyCoversButtons`). Every pilot panel holds a `DangerDice`; only a pilot that rolls it
     has it `IsActive` (Tippy's is face 0). Seen live, the areas forced through `TippyArea` and
     `SetTippyAreaVisual`.
   - Blood Beast (starter perk `Hemophage`): Rage (`EncounterValue.Rage`, drawn only as a second bar

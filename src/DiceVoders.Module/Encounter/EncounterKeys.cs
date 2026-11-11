@@ -160,7 +160,7 @@ namespace DiceVoders.Module.Encounter
             AfterDie(die, 0, () =>
             {
                 if (die.IsLockedIn == before) { Speech.Say(Strings.EncCantFreeze, interrupt: true); return; }
-                Speech.Say(EncounterScreen.DieText(die), interrupt: true);
+                Speech.Say(EncounterScreen.DieText(die, blocked: false), interrupt: true);
             });
         }
 
@@ -253,9 +253,11 @@ namespace DiceVoders.Module.Encounter
         private static string DiceLine()
         {
             var parts = new List<string>();
-            foreach (var die in Encounter.Dice()) parts.Add(EncounterScreen.DieText(die));
+            // Tippy over the dice buttons: "blocked" once, before the dice, not on each.
+            if (Encounter.TippyCoversButtons()) parts.Add(Core.Strings.Strings.EncBlocked);
+            foreach (var die in Encounter.Dice()) parts.Add(EncounterScreen.DieText(die, blocked: false));
             var pilotDie = Encounter.PilotDie();
-            if (pilotDie != null) parts.Add(EncounterScreen.DieText(pilotDie));
+            if (pilotDie != null) parts.Add(EncounterScreen.DieText(pilotDie, blocked: false));
             return Join(parts.ToArray());
         }
 

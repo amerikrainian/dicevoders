@@ -410,12 +410,12 @@ namespace DiceVoders.Module.Screens
             b.StartRow(BoardStop);
             if (reroll != null)
                 b.AddItem(ControlId.Structural("enc:ability:reroll"), Ability(reroll.gameObject, reroll.Tooltip, () => Chrono(), EncounterKeys.Reroll,
-                    () => !SpecialRewardStrip.RerollCrossedOut()));
+                    () => !SpecialRewardStrip.RerollCrossedOut(), EncounterState.TippyCoversButtons));
             // Disabled while there is no budge to undo (the game's click then only shows the dice's
             // arrows to a mouse); the Budge left read then, "undo" while it does something.
             if (budge != null)
                 b.AddItem(ControlId.Structural("enc:ability:budge"), Ability(budge.gameObject, budge.Tooltip,
-                    () => CanUndoBudge() ? Strings.EncUndo : Budge(), EncounterKeys.Cancel, CanUndoBudge));
+                    () => CanUndoBudge() ? Strings.EncUndo : Budge(), EncounterKeys.Cancel, CanUndoBudge, EncounterState.TippyCoversButtons));
             if (mini != null)
                 b.AddItem(ControlId.Structural("enc:ability:minidice"), Ability(mini.gameObject, mini.Tooltip,
                     () => GameText.Of(mini.MiniDiceNumberText), null));
@@ -432,11 +432,13 @@ namespace DiceVoders.Module.Screens
         // when it does something. No role word: the game's title says "Button" already ("Budge
         // Button, Budge 3, disabled").
         private static NodeVtable Ability(UnityEngine.GameObject view, UnityEngine.GameObject tooltip, Func<string> figure, Action activate,
-            Func<bool> enabled = null)
+            Func<bool> enabled = null, Func<bool> blocked = null)
         {
             Func<string> label = () =>
             {
                 var parts = new List<string> { Keywords.LocalizedTitle(tooltip) ?? view.name, figure() };
+                // Tippy over the dice buttons: the game refuses them ("blocked", as on the dice).
+                if (blocked != null && blocked()) parts.Insert(0, Strings.EncBlocked);
                 parts.RemoveAll(string.IsNullOrEmpty);
                 return string.Join(", ", parts);
             };
@@ -837,11 +839,14 @@ namespace DiceVoders.Module.Screens
             };
         }
 
-        internal static string DieText(Dice die)
+        /// <summary>"3, frozen": a die as the tray draws it, led by "blocked" while Tippy covers the dice
+        /// buttons (no Budge or reroll then; Ctrl+D says it once for the row instead).</summary>
+        internal static string DieText(Dice die, bool blocked = true)
         {
             var parts = new List<string>();
             try
             {
+                if (blocked && EncounterState.TippyCoversButtons()) parts.Add(Strings.EncBlocked);
                 // A Chrono Rift face is the game's 7, drawn as the Chrono swirl.
                 parts.Add(die.isRolling ? Strings.EncRolling
                     : die.Value == Core.Encounter.EncounterDiff.RiftFace ? EncounterState.RiftName() ?? die.Value.ToString()

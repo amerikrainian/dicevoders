@@ -585,6 +585,12 @@ namespace DiceVoders.Module.Encounter
             return -1;
         }
 
+        /// <summary>Whether Tippy covers the dice buttons (area 4): the game then refuses Budge both
+        /// ways (<c>Dice.CanBudgeUp</c>/<c>CanBudgeDown</c>), the Budge button and its undo
+        /// (<c>OnPressBudgeButton</c>) and the Chrono reroll (<c>OnPressRerollButton</c>); a freeze
+        /// (<c>Dice.OnMoreInfo</c>) still works.</summary>
+        public static bool TippyCoversButtons() => TippyArea() == 4;
+
         /// <summary>Whether Tippy covers the column's tiles (the half the column is in).</summary>
         public static bool TippyCovers(int x)
         {
