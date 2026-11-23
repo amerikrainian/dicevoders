@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.1.1
+
+- Focus now resets to control when you move to a new UI control.
+
 ## V0.1.0
 
 - Buttons that Tippy blocks now explicitly state that they're blocked.
