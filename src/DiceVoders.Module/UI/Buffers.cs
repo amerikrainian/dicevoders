@@ -13,7 +13,7 @@ namespace DiceVoders.Module.UI
     /// grid and the run's perks (<see cref="Encounter.EncounterBuffers"/>); the encounter's events (every
     /// line the narration said, uncapped, oldest first, opening on the newest). Every buffer
     /// reads live on each keypress; a focus change rewinds every buffer (one that follows its latest
-    /// line to its end) and leaves review on whichever buffer is being read.
+    /// line to its end) and returns review to the control's buffer.
     /// </summary>
     internal static class Buffers
     {
@@ -35,7 +35,7 @@ namespace DiceVoders.Module.UI
         }
 
         /// <summary>Per frame: a focus change (by key or by the game moving things) rewinds every
-        /// buffer (one that follows its latest line to its end).</summary>
+        /// buffer (one that follows its latest line to its end) and returns review to the control's.</summary>
         public static void Tick()
         {
             if (Manager == null) return;
@@ -47,7 +47,9 @@ namespace DiceVoders.Module.UI
                 if (buffer.FollowLatest) buffer.MoveToEnd();
                 else buffer.Reset();
             }
-            // Review stays on the buffer being read: only the control buffer's content follows focus.
+            // Review returns to the control's own buffer: line review right after a move otherwise
+            // read another buffer's first line, unnamed, as if it were the new control's.
+            Manager.SetCurrent(BufferKeys.Ui);
         }
     }
 }
