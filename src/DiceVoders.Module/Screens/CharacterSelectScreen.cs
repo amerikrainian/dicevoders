@@ -88,6 +88,7 @@ namespace DiceVoders.Module.Screens
                 var text = tmp;
                 b.AddItem(ControlId.Structural("cs:chapterline:" + tmp.gameObject.name), GameNodes.Text(() => GameText.Of(text)));
             }
+            BuildGauntletLevel(b, c, items, taken);
             BuildNewMechanic(b, c);
             // The challenges (once unlocked, on the chapter panel's map): a row, by name ("Strange
             // World"), locked, completed, selected as chosen; Backspace its description and rules.
@@ -111,7 +112,11 @@ namespace DiceVoders.Module.Screens
             Transform panel = null;
             foreach (var kind in new[] { c.TutorialCompletePanel, c.MissionPanel, c.Chapter6MissionPanel, c.EndOfContentPanel, c.NoNewMissionThisVersion, c.UnlockAllMissionPanel })
                 if (panel == null && kind != null && kind.activeInHierarchy) panel = kind.transform;
-            if (panel != null)
+            var endgame = c.EndgameContentController;
+            // The controller is its own object; the panel it fills holds its texts.
+            if (panel != null && endgame != null && endgame.UltimateStreak != null && endgame.UltimateStreak.transform.IsChildOf(panel))
+                BuildEndgame(b, c, endgame, panel, taken);
+            else if (panel != null)
             {
                 var lines = ViewNodes.Prose(panel);
                 var done = CheckedLines(panel);
@@ -188,10 +193,168 @@ namespace DiceVoders.Module.Screens
             {
                 if (item == null || !ViewNodes.IsShown(item) || item.TryCast<IClickable>() == null || !taken.Add(item.Pointer)) continue;
                 if (item.gameObject.name == "BackButton") { back = item; continue; }
+                if (item.gameObject.name == "StartButton")
+                {
+                    // In the Gauntlet, a commander not among its three playable draws Launch! as a lock
+                    // (LockedStartButton, a child of the button): said as locked.
+                    var start = item;
+                    b.AddItem(ControlId.Structural("cs:" + item.gameObject.name + ":" + item.GetInstanceID()), ViewNodes.Button(item, () =>
+                    {
+                        string caption = ViewNodes.Label(start) ?? GameLoc.Get("Launch_Misc");
+                        return c.LockedStartButton != null && c.LockedStartButton.activeInHierarchy ? caption + ", " + Strings.StateLocked : caption;
+                    }));
+                    continue;
+                }
                 b.AddItem(ControlId.Structural("cs:" + item.gameObject.name + ":" + item.GetInstanceID()), ViewNodes.Button(item));
             }
             if (back != null)
                 b.AddItem(ControlId.Structural("cs:back"), ViewNodes.Button(back, () => GameLoc.Get("Back_Misc") ?? "Back"));
+        }
+
+        // The Gauntlet's lines on the chapter panel (GauntletObject, while it is chosen): "Current Level:
+        // 0", its figure being in a box (a TooltipTriggerView: Backspace its tooltip, what the level
+        // does), then "Playable commanders are RANDOMIZED.".
+        private static void BuildGauntletLevel(GraphBuilder b, CharacterSelectionController c, IReadOnlyList<AViewItem> items, HashSet<IntPtr> taken)
+        {
+            try
+            {
+                var g = c.GauntletObject;
+                if (g == null || !g.activeInHierarchy) return;
+                var caption = g.GetComponent<TMPro.TMP_Text>();
+                TooltipTriggerView box = null;
+                foreach (var item in items)
+                {
+                    if (item == null || !item.transform.IsChildOf(g.transform)) continue;
+                    var trigger = item.TryCast<TooltipTriggerView>();
+                    if (trigger != null) { box = trigger; taken.Add(item.Pointer); }
+                }
+                var figure = box != null ? box.GetComponentInChildren<TMPro.TMP_Text>(false) : null;
+                Func<string> label = () => string.Join(" ", NonEmpty(GameText.Of(caption), GameText.Of(figure)));
+                Func<IEnumerable<string>> details = () => box != null && box.Tooltip != null ? Keywords.Tooltip(box.Tooltip, localized: true) : new List<string>();
+                b.AddItem(ControlId.Structural("cs:gauntlet:level"), new NodeVtable
+                {
+                    ControlType = ControlTypes.Text,
+                    Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                    SearchText = label,
+                    OnFocus = () => { if (box != null) ViewNodes.Hover(box); },
+                    Details = details,
+                    OnSecondary = () => SayDetails(details()),
+                });
+                for (int i = 0; i < g.transform.childCount; i++)
+                {
+                    var tmp = g.transform.GetChild(i).GetComponent<TMPro.TMP_Text>();
+                    if (tmp == null || !tmp.gameObject.activeInHierarchy) continue;
+                    var text = tmp;
+                    b.AddItem(ControlId.Structural("cs:gauntlet:" + i), GameNodes.Text(() => GameText.Of(text)));
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading the Gauntlet's level failed: " + e.Message); }
+        }
+
+        // The Endgame Content panel (EndgameContentController, in EndTrueContentPanel once every mission
+        // is done): its title and compendium line; the chosen commander's win streaks in the Ultimate
+        // Earth and Chapter X challenges, drawn under "Current / Best" beside each challenge's planet
+        // and the commander's portrait: "Hex Prince, Current / Best", "Ultimate Earth, Win Streak: 0 /
+        // 0"; then Max Gauntlet, its trophy and best, "Max Gauntlet, No Trophy, 0", Backspace its "?"
+        // (what the Gauntlet is, the trophies and the wins each takes, those not reached "Win more to
+        // reveal...").
+        private static void BuildEndgame(GraphBuilder b, CharacterSelectionController c, EndgameContentController e, Transform panel, HashSet<IntPtr> taken)
+        {
+            try
+            {
+                foreach (var name in new[] { "MissionCompleteTitle", "MissionDesc (1)" })
+                {
+                    var tmp = Text(panel, name);
+                    if (tmp != null) b.AddItem(ControlId.Structural("cs:endgame:" + name), GameNodes.Text(() => GameText.Of(tmp)));
+                }
+                var heading = Text(panel, "CurrentBest");
+                b.AddItem(ControlId.Structural("cs:endgame:commander"), GameNodes.Text(() => string.Join(", ", NonEmpty(
+                    GameLoc.Get(CharacterSelectionController.CurrentCommander + "_Misc"), GameText.Of(heading) ?? GameLoc.Get("CurrentBest_Misc")))));
+                Streak(b, panel, "UltimateEarthStreak", GameLoc.Get("UltimateEnding_Title"), e.UltimateStreak, e.UltimateBest);
+                Streak(b, panel, "ChapterXStreak", GameLoc.Get("ChapterX_Title"), e.ChapterXStreak, e.ChapterXBest);
+                var gauntlet = panel.GetComponentInChildren<TooltipTriggerView>(false);
+                if (gauntlet != null)
+                {
+                    taken.Add(gauntlet.Pointer);
+                    var box = gauntlet;
+                    Func<string> label = () =>
+                    {
+                        var parts = new List<string> { GameText.Of(Text(box.transform, "Text (TMP)")) ?? GameLoc.Get("MaxGauntlet_Misc") };
+                        foreach (var trophy in new[] { e.NoTrophyObject, e.BronzeObject, e.SilverObject, e.GoldObject, e.PlatinumObject })
+                            if (trophy != null && trophy.activeInHierarchy) parts.Add(GameText.Of(trophy.GetComponent<TMPro.TMP_Text>()));
+                        parts.Add(GameText.Of(e.GauntletBest));
+                        return string.Join(", ", NonEmpty(parts.ToArray()));
+                    };
+                    Func<IEnumerable<string>> details = () => GauntletDetails(box);
+                    b.AddItem(ControlId.Structural("cs:endgame:gauntlet"), new NodeVtable
+                    {
+                        ControlType = ControlTypes.Text,
+                        Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                        SearchText = label,
+                        OnFocus = () => ViewNodes.Hover(box),
+                        Details = details,
+                        OnSecondary = () => SayDetails(details()),
+                    });
+                }
+            }
+            catch (Exception ex) { CoreLog.Warning("CharacterSelectScreen: reading the endgame panel failed: " + ex); }
+        }
+
+        private static void Streak(GraphBuilder b, Transform panel, string captionName, string challenge, TMPro.TMP_Text current, TMPro.TMP_Text best)
+        {
+            var caption = Text(panel, captionName);
+            b.AddItem(ControlId.Structural("cs:endgame:" + captionName), GameNodes.Text(() => string.Join(", ", NonEmpty(challenge,
+                (GameText.Of(caption) ?? GameLoc.Get("Winstreak_Misc")) + " " + GameText.Of(current) + " / " + GameText.Of(best)))));
+        }
+
+        // The Gauntlet's "?" tooltip: what it is, then its trophies ("SILVER: 4-6 wins"), each not yet
+        // reached with the "Win more to reveal..." that covers it.
+        private static List<string> GauntletDetails(TooltipTriggerView box)
+        {
+            var lines = new List<string>();
+            try
+            {
+                if (box.Tooltip == null) return lines;
+                lines.AddRange(Keywords.Tooltip(box.Tooltip));
+                var tip = box.Tooltip.GetComponentInChildren<StarVaders.Tooltip>(true);
+                var holder = tip != null && tip.DescriptionText != null ? tip.DescriptionText.transform : null;
+                for (int i = 0; holder != null && i < holder.childCount; i++)
+                {
+                    var tier = holder.GetChild(i);
+                    if (!tier.gameObject.activeSelf) continue;
+                    if (tier.name != "Bronze" && tier.name != "Silver" && tier.name != "Gold" && tier.name != "Platinum") continue;
+                    var parts = new List<string> { GameText.Of(tier.GetComponent<TMPro.TMP_Text>()) };
+                    foreach (var cover in tier.GetComponentsInChildren<TMPro.TMP_Text>(true))
+                        if (cover.transform.Pointer != tier.Pointer && IsShownIn(cover.transform, tier)) parts.Add(GameText.Of(cover));
+                    var words = NonEmpty(parts.ToArray());
+                    if (words.Count > 0) lines.Add(string.Join(", ", words));
+                }
+            }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading the Gauntlet's tooltip failed: " + e.Message); }
+            return lines;
+        }
+
+        // Shown within its tier: every object from it up to the tier active (the tooltip itself is
+        // hidden until hovered).
+        private static bool IsShownIn(Transform t, Transform root)
+        {
+            for (; t != null && t.Pointer != root.Pointer; t = t.parent)
+                if (!t.gameObject.activeSelf) return false;
+            return true;
+        }
+
+        private static List<string> NonEmpty(params string[] parts)
+        {
+            var list = new List<string>();
+            foreach (var part in parts) if (!string.IsNullOrEmpty(part)) list.Add(part);
+            return list;
+        }
+
+        private static TMPro.TMP_Text Text(Transform scope, string name)
+        {
+            foreach (var tmp in scope.GetComponentsInChildren<TMPro.TMP_Text>(false))
+                if (tmp.gameObject.name == name) return tmp;
+            return null;
         }
 
         // CH6's missions ("Complete CHAPTER 6.") each carry a check mark or a red cross (their
@@ -351,7 +514,13 @@ namespace DiceVoders.Module.Screens
         {
             Func<string> label = () =>
             {
-                try { return icon.Tooltip != null ? GameText.Of(icon.Tooltip.TitleText) : null; }
+                try
+                {
+                    string title = icon.Tooltip != null ? GameText.Of(icon.Tooltip.TitleText) : null;
+                    // The Gauntlet's icon draws its current level beside it (GauntletObject, GauntletText).
+                    string level = icon.GauntletObject != null && icon.GauntletObject.activeInHierarchy ? GameText.Of(icon.GauntletText) : null;
+                    return level != null && title != null ? title + ", " + level : title;
+                }
                 catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading a modifier failed: " + e.Message); return null; }
             };
             Func<IEnumerable<string>> details = () => ModifierDetails(icon);
@@ -639,6 +808,13 @@ namespace DiceVoders.Module.Screens
                 if (title != null) return title;
             }
             string name = GameLoc.Get(icon.CommanderName + "_Misc") ?? icon.CommanderName.ToString();
+            try
+            {
+                // The Gauntlet marks its three playable commanders with its badge (GauntletObject) and
+                // greys the rest.
+                if (icon.GauntletObject != null && icon.GauntletObject.activeInHierarchy) name += ", " + Strings.Get("cs.playable");
+            }
+            catch (Exception e) { CoreLog.Warning("CharacterSelectScreen: reading a commander's Gauntlet badge failed: " + e.Message); }
             try
             {
                 if (icon.NewText != null && icon.NewText.activeInHierarchy)

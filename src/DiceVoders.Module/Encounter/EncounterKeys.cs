@@ -255,6 +255,8 @@ namespace DiceVoders.Module.Encounter
             var parts = new List<string>();
             // Tippy over the dice buttons: "blocked" once, before the dice, not on each.
             if (Encounter.TippyCoversButtons()) parts.Add(Core.Strings.Strings.EncBlocked);
+            // The Echo Dice first, as the strip has them: "Echo 5, Echo 6".
+            foreach (int face in Encounter.EchoDice()) parts.Add(DiceVoders.Core.Encounter.EncounterDiff.EchoDie(face, Encounter.RiftName()));
             foreach (var die in Encounter.Dice()) parts.Add(EncounterScreen.DieText(die, blocked: false));
             var pilotDie = Encounter.PilotDie();
             if (pilotDie != null) parts.Add(EncounterScreen.DieText(pilotDie, blocked: false));

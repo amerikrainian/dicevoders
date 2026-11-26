@@ -413,6 +413,7 @@ namespace DiceVoders.Module.Encounter
                     RiftLabel = Encounter.RiftName(),
                 };
                 foreach (var die in Encounter.Dice()) (Encounter.IsKraken(die) ? s.Kraken : s.Dice).Add(die.isRolling ? 0 : die.Value);
+                s.Echo = Encounter.EchoDice();
                 var pilotDie = Encounter.PilotDie();
                 if (pilotDie != null && !pilotDie.isRolling) s.PilotDie = pilotDie.Value;
                 s.Tippy = Screens.EncounterScreen.TippyLine();

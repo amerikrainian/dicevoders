@@ -188,7 +188,31 @@ namespace DiceVoders.Module.Encounter
             catch (Exception e) { CoreLog.Warning("Encounter: reading the dice power failed: " + e.Message); return 0; }
         }
 
-        // ---- units ----
+        /// <summary>The Echo Dice for this turn (Phantom's: <see cref="EncounterModel.PhantomDices"/>, a face
+        /// each, drawn under its column, at most 2; a Chrono Rift's on the grid), sorted. They count as
+        /// base dice for the turn and cannot be budged or rerolled. Those spawned "for the next turn"
+        /// wait in <see cref="EncounterModel.NextTurnPhantomDices"/>, undrawn, until the turn ends.</summary>
+        public static List<int> EchoDice()
+        {
+            var faces = new List<int>();
+            try
+            {
+                var list = Model?.PhantomDices;
+                if (list != null)
+                    for (int i = 0; i < list.Count; i++) faces.Add(list[i]);
+            }
+            catch (Exception e) { CoreLog.Warning("Encounter: reading the Echo Dice failed: " + e.Message); }
+            faces.Sort();
+            return faces;
+        }
+
+        /// <summary>The Echo Dice in a column (0-based).</summary>
+        public static int EchoDice(int x) => EchoDice().FindAll(face => face == x + 1).Count;
+
+        /// <summary>"Echo Dice", the game's keyword title.</summary>
+        public static string EchoLabel() => GameLoc.Get("EchoDice_TooltipTitle") ?? "Echo Dice";
+
+        // ---- units ----        // ---- units ----
 
         /// <summary>The unit's name ("Migo").</summary>
         public static string Name(EntityModel entity)

@@ -20,6 +20,8 @@ namespace DiceVoders.Core.Encounter
     /// <item>artifacts: added ("Meteor added, column 5"), removed, moved, levelled, XP ("Meteor: 9/10 XP"),
     /// blocked and freed ("Meteor: blocked", "Meteor: blocked lost");</item>
     /// <item>tiles: new ones, clouds coming and going, honey;</item>
+    /// <item>Echo Dice added ("Echo 5, Echo 6 added") and lost ("Echo 4 lost"), except those the
+    /// scoring spends and a new turn's, which its roll lists;</item>
     /// <item>the tokens that changed ("Chrono 4"), the shop's rarity ("Shop rarity, +5 %"), Mult rising;</item>
     /// <item>the shop opening, its offer changing other than by a purchase ("shop: Comet, Migo");</item>
     /// <item>a new turn with its roll ("3 Turns, rolled 2, 4, 6"), turns left changing within a phase, and
@@ -79,6 +81,7 @@ namespace DiceVoders.Core.Encounter
             Units(prev, now, lines);
             Artifacts(prev, now, lines);
             Tiles(prev, now, lines);
+            Echo(prev, now, lines);
 
             foreach (var token in now.Tokens)
             {
@@ -279,6 +282,30 @@ namespace DiceVoders.Core.Encounter
             }
         }
 
+        // Echo Dice: those added, and those lost other than to the scoring (each column's are spent as
+        // it scores: the launch, the scoring's steps). A new turn's roll lists them all instead. Every
+        // Echo Die counts as a die of its column, so the scoring spends them all: once it is over
+        // (the turn left for the shop, a result), those there are all new, a face kept included.
+        private static void Echo(EncounterSnapshot prev, EncounterSnapshot now, List<string> lines)
+        {
+            bool newTurn = now.Phase == PlayerPhase && prev.Phase != PlayerPhase;
+            bool scoring = now.Phase == ScoringPhase || prev.Phase == PlayerPhase && now.Phase != PlayerPhase;
+            bool scored = (prev.Phase == PlayerPhase || prev.Phase == ScoringPhase) && now.Phase != PlayerPhase && now.Phase != ScoringPhase;
+            var added = scored ? new List<int>(now.Echo) : Added(prev.Echo, now.Echo);
+            var lost = Added(now.Echo, prev.Echo);
+            if (added.Count > 0 && !newTurn) lines.Add(S.EncArtifactAdded(EchoFaces(now, added)));
+            if (lost.Count > 0 && !newTurn && !scoring) lines.Add(S.EncLost(EchoFaces(now, lost)));
+        }
+
+        /// <summary>Echo Dice as said: each "Echo 5" (a Chrono Rift's "Echo Chrono Rift"), joined.</summary>
+        public static string EchoFaces(EncounterSnapshot s, List<int> faces) =>
+            string.Join(", ", faces.ConvertAll(face => EchoDie(face, s.RiftLabel)));
+
+        /// <summary>One Echo Die, "Echo 5"; a Chrono Rift face (<see cref="RiftFace"/>) by
+        /// <paramref name="riftLabel"/> when given.</summary>
+        public static string EchoDie(int face, string riftLabel) =>
+            S.EncFigure(S.EncEchoDie, face == RiftFace && !string.IsNullOrEmpty(riftLabel) ? riftLabel : face.ToString());
+
         // Reading order: top row first, left to right.
         private static List<(int X, int Y)> Sorted(HashSet<(int X, int Y)> tiles)
         {
@@ -295,20 +322,22 @@ namespace DiceVoders.Core.Encounter
 
         // The choices in the offer now that were not in it before (as a multiset, in the offer's
         // order); none after a purchase alone.
-        private static List<string> Added(List<string> before, List<string> after)
+        private static List<T> Added<T>(List<T> before, List<T> after)
         {
-            var left = new List<string>(before);
-            var added = new List<string>();
+            var left = new List<T>(before);
+            var added = new List<T>();
             foreach (var item in after)
                 if (!left.Remove(item)) added.Add(item);
             return added;
         }
 
-        // "rolled 3, 3, 5", a Kraken die and a pilot's die after: "rolled 3, 3, 5, Kraken 4, pilot die 3".
+        // "rolled 3, 3, 5", the Echo Dice before (as the strip has them) and a Kraken die and a pilot's
+        // die after: "rolled Echo 5, Echo 6, 3, 3, 5, Kraken 4, pilot die 3".
         private static string Rolled(EncounterSnapshot s)
         {
             string Face(int face) => face == RiftFace && !string.IsNullOrEmpty(s.RiftLabel) ? s.RiftLabel : face.ToString();
             string faces = string.Join(", ", s.Dice.ConvertAll(Face));
+            if (s.Echo.Count > 0) faces = EchoFaces(s, s.Echo) + (faces.Length > 0 ? ", " + faces : "");
             foreach (int face in s.Kraken) faces += ", " + S.EncFigure(S.EncKrakenDie, Face(face));
             if (s.PilotDie > 0) faces += ", " + S.EncFigure(S.EncPilotDie, s.PilotDie.ToString());
             return S.EncRolled(faces);

@@ -50,6 +50,7 @@ namespace DiceVoders.Core.Strings
             D("state.locked", "locked"),
             D("state.completed", "completed"),
             D("cs.random", "Random commander"),
+            D("cs.playable", "playable"),
             D("cs.challenges", "Challenges"),
             D("cs.modifiers", "Modifiers"),
             D("state.selected", "selected"),
@@ -153,6 +154,7 @@ namespace DiceVoders.Core.Strings
             D("enc.pilot_die", "pilot die"),
             // The Core's extra die, as the game's perks name it ("an extra Kraken Base Dice").
             D("enc.kraken_die", "Kraken"),
+            D("enc.echo_die", "Echo"),
             // Dice Power a die adds on top of its own; {0} = the amount.
             D("enc.added_power", "plus {0} power"),
             // The attack gathered against the target: {0} = Total Attack, {1} = Target Defense.
@@ -543,6 +545,9 @@ namespace DiceVoders.Core.Strings
         public static string EncCracked => Get("enc.cracked");
         public static string EncPilotDie => Get("enc.pilot_die");
         public static string EncKrakenDie => Get("enc.kraken_die");
+        /// <summary>An Echo Die's word ("Echo 5"): the game's "Echo Dice" as each locale words its
+        /// adjective (fr "dés échos", de "Schemenwürfel", es "dados espectrales").</summary>
+        public static string EncEchoDie => Get("enc.echo_die");
         public static string EncAddedPower(int amount) => F("enc.added_power", amount);
         public static string EncAttack(string total, string target) => F("enc.attack", total, target);
         public static string EncHearts => Get("enc.hearts");

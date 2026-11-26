@@ -63,6 +63,47 @@ namespace DiceVoders.Tests
             Assert.Equal(new[] { "3 Turns, rolled 2, 2, Chrono Rift" }, EncounterDiff.Lines(Snap("Draft", turns: 3), turn));
         }
 
+        private static EncounterSnapshot WithEcho(EncounterSnapshot s, params int[] echo)
+        {
+            s.Echo = new List<int>(echo);
+            s.RiftLabel = "Chrono Rift";
+            return s;
+        }
+
+        [Fact]
+        public void A_new_turn_s_roll_lists_its_echo_dice()
+        {
+            var turn = WithEcho(Snap("Player", turns: 3, dice: new[] { 2, 4 }), 5, 6);
+            Assert.Equal(new[] { "3 Turns, rolled Echo 5, Echo 6, 2, 4" }, EncounterDiff.Lines(WithEcho(Snap("Draft", turns: 3), 5, 6), turn));
+        }
+
+        [Fact]
+        public void Echo_dice_left_for_the_next_turn_are_said_as_the_shop_opens_and_the_spent_ones_not()
+        {
+            var prev = WithEcho(Snap("Player", dice: new[] { 4, 6 }), 5, 6);
+            var now = WithEcho(Snap("Draft", turns: 3), 4, 6);
+            Assert.Equal(new[] { "Echo 4, Echo 6 added", "Shop" }, EncounterDiff.Lines(prev, now));
+            // After the scoring's steps (the last one spent the column's, the turn's end left new ones).
+            Assert.Equal(new[] { "Echo 6 added", "Shop" }, EncounterDiff.Lines(WithEcho(Snap("Scoring"), 6), WithEcho(Snap("Draft", turns: 3), 6)));
+        }
+
+        [Fact]
+        public void A_scoring_step_spending_echo_dice_says_nothing_of_them()
+        {
+            var prev = WithEcho(Snap("Scoring"), 5, 5, 6);
+            var now = WithEcho(Snap("Scoring"), 6);
+            Assert.Empty(EncounterDiff.Lines(prev, now));
+        }
+
+        [Fact]
+        public void Echo_dice_destroyed_in_the_turn_are_lost_and_a_rift_one_reads_as_the_rift()
+        {
+            var prev = WithEcho(Snap("Player", dice: new[] { 2, 4 }), 3, 3, 7);
+            var now = WithEcho(Snap("Player", dice: new[] { 2, 4 }), 7);
+            Assert.Equal(new[] { "Echo 3, Echo 3 lost" }, EncounterDiff.Lines(prev, now));
+            Assert.Equal(new[] { "Echo Chrono Rift added" }, EncounterDiff.Lines(WithEcho(Snap("Player", dice: new[] { 2, 4 })), now));
+        }
+
         [Fact]
         public void The_turn_summary_keeps_every_column_by_position()
         {

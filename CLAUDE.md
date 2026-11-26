@@ -214,6 +214,23 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     (`CH6MissionCheckBoxes`; a cross unsaid). Staged: `CurrentMaxUnlockedDifficulty` 6 plus a
     `Chapter6` winner, then `SetupMissionPanel`; restoring needs `MissionPanel` switched back on and
     the CH6 panel off by hand (the game never re-shows the first), `EndOfContentReached` as it was.
+    Since 1.1, with every mission done, `EndOfContentPanel` (`EndTrueContentPanel`) is the Endgame
+    Content panel, filled by `EndgameContentController` (its own object; the panel holds its texts):
+    "Endgame Content", "0% Compendium Completion", the chosen commander's streaks under "Current /
+    Best" beside its portrait ("Phantom, Current / Best"), each challenge drawn only as a planet:
+    "Ultimate Earth, Win Streak: 0 / 0", "Chapter X, Win Streak: 0 / 0" (`UltimateStreak`/`Best`,
+    `ChapterXStreak`/`Best`, per commander in `LoggerDataSO.CommanderUltimate*Streak`/`CommanderX*Streak`);
+    then `GauntletPanel` (a `TooltipTriggerView`, read as text): "Max Gauntlet, No Trophy, 0" (the shown
+    trophy object, `GauntletBest`), Backspace its "?": the Gauntlet's description and the trophies
+    ("SILVER: 4-6 wins, Win more to reveal..." while that tier's cover shows). The Gauntlet (challenge
+    14; Chapter X is 15, random pilots): `GauntletObject` on the chapter panel, "Current Level: 0" (its
+    figure in a `TooltipTriggerView` box, Backspace the tooltip read through its `LocalizeStringEvent`s:
+    the drawn text is a prefab placeholder until hovered; the rules by level) and "Playable commanders
+    are RANDOMIZED."; the modifier line's Gauntlet icon adds its level ("The Gauntlet, 0":
+    `RunModIcon.GauntletObject`, `GauntletText`); the three playable commanders
+    (`EndgameContentController.GauntletCommanders`) carry the badge `CommanderIconView.GauntletObject`:
+    "Whisperer, playable" (the mod's `cs.playable`); with another chosen, `LockedStartButton` (a child of
+    `StartButton`) draws Launch! as a lock: "Launch!, locked". Seen live on the Unlock All profile.
   - `CompendiumScreen` (`CompendiumController`, CompendiumSceneAdditive over the main menu, from its
     Compendium icon, `GlossaryIcon`, which reads "Compendium, 12%": an edge icon is its tooltip's
     name with its caption; layer 10, exclusive; up while `Canvas` shows), named by `Pages/Title`.
@@ -300,9 +317,9 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     boss fights' "Has negative STR" units, "Coral, -10 strength": `EntityModel.IsNegative`, the value
     kept positive, the tooltip printing "-" before it in red; the stats overlay's STR view draws it
     unsigned, the same red as every unit, and is signed too), then a strict strip:
-    in `Phase.Player` the dice in `DiceVisualOrder` ("3, frozen"; a Kraken die, The Core's, `_index` 3 and
+    in `Phase.Player` the Echo Dice first (below), then the dice in `DiceVisualOrder` ("3, frozen"; a Kraken die, The Core's, `_index` 3 and
     up as the game counts and draws them: "4, Kraken", the roll "rolled 5, 6, 6, Kraken 2") and Launch
-    (`DicePanel/ProceedKnob/ProceedLine/LaunchPanel/LaunchButton`). Focus lands on the first die.
+    (`DicePanel/ProceedKnob/ProceedLine/LaunchPanel/LaunchButton`). Focus lands on the first die of the tray.
     Backspace on a unit runs the game's `EntityTooltip.UpdateTooltip` on the tile's own tooltip
     (a hidden one holds prefab placeholders: "Mutantenschwamm", Legendary) and reads it; an
     artifact's runs `Tooltip.SetArtifactText` and leads with its title ("Meteor [9/10 XP]"). An
@@ -350,7 +367,8 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     scores the columns holding dice in ascending order, each a `ScoreColumnTask` with all that
     column's dice (`ArgKey.Amount`), the mini-dice through a second `ScoreDiceTask` (`isMini`). A
     Harmony prefix and postfix on its coroutine (`ScoreColumnTask._Execute_d__1.MoveNext`: state 0
-    is the start, `false` the end; the 1-based column in the closure, `__8__1.i`, since 1.1, `_isMini_5__2`), live engine only,
+    is the start, `false` the end; the 1-based column and the kind from the task's args, `ArgKey.Value`
+    and `ArgKey.IsMiniDice`, never the coroutine's compiler-numbered locals, which 1.1 renumbered), live engine only,
     snapshot as each column starts (what came before is said) and ends (`EncounterDiff.Step`: "column
     4: 80", then what it set off: "4D Printer level 2", "new tile at 5, 1", "Mult 2"; the gain is
     the column units' `AttackGainedThisTurn` summed, end less start, negatives kept ("column 1: -10"),
@@ -456,6 +474,22 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     Common/Uncommon/Rare/Legendary) reads with its name, bars as commas ("Current chances: Common 84%,
     Uncommon 13%, Rare 6%, Legendary 0%"). Seen live in the shop, with the choices' keywords (Comet:
     Base Dice, Mult; Shooter: Repeat; the spells carry none).
+  - Echo Dice (1.1, Phantom's: "Echo From Beyond" leaves the launched faces for the next turn; Harvest
+    Moon, Jack-O-Lantern, Necrophone spawn them, Holy Soda destroys them): `EncounterModel.PhantomDices`, a
+    face each (a Chrono Rift's 7 counts in every column with dice, as a Rift face does), drawn under the
+    column (`GridColumn.PhantomDice1/2`, at most 2; a Rift's `GridView.ChronoPhantomDice1/2`), not in the
+    tray; they count as base dice for the turn (`DicePanel.GetAmountOfDiceOfValue` and the Chrono count
+    add `GetAmountOfPhantomDice`, so the column task's Amount and the combo label include them) and
+    cannot be budged or rerolled. Each column's are removed as it scores (`ScoreColumnTask`,
+    `PhantomDices.RemoveAll(d => d == i)` after its triggers); those spawned "for the next turn" wait in
+    `NextTurnPhantomDices`, undrawn, until `ProcessEndTurnTask` moves them in. Read as "Echo 5" (the mod's
+    `enc.echo_die`, each locale's word from the game's own "Echo Dice"; a Rift's "Echo Chrono Rift"): text
+    items at the strip's left (`enc:echo:<i>`, Backspace the keyword), first in Ctrl+D and the roll ("3
+    Turns, rolled Echo 5, Echo 6, 2, 4"); the column header counts them, "Dice Power 1, Echo Dice 1"
+    (the game's keyword title), its details adding the keyword. Narrated: "Echo 1, Echo 5 added" (after a
+    scoring every one there is new: the scoring spends them all), "Echo 3 lost" outside the scoring.
+    Seen live in a CH6 Phantom run, staged triples included (one die and two Echo Dice of a face:
+    `PhantomDices` filled through `/eval`, then `UpdateDicePreview`).
   - The Oculus (and Warped Oculus) score "in the direction its looking at", drawn only as the
     sprite's facing: a unit with an `OculusTask` in `OnScoreTaskList` has its `OculusDirection` in
     its details after the description, "looking right" (`EncounterScreen.Facing`; N is a row up, E a

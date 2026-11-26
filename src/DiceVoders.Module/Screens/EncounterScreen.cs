@@ -507,6 +507,11 @@ namespace DiceVoders.Module.Screens
             if (dice.Count == 0 && launch == null) return;
             b.PushContext(null);
             b.StartRow(BoardStop, strictColumns: true);
+            // The Echo Dice first ("Echo 5"): drawn under their columns, not in the tray, and neither
+            // budged nor rerolled. A turn still lands on the first die of the tray.
+            var echo = EncounterState.EchoDice();
+            for (int i = 0; i < echo.Count; i++)
+                b.AddItem(ControlId.Structural("enc:echo:" + i), EchoDie(echo[i]));
             for (int i = 0; i < dice.Count; i++)
                 b.AddItem(DieId(dice[i]), Die(dice[i], i == 0));
             // A pilot's die (drawn on the pilot panel; Budge takes it as it takes the tray's).
@@ -539,7 +544,8 @@ namespace DiceVoders.Module.Screens
             b.PopContext();
         }
 
-        // "Dice Power 2, honey, Twin Engines": what bears on all of the column ("column 3" when it has no artifact).
+        // "Dice Power 2, Echo Dice 1, honey, Twin Engines": what bears on all of the column ("column 3"
+        // when it has no artifact).
         private static NodeVtable Header(int x)
         {
             Func<string> label = () => HeaderText(x);
@@ -561,7 +567,7 @@ namespace DiceVoders.Module.Screens
             };
         }
 
-        // The column's artifact, then Dice Power explained while the column has some.
+        // The column's artifact, then Dice Power and Echo Dice explained while the column has some.
         private static IEnumerable<string> HeaderDetails(int x)
         {
             foreach (var line in ArtifactDetails(EncounterState.Artifact(x), highlighted: true)) yield return line;
@@ -569,6 +575,11 @@ namespace DiceVoders.Module.Screens
             {
                 string power = Keywords.Line(NestedTooltipName.DiceMult);
                 if (power != null) yield return power;
+            }
+            if (EncounterState.EchoDice(x) > 0)
+            {
+                string echo = Keywords.Line(NestedTooltipName.EchoDice);
+                if (echo != null) yield return echo;
             }
         }
 
@@ -588,6 +599,8 @@ namespace DiceVoders.Module.Screens
             if (column && (artifact == null || target)) parts.Add(Strings.EncColumn(x + 1));
             int power = EncounterState.DicePower(x);
             if (power > 0) parts.Add(Strings.EncFigure(GameLoc.Get("DicePower_Misc") ?? "Dice Power", power.ToString()));
+            int echo = EncounterState.EchoDice(x);
+            if (echo > 0) parts.Add(Strings.EncFigure(EncounterState.EchoLabel(), echo.ToString()));
             if (EncounterState.Honey(x)) parts.Add(Strings.EncHoney);
             if (artifact != null) parts.Add(artifact);
             return string.Join(", ", parts);
@@ -836,6 +849,26 @@ namespace DiceVoders.Module.Screens
                 IsSelected = () => first,
                 QuietVanish = true,
                 OnFocus = () => { _lastDie = DieId(die).StructuralKey as string; EncounterState.Hover(die); },
+            };
+        }
+
+        // "Echo 5": an Echo Die, its face the column it scores; Backspace the game's keyword.
+        private static NodeVtable EchoDie(int face)
+        {
+            Func<string> label = () => Core.Encounter.EncounterDiff.EchoDie(face, EncounterState.RiftName());
+            Func<IEnumerable<string>> details = () =>
+            {
+                string line = Keywords.Line(NestedTooltipName.EchoDice);
+                return line != null ? new List<string> { line } : new List<string>();
+            };
+            return new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GameNodes.LabelPart(label) },
+                SearchText = label,
+                QuietVanish = true,
+                Details = details,
+                OnSecondary = () => SayDetails(details()),
             };
         }
 

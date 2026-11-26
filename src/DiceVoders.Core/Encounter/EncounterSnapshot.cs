@@ -44,6 +44,9 @@ namespace DiceVoders.Core.Encounter
         /// <summary>What a Chrono Rift face (a die showing <see cref="EncounterDiff.RiftFace"/>) reads as:
         /// the artifact's title, "Chrono Rift"; null, the number.</summary>
         public string RiftLabel;
+        /// <summary>The Echo Dice for this turn (Phantom's: <c>EncounterModel.PhantomDices</c>, each a face,
+        /// drawn under its column, a Chrono Rift's on the grid), sorted.</summary>
+        public List<int> Echo = new List<int>();
         /// <summary>A pilot's own die (Kaia's, on the pilot panel), its face; 0 for none or rolling.</summary>
         public int PilotDie;
         /// <summary>What Tippy covers, as said ("Tippy: right tiles"); null outside Tippy's fight.</summary>
