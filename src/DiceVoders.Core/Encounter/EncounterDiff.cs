@@ -20,8 +20,7 @@ namespace DiceVoders.Core.Encounter
     /// <item>artifacts: added ("Meteor added, column 5"), removed, moved, levelled, XP ("Meteor: 9/10 XP"),
     /// blocked and freed ("Meteor: blocked", "Meteor: blocked lost");</item>
     /// <item>tiles: new ones, clouds coming and going, honey;</item>
-    /// <item>Echo Dice added ("Echo 5, Echo 6 added") and lost ("Echo 4 lost"), except those the
-    /// scoring spends and a new turn's, which its roll lists;</item>
+    /// <item>Echo Dice gained ("Echo 5, 6"), except a new turn's, which its roll lists; losses unsaid;</item>
     /// <item>the tokens that changed ("Chrono 4"), the shop's rarity ("Shop rarity, +5 %"), Mult rising;</item>
     /// <item>the shop opening, its offer changing other than by a purchase ("shop: Comet, Migo");</item>
     /// <item>a new turn with its roll ("3 Turns, rolled 2, 4, 6"), turns left changing within a phase, and
@@ -282,19 +281,19 @@ namespace DiceVoders.Core.Encounter
             }
         }
 
-        // Echo Dice: those added, and those lost other than to the scoring (each column's are spent as
-        // it scores: the launch, the scoring's steps). A new turn's roll lists them all instead. Every
-        // Echo Die counts as a die of its column, so the scoring spends them all: once it is over
-        // (the turn left for the shop, a result), those there are all new, a face kept included.
+        // Echo Dice gained, "Echo 1, 5" (asked for: the word once, the faces after). A new turn's roll
+        // lists them all instead. Every Echo Die counts as a die of its column, so the scoring spends
+        // them all: once it is over (the turn left for the shop, a result), those there are all new, a
+        // face kept included. Losses are unsaid (asked for): they last a turn, the scoring spends them,
+        // and Holy Soda, the one other taker, says its reward; the strip and Ctrl+D hold what is left.
         private static void Echo(EncounterSnapshot prev, EncounterSnapshot now, List<string> lines)
         {
-            bool newTurn = now.Phase == PlayerPhase && prev.Phase != PlayerPhase;
-            bool scoring = now.Phase == ScoringPhase || prev.Phase == PlayerPhase && now.Phase != PlayerPhase;
+            if (now.Phase == PlayerPhase && prev.Phase != PlayerPhase) return;
             bool scored = (prev.Phase == PlayerPhase || prev.Phase == ScoringPhase) && now.Phase != PlayerPhase && now.Phase != ScoringPhase;
             var added = scored ? new List<int>(now.Echo) : Added(prev.Echo, now.Echo);
-            var lost = Added(now.Echo, prev.Echo);
-            if (added.Count > 0 && !newTurn) lines.Add(S.EncArtifactAdded(EchoFaces(now, added)));
-            if (lost.Count > 0 && !newTurn && !scoring) lines.Add(S.EncLost(EchoFaces(now, lost)));
+            if (added.Count > 0)
+                lines.Add(S.EncFigure(S.EncEchoDie, string.Join(", ", added.ConvertAll(face =>
+                    face == RiftFace && !string.IsNullOrEmpty(now.RiftLabel) ? now.RiftLabel : face.ToString()))));
         }
 
         /// <summary>Echo Dice as said: each "Echo 5" (a Chrono Rift's "Echo Chrono Rift"), joined.</summary>

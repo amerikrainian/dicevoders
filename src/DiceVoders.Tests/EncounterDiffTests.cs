@@ -82,9 +82,9 @@ namespace DiceVoders.Tests
         {
             var prev = WithEcho(Snap("Player", dice: new[] { 4, 6 }), 5, 6);
             var now = WithEcho(Snap("Draft", turns: 3), 4, 6);
-            Assert.Equal(new[] { "Echo 4, Echo 6 added", "Shop" }, EncounterDiff.Lines(prev, now));
+            Assert.Equal(new[] { "Echo 4, 6", "Shop" }, EncounterDiff.Lines(prev, now));
             // After the scoring's steps (the last one spent the column's, the turn's end left new ones).
-            Assert.Equal(new[] { "Echo 6 added", "Shop" }, EncounterDiff.Lines(WithEcho(Snap("Scoring"), 6), WithEcho(Snap("Draft", turns: 3), 6)));
+            Assert.Equal(new[] { "Echo 6", "Shop" }, EncounterDiff.Lines(WithEcho(Snap("Scoring"), 6), WithEcho(Snap("Draft", turns: 3), 6)));
         }
 
         [Fact]
@@ -96,12 +96,12 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
-        public void Echo_dice_destroyed_in_the_turn_are_lost_and_a_rift_one_reads_as_the_rift()
+        public void Echo_dice_destroyed_in_the_turn_go_unsaid_and_a_rift_one_reads_as_the_rift()
         {
             var prev = WithEcho(Snap("Player", dice: new[] { 2, 4 }), 3, 3, 7);
             var now = WithEcho(Snap("Player", dice: new[] { 2, 4 }), 7);
-            Assert.Equal(new[] { "Echo 3, Echo 3 lost" }, EncounterDiff.Lines(prev, now));
-            Assert.Equal(new[] { "Echo Chrono Rift added" }, EncounterDiff.Lines(WithEcho(Snap("Player", dice: new[] { 2, 4 })), now));
+            Assert.Empty(EncounterDiff.Lines(prev, now));
+            Assert.Equal(new[] { "Echo Chrono Rift" }, EncounterDiff.Lines(WithEcho(Snap("Player", dice: new[] { 2, 4 })), now));
         }
 
         [Fact]
