@@ -199,6 +199,7 @@ mod.close=閉じる
 mod.speak_positions=リスト内の位置を読み上げる
 mod.focus_on_launch=起動時にキーボードナビゲーションをオン
 mod.scoring_summary=各ターンの得点を要約する
+mod.quiet_echo=残響ダイスを読み上げない
 mod.key_category={0} キー
 mod.category.global=グローバル
 mod.category.ui=ナビゲーション

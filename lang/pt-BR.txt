@@ -199,6 +199,7 @@ mod.close=Fechar
 mod.speak_positions=Falar posições nas listas
 mod.focus_on_launch=Navegação por teclado ativada ao iniciar
 mod.scoring_summary=Resumir a pontuação de cada turno
+mod.quiet_echo=Não anunciar os dados eco
 mod.key_category=Teclas: {0}
 mod.category.global=globais
 mod.category.ui=navegação

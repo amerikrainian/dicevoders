@@ -201,6 +201,7 @@ mod.close=Close
 mod.speak_positions=Speak list positions
 mod.focus_on_launch=Keyboard navigation on at launch
 mod.scoring_summary=Summarize each turn's scoring
+mod.quiet_echo=Leave Echo Dice out of announcements
 mod.key_category={0} keys
 mod.category.global=Global
 mod.category.ui=Navigation

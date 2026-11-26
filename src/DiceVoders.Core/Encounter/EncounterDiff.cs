@@ -36,7 +36,9 @@ namespace DiceVoders.Core.Encounter
 
         /// <param name="columns">false: the turn's scoring line leaves its columns out ("30/100
         /// attack"), the turn summary (<see cref="TurnSummary"/>) having said them.</param>
-        public static List<string> Lines(EncounterSnapshot prev, EncounterSnapshot now, bool columns = true)
+        /// <param name="echo">false: the Echo Dice are left out, their gains and the roll's (the mod
+        /// setting: they are the faces just launched, so their values are known).</param>
+        public static List<string> Lines(EncounterSnapshot prev, EncounterSnapshot now, bool columns = true, bool echo = true)
         {
             var lines = new List<string>();
             if (prev == null || now == null) return lines;
@@ -80,7 +82,7 @@ namespace DiceVoders.Core.Encounter
             Units(prev, now, lines);
             Artifacts(prev, now, lines);
             Tiles(prev, now, lines);
-            Echo(prev, now, lines);
+            if (echo) Echo(prev, now, lines);
 
             foreach (var token in now.Tokens)
             {
@@ -115,9 +117,9 @@ namespace DiceVoders.Core.Encounter
             if (isPlayer && !now.DiceRolling)
             {
                 if (!wasPlayer)
-                    lines.Add(string.IsNullOrEmpty(now.TurnsText) ? Rolled(now) : now.TurnsText + ", " + Rolled(now));
+                    lines.Add(string.IsNullOrEmpty(now.TurnsText) ? Rolled(now, echo) : now.TurnsText + ", " + Rolled(now, echo));
                 else if (!SameDice(prev, now))
-                    lines.Add(Rolled(now));
+                    lines.Add(Rolled(now, echo));
                 else if (now.PilotDie != prev.PilotDie && now.PilotDie > 0)
                     lines.Add(S.EncFigure(S.EncPilotDie, now.PilotDie.ToString()));
             }
@@ -137,9 +139,9 @@ namespace DiceVoders.Core.Encounter
         /// dice ("column 4: 80, Pair"). <paramref name="dice"/> is how many dice the column scored with; <paramref name="gains"/> holds each column's gain as printed, left to right, null
         /// for none.
         /// </summary>
-        public static List<string> Step(EncounterSnapshot prev, EncounterSnapshot now, int column, int dice, IList<string> gains, string miniLabel, string combo = null)
+        public static List<string> Step(EncounterSnapshot prev, EncounterSnapshot now, int column, int dice, IList<string> gains, string miniLabel, string combo = null, bool echo = true)
         {
-            var rest = Lines(prev, now);
+            var rest = Lines(prev, now, echo: echo);
             bool any = !string.IsNullOrEmpty(miniLabel);
             var parts = new List<string>();
             if (!string.IsNullOrEmpty(miniLabel)) parts.Add(dice > 1 ? S.EncDiceCount(dice, miniLabel) : miniLabel);
@@ -181,10 +183,10 @@ namespace DiceVoders.Core.Encounter
 
         /// <summary>The turn as it stands ("3 Turns, rolled 3, 6, 6"), for an encounter met mid-turn (a
         /// rewound turn, a loaded run): null outside the player's turn or while dice roll.</summary>
-        public static string TurnLine(EncounterSnapshot s)
+        public static string TurnLine(EncounterSnapshot s, bool echo = true)
         {
             if (s == null || s.Phase != PlayerPhase || s.DiceRolling || s.Dice.Count == 0) return null;
-            return string.IsNullOrEmpty(s.TurnsText) ? Rolled(s) : s.TurnsText + ", " + Rolled(s);
+            return string.IsNullOrEmpty(s.TurnsText) ? Rolled(s, echo) : s.TurnsText + ", " + Rolled(s, echo);
         }
 
         private static string Place(int x, int y) => S.EncCoord(x + 1, y + 1);
@@ -332,11 +334,11 @@ namespace DiceVoders.Core.Encounter
 
         // "rolled 3, 3, 5", the Echo Dice before (as the strip has them) and a Kraken die and a pilot's
         // die after: "rolled Echo 5, Echo 6, 3, 3, 5, Kraken 4, pilot die 3".
-        private static string Rolled(EncounterSnapshot s)
+        private static string Rolled(EncounterSnapshot s, bool echo = true)
         {
             string Face(int face) => face == RiftFace && !string.IsNullOrEmpty(s.RiftLabel) ? s.RiftLabel : face.ToString();
             string faces = string.Join(", ", s.Dice.ConvertAll(Face));
-            if (s.Echo.Count > 0) faces = EchoFaces(s, s.Echo) + (faces.Length > 0 ? ", " + faces : "");
+            if (echo && s.Echo.Count > 0) faces = EchoFaces(s, s.Echo) + (faces.Length > 0 ? ", " + faces : "");
             foreach (int face in s.Kraken) faces += ", " + S.EncFigure(S.EncKrakenDie, Face(face));
             if (s.PilotDie > 0) faces += ", " + S.EncFigure(S.EncPilotDie, s.PilotDie.ToString());
             return S.EncRolled(faces);

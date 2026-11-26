@@ -199,6 +199,7 @@ mod.close=關閉
 mod.speak_positions=讀出清單位置
 mod.focus_on_launch=遊戲啟動時開啟鍵盤導覽
 mod.scoring_summary=彙總每回合的計分
+mod.quiet_echo=不播報回聲骰
 mod.key_category={0} 按鍵
 mod.category.global=全域
 mod.category.ui=導覽

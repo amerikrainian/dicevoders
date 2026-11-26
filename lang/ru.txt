@@ -199,6 +199,7 @@ mod.close=Закрыть
 mod.speak_positions=Озвучивать позиции в списках
 mod.focus_on_launch=Клавиатурная навигация при запуске
 mod.scoring_summary=Кратко озвучивать подсчёт очков за ход
+mod.quiet_echo=Не объявлять эхо-кубики
 mod.key_category={0}: клавиши
 mod.category.global=общие
 mod.category.ui=навигация

@@ -199,6 +199,7 @@ mod.close=Fermer
 mod.speak_positions=Annoncer les positions dans les listes
 mod.focus_on_launch=Navigation au clavier activée au lancement
 mod.scoring_summary=Résumer le score de chaque tour
+mod.quiet_echo=Ne pas annoncer les dés échos
 mod.key_category=Touches {0}
 mod.category.global=globales
 mod.category.ui=de navigation

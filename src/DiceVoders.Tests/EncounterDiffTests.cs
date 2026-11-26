@@ -88,6 +88,16 @@ namespace DiceVoders.Tests
         }
 
         [Fact]
+        public void With_echo_dice_left_out_neither_the_roll_nor_the_gains_name_them()
+        {
+            var turn = WithEcho(Snap("Player", turns: 3, dice: new[] { 2, 4 }), 5, 6);
+            Assert.Equal(new[] { "3 Turns, rolled 2, 4" }, EncounterDiff.Lines(WithEcho(Snap("Draft", turns: 3), 5, 6), turn, echo: false));
+            Assert.Equal("3 Turns, rolled 2, 4", EncounterDiff.TurnLine(turn, echo: false));
+            var shop = WithEcho(Snap("Draft", turns: 2), 2, 4);
+            Assert.Equal(new[] { "Shop" }, EncounterDiff.Lines(turn, shop, echo: false));
+        }
+
+        [Fact]
         public void A_scoring_step_spending_echo_dice_says_nothing_of_them()
         {
             var prev = WithEcho(Snap("Scoring"), 5, 5, 6);

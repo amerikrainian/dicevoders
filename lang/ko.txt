@@ -199,6 +199,7 @@ mod.close=닫기
 mod.speak_positions=목록 위치 읽기
 mod.focus_on_launch=시작 시 키보드 탐색 켜기
 mod.scoring_summary=턴마다 점수 요약
+mod.quiet_echo=메아리 주사위 안내 생략
 mod.key_category={0} 키
 mod.category.global=전역
 mod.category.ui=탐색

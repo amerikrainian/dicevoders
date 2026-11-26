@@ -79,6 +79,9 @@ namespace DiceVoders.Module.Screens
             b.AddItem(ControlId.Structural("modsettings:summary"), Toggle(() => Strings.ModScoringSummary,
                 () => settings.Store.GetBool(Encounter.EncounterEvents.SummaryKey, false),
                 v => settings.Store.SetBool(Encounter.EncounterEvents.SummaryKey, v)));
+            b.AddItem(ControlId.Structural("modsettings:quietecho"), Toggle(() => Strings.ModQuietEcho,
+                () => settings.Store.GetBool(Encounter.EncounterEvents.QuietEchoKey, false),
+                v => settings.Store.SetBool(Encounter.EncounterEvents.QuietEchoKey, v)));
             b.PopContext();
         }
 

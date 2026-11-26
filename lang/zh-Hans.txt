@@ -199,6 +199,7 @@ mod.close=关闭
 mod.speak_positions=读出列表位置
 mod.focus_on_launch=启动时开启键盘导航
 mod.scoring_summary=汇总每回合的计分
+mod.quiet_echo=不播报回声骰
 mod.key_category={0}按键
 mod.category.global=全局
 mod.category.ui=导航

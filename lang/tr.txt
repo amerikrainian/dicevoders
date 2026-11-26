@@ -199,6 +199,7 @@ mod.close=Kapat
 mod.speak_positions=Liste konumlarını söyle
 mod.focus_on_launch=Başlangıçta klavye gezinmesi açık
 mod.scoring_summary=Her turun puanlamasını özetle
+mod.quiet_echo=Yankı zarlarını duyurma
 mod.key_category={0} tuşları
 mod.category.global=Genel
 mod.category.ui=Gezinme

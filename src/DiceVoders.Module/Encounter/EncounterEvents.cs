@@ -41,6 +41,21 @@ namespace DiceVoders.Module.Encounter
             }
         }
 
+        /// <summary>The setting's key for leaving the Echo Dice out of the narration.</summary>
+        public const string QuietEchoKey = "quiet_echo";
+
+        /// <summary>Whether the narration leaves the Echo Dice out (their gains, "Echo 1, 5", and the
+        /// roll's): they are the faces just launched, so their values are known. The strip and Ctrl+D
+        /// still list them. Off by default; asked for by the user.</summary>
+        public static bool Echo
+        {
+            get
+            {
+                try { return ModuleMain.Host?.Settings?.Store.GetBool(QuietEchoKey, false) != true; }
+                catch (Exception e) { CoreLog.Warning("EncounterEvents: reading the Echo Dice setting failed: " + e.Message); return true; }
+            }
+        }
+
         /// <summary>Every line said in the current encounter, oldest first.</summary>
         public static readonly List<string> Log = new List<string>();
 
@@ -75,12 +90,12 @@ namespace DiceVoders.Module.Encounter
 
             var now = Take();
             if (now == null) return;
-            if (_last != null) Say(EncounterDiff.Lines(_last, now, columns: !Summary));
+            if (_last != null) Say(EncounterDiff.Lines(_last, now, columns: !Summary, echo: Echo));
             else
             {
                 // A new encounter (a run begun, a turn rewound, a run loaded) met on the player's turn:
                 // where it stands. Otherwise its first change says it.
-                string turn = EncounterDiff.TurnLine(now);
+                string turn = EncounterDiff.TurnLine(now, Echo);
                 if (turn != null) Say(new List<string> { turn });
             }
             _last = now;
@@ -259,7 +274,7 @@ namespace DiceVoders.Module.Encounter
                 }
                 var now = Take();
                 if (now == null) return true;
-                Say(EncounterDiff.Lines(_last, now));
+                Say(EncounterDiff.Lines(_last, now, echo: Echo));
                 _last = now;
                 _stepStart = ColumnSums(Encounter.Model, true, _stepPlaces, record: true);
                 return true;
@@ -294,7 +309,7 @@ namespace DiceVoders.Module.Encounter
                 }
                 string mini = _columnMini ? GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice" : null;
                 CoreLog.Info("EncounterEvents: column " + column + " scored with " + _columnDice + (_columnMini ? " mini" : "") + " dice, gains [" + string.Join(" ", gains.ConvertAll(g => g ?? "-")) + "]");
-                Say(EncounterDiff.Step(_last, now, column, _columnDice, gains, mini, Combo(column - 1, _columnDice + _columnRift)));
+                Say(EncounterDiff.Step(_last, now, column, _columnDice, gains, mini, Combo(column - 1, _columnDice + _columnRift), Echo));
                 _last = now;
             }
         }

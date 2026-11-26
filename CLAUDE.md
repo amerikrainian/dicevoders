@@ -488,7 +488,9 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     Turns, rolled Echo 5, Echo 6, 2, 4"); the column header counts them, "Dice Power 1, Echo Dice 1"
     (the game's keyword title), its details adding the keyword. Gains narrated as "Echo 1, 5" (asked for;
     after a scoring every one there is new: the scoring spends them all); losses unsaid (asked for: a
-    turn's life, the scoring spends them, Holy Soda says its reward).
+    turn's life, the scoring spends them, Holy Soda says its reward). The mod setting "Leave Echo Dice out of
+    announcements" (store key `quiet_echo`, off by default; asked for: they are the faces just launched)
+    drops the gains and the roll's Echo Dice; the strip and Ctrl+D keep them.
     Seen live in a CH6 Phantom run, staged triples included (one die and two Echo Dice of a face:
     `PhantomDices` filled through `/eval`, then `UpdateDicePreview`).
   - The Oculus (and Warped Oculus) score "in the direction its looking at", drawn only as the

@@ -301,6 +301,7 @@ namespace DiceVoders.Core.Strings
             D("mod.focus_on_launch", "Keyboard navigation on at launch"),
             // The setting saying each turn's scoring as one line instead of column by column.
             D("mod.scoring_summary", "Summarize each turn's scoring"),
+            D("mod.quiet_echo", "Leave Echo Dice out of announcements"),
             // {0} = the key category, one of the three names below.
             D("mod.key_category", "{0} keys"),
             // The key categories of the "All keys" list: live everywhere, on the focused screen, in a run.
@@ -637,6 +638,7 @@ namespace DiceVoders.Core.Strings
         public static string ModSpeakPositions => Get("mod.speak_positions");
         public static string ModFocusOnLaunch => Get("mod.focus_on_launch");
         public static string ModScoringSummary => Get("mod.scoring_summary");
+        public static string ModQuietEcho => Get("mod.quiet_echo");
         public static string ModKeyCategory(string category)
         {
             string name = "mod.category." + (category ?? "").ToLowerInvariant();
