@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.1.2
+
+- We now should cover the new update and its mechanics.
+
 ## V0.1.1
 
 - Focus now resets to control when you move to a new UI control.

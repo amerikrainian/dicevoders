@@ -10,7 +10,8 @@ player, so every catch logs, and nothing caches game state.
 
 ## Game facts
 - **Engine**: Unity **6000.3.10f1**, **IL2CPP** x64, metadata **v39**, unobfuscated. Steam app
-  **3917700**, build 25892943 (2026-10-16). Install:
+  **3917700**, build 26765983 (2026-11-26, 1.1 "The Phantom Update"; the previous dump, build 25892943, is
+  parked in `game/il2cppdump.prev`). Install:
   `C:\Program Files (x86)\Steam\steamapps\common\DiceVaders` (`Directory.Build.props`: registry,
   `DICEVADERS_DIR`, `-p:GameDir=`, or a gitignored `Directory.Build.local.props`). Steam and GOG
   Galaxy SDKs ship; audio is FMOD.
@@ -170,7 +171,9 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     locked, completed, selected = `IsSelected`, Backspace `_Desc` and the `Mod` rules, Enter its
     click); the mission panel (`TutorialCompletePanel`, else `MissionPanel`: "Current
     Mission", "Win CH1 with any commander") as prose then its buttons ("New Chapter Unlocked!" =
-    `OnPressCompleteTutorial`, writes the save); the shown `CommanderIcons` as a row by x (unlocked:
+    `OnPressCompleteTutorial`, writes the save); the shown `CommanderIcons` as rows, one per drawn row, top first (since 1.1 the expansion's
+    `ExtraCommanders`, Phantom and four "Locked - Coming Soon!", above the first ten's `CommanderList`),
+    each by x (unlocked:
     "The Captain, New!": `<Commander>_Misc`, `_Arti_Title` being its perk's, Backspace the perk's
     name; "New!" from the `NewText` field's child text, the field being `UnlockIcon`; locked: the
     `Tooltip` title "Locked - The Invasion Begins!", Backspace "Reach Chapter 1 to unlock!";
@@ -347,7 +350,7 @@ moment after a key that opens a screen, or the next is lost while it arrives).
     scores the columns holding dice in ascending order, each a `ScoreColumnTask` with all that
     column's dice (`ArgKey.Amount`), the mini-dice through a second `ScoreDiceTask` (`isMini`). A
     Harmony prefix and postfix on its coroutine (`ScoreColumnTask._Execute_d__1.MoveNext`: state 0
-    is the start, `false` the end; `_i_5__2` the 1-based column, `_isMini_5__3`), live engine only,
+    is the start, `false` the end; the 1-based column in the closure, `__8__1.i`, since 1.1, `_isMini_5__2`), live engine only,
     snapshot as each column starts (what came before is said) and ends (`EncounterDiff.Step`: "column
     4: 80", then what it set off: "4D Printer level 2", "new tile at 5, 1", "Mult 2"; the gain is
     the column units' `AttackGainedThisTurn` summed, end less start, negatives kept ("column 1: -10"),

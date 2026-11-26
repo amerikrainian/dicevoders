@@ -252,11 +252,14 @@ namespace DiceVoders.Module.Encounter
                 try
                 {
                     // The column and whether it is a mini-die's are read from the args on the first step;
-                    // how many dice it scores with stays in the args (Amount).
+                    // how many dice it scores with stays in the args (Amount). The column lives in the
+                    // coroutine's closure (<>8__1.i) since build 26765983, a lambda capturing it.
                     if (__state)
                     {
-                        _column = __instance._i_5__2;
-                        _columnMini = __instance._isMini_5__3;
+                        var closure = __instance.__8__1;
+                        if (closure == null) { CoreLog.Warning("EncounterEvents: a column's first step left no closure, column unknown"); return; }
+                        _column = closure.i;
+                        _columnMini = __instance._isMini_5__2;
                         _columnDice = DiceCount(__instance.__4__this);
                         // The Chrono Rift faces in the tray count as dice in every column with dice,
                         // for the base dice only (as the game's label and its pair conditions count).

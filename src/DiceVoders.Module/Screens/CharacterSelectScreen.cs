@@ -135,26 +135,45 @@ namespace DiceVoders.Module.Screens
                 }
             }
 
-            // The commanders, a row.
+            // The commanders, a row per drawn row, top first, each left to right: since build 26765983
+            // the expansion's (ExtraCommanders: Phantom, then the "Coming Soon" ones) sit above the
+            // first ten (CommanderList), and sorting both by x alone interleaved them.
             var icons = new List<CommanderIconView>();
             if (c.CommanderIcons != null)
                 foreach (var icon in c.CommanderIcons)
                     if (icon != null && icon.gameObject.activeInHierarchy) icons.Add(icon);
-            icons.Sort((l, r) => l.transform.position.x.CompareTo(r.transform.position.x));
-            if (icons.Count > 0)
+            var rows = new List<List<CommanderIconView>>();
+            icons.Sort((l, r) => r.transform.position.y.CompareTo(l.transform.position.y));
+            foreach (var icon in icons)
             {
-                b.StartRow("cs:commanders", entry: () => Math.Max(0, icons.FindIndex(i => Selected(i))));
-                foreach (var icon in icons)
+                var last = rows.Count > 0 ? rows[rows.Count - 1] : null;
+                if (last == null || Math.Abs(last[0].transform.position.y - icon.transform.position.y) > 1f) rows.Add(last = new List<CommanderIconView>());
+                last.Add(icon);
+            }
+            // The random commander ends the row it is drawn beside (the first ten's): it draws only its
+            // key prompt.
+            AViewItem random = null;
+            foreach (var item in items)
+                if (item != null && item.gameObject.name == "RandomIcon" && ViewNodes.IsShown(item)) random = item;
+            int randomRow = -1;
+            if (random != null)
+                for (int i = 0; i < rows.Count; i++)
+                    if (randomRow < 0 || Math.Abs(rows[i][0].transform.position.y - random.transform.position.y) < Math.Abs(rows[randomRow][0].transform.position.y - random.transform.position.y))
+                        randomRow = i;
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var row = rows[i];
+                row.Sort((l, r) => l.transform.position.x.CompareTo(r.transform.position.x));
+                b.StartRow(i == 0 ? "cs:commanders" : "cs:commanders:" + i, entry: () => Math.Max(0, row.FindIndex(x => Selected(x))));
+                foreach (var icon in row)
                 {
                     taken.Add(icon.Pointer);
                     b.AddItem(ControlId.Structural("cs:commander:" + icon.CommanderName), Commander(icon));
                 }
-                // The random commander, at the list's end: it draws only its key prompt.
-                foreach (var item in items)
+                if (i == randomRow)
                 {
-                    if (item == null || item.gameObject.name != "RandomIcon" || !ViewNodes.IsShown(item)) continue;
-                    taken.Add(item.Pointer);
-                    b.AddItem(ControlId.Structural("cs:random"), ViewNodes.Button(item, () => Strings.Get("cs.random")));
+                    taken.Add(random.Pointer);
+                    b.AddItem(ControlId.Structural("cs:random"), ViewNodes.Button(random, () => Strings.Get("cs.random")));
                 }
                 b.EndRow();
             }
