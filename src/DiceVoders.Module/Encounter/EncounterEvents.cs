@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using BreakInfinity;
 using StarVaders;
 using DiceVoders.Core;
@@ -218,6 +219,14 @@ namespace DiceVoders.Module.Encounter
         // "Lose 1 Budge and destroy this") leaves the grid with its gain still on its model.
         private static readonly Dictionary<string, int> _stepPlaces = new Dictionary<string, int>();
 
+        // The patch's own methods only call the bodies below, inside a try: a member the bodies use
+        // that a game update renamed fails as the body is compiled, which surfaces at its call, here,
+        // and is caught. Referenced from the patch methods themselves, it failed before their try,
+        // escaped into the game's coroutine, and Il2CppInterop's trampoline answered MoveNext with
+        // false: every column stopped after its first step and nothing scored (0.1.1 on the game's
+        // 1.1: no unit scored, no "after you score this column with a triple" trigger, Locked Slots
+        // never unlocking). The column and its kind come from the task's args (Value, IsMiniDice),
+        // not the coroutine's compiler-numbered locals, which 1.1 renumbered.
         [HarmonyPatch(typeof(ScoreColumnTask._Execute_d__1), nameof(ScoreColumnTask._Execute_d__1.MoveNext))]
         internal static class ColumnSteps
         {
@@ -225,66 +234,89 @@ namespace DiceVoders.Module.Encounter
             private static void Prefix(ScoreColumnTask._Execute_d__1 __instance, out bool __state)
             {
                 __state = false;
-                try
-                {
-                    if (__instance.__1__state != 0 || _last == null || !Live(__instance.__4__this)) return;
-                    __state = true;
-                    // Summarized: nothing said in the scoring, and the baseline kept from before it, so
-                    // the shop's settled snapshot says what the whole turn changed, once.
-                    if (Summary && Encounter.Phase == Phase.Scoring)
-                    {
-                        if (!_summary.Open) _summary.Start(Encounter.Columns);
-                        _stepStart = ColumnSums(Encounter.Model, true, _stepPlaces, record: true);
-                        return;
-                    }
-                    var now = Take();
-                    if (now == null) return;
-                    Say(EncounterDiff.Lines(_last, now));
-                    _last = now;
-                    _stepStart = ColumnSums(Encounter.Model, true, _stepPlaces, record: true);
-                }
-                catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's start failed: " + e.Message); }
+                try { __state = StepStart(__instance); }
+                catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's start failed: " + e); }
             }
 
             [HarmonyPostfix]
             private static void Postfix(ScoreColumnTask._Execute_d__1 __instance, bool __result, bool __state)
             {
-                try
-                {
-                    // The column and whether it is a mini-die's are read from the args on the first step;
-                    // how many dice it scores with stays in the args (Amount). The column lives in the
-                    // coroutine's closure (<>8__1.i) since build 26765983, a lambda capturing it.
-                    if (__state)
-                    {
-                        var closure = __instance.__8__1;
-                        if (closure == null) { CoreLog.Warning("EncounterEvents: a column's first step left no closure, column unknown"); return; }
-                        _column = closure.i;
-                        _columnMini = __instance._isMini_5__2;
-                        _columnDice = DiceCount(__instance.__4__this);
-                        // The Chrono Rift faces in the tray count as dice in every column with dice,
-                        // for the base dice only (as the game's label and its pair conditions count).
-                        _columnRift = _columnMini ? 0 : Encounter.RiftFaces();
-                    }
-                    if (__result || _column < 0 || _last == null || _stepStart == null) return;
-                    int column = _column;
-                    _column = -1;
-                    if (_summary.Open) { Tally(column); return; }
-                    var now = Take();
-                    var end = ColumnSums(Encounter.Model, true, _stepPlaces);
-                    if (now == null || end == null) return;
-                    var gains = new List<string>();
-                    for (int x = 0; x < end.Length; x++)
-                    {
-                        var gain = x < _stepStart.Length ? end[x] - _stepStart[x] : end[x];
-                        gains.Add(gain.ToDouble() != 0 ? gain.ToString() : null);
-                    }
-                    string mini = _columnMini ? GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice" : null;
-                    CoreLog.Info("EncounterEvents: column " + column + " scored with " + _columnDice + (_columnMini ? " mini" : "") + " dice, gains [" + string.Join(" ", gains.ConvertAll(g => g ?? "-")) + "]");
-                    Say(EncounterDiff.Step(_last, now, column, _columnDice, gains, mini, Combo(column - 1, _columnDice + _columnRift)));
-                    _last = now;
-                }
-                catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's end failed: " + e.Message); }
+                try { StepEnd(__instance, __result, __state); }
+                catch (Exception e) { CoreLog.Warning("EncounterEvents: a column's end failed: " + e); }
             }
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private static bool StepStart(ScoreColumnTask._Execute_d__1 step)
+            {
+                if (step.__1__state != 0 || _last == null || !Live(step.__4__this)) return false;
+                // Summarized: nothing said in the scoring, and the baseline kept from before it, so
+                // the shop's settled snapshot says what the whole turn changed, once.
+                if (Summary && Encounter.Phase == Phase.Scoring)
+                {
+                    if (!_summary.Open) _summary.Start(Encounter.Columns);
+                    _stepStart = ColumnSums(Encounter.Model, true, _stepPlaces, record: true);
+                    return true;
+                }
+                var now = Take();
+                if (now == null) return true;
+                Say(EncounterDiff.Lines(_last, now));
+                _last = now;
+                _stepStart = ColumnSums(Encounter.Model, true, _stepPlaces, record: true);
+                return true;
+            }
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private static void StepEnd(ScoreColumnTask._Execute_d__1 step, bool running, bool first)
+            {
+                if (first)
+                {
+                    var task = step.__4__this;
+                    _column = IntArg(task, ArgKey.Value, -1);
+                    _columnMini = BoolArg(task, ArgKey.IsMiniDice);
+                    _columnDice = DiceCount(task);
+                    // The Chrono Rift faces in the tray count as dice in every column with dice,
+                    // for the base dice only (as the game's label and its pair conditions count).
+                    _columnRift = _columnMini ? 0 : Encounter.RiftFaces();
+                    if (_column < 0) CoreLog.Warning("EncounterEvents: a column task carried no column (Value)");
+                }
+                if (running || _column < 0 || _last == null || _stepStart == null) return;
+                int column = _column;
+                _column = -1;
+                if (_summary.Open) { Tally(column); return; }
+                var now = Take();
+                var end = ColumnSums(Encounter.Model, true, _stepPlaces);
+                if (now == null || end == null) return;
+                var gains = new List<string>();
+                for (int x = 0; x < end.Length; x++)
+                {
+                    var gain = x < _stepStart.Length ? end[x] - _stepStart[x] : end[x];
+                    gains.Add(gain.ToDouble() != 0 ? gain.ToString() : null);
+                }
+                string mini = _columnMini ? GameLoc.Get("MiniDice_Keyword") ?? "Mini-Dice" : null;
+                CoreLog.Info("EncounterEvents: column " + column + " scored with " + _columnDice + (_columnMini ? " mini" : "") + " dice, gains [" + string.Join(" ", gains.ConvertAll(g => g ?? "-")) + "]");
+                Say(EncounterDiff.Step(_last, now, column, _columnDice, gains, mini, Combo(column - 1, _columnDice + _columnRift)));
+                _last = now;
+            }
+        }
+
+        private static int IntArg(ATask task, ArgKey key, int fallback)
+        {
+            try
+            {
+                if (task?.Args != null && task.Args.TryGetValue(key, out var value) && value != null) return value.Unbox<int>();
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterEvents: reading the task arg " + key + " failed: " + e.Message); }
+            return fallback;
+        }
+
+        private static bool BoolArg(ATask task, ArgKey key)
+        {
+            try
+            {
+                if (task?.Args != null && task.Args.TryGetValue(key, out var value) && value != null) return value.Unbox<bool>();
+            }
+            catch (Exception e) { CoreLog.Warning("EncounterEvents: reading the task arg " + key + " failed: " + e.Message); }
+            return false;
         }
 
         // A summarized turn's column: the attack every column gained in it, and a Mini-Dice pass's
